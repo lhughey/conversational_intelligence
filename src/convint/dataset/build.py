@@ -41,6 +41,37 @@ _ERA_MARKERS = {
 }
 
 
+def segment_threads(turns: list[str]) -> list[int]:
+    """Assign each turn a thread index, INDEPENDENTLY of any action label.
+
+    Independence is the point. Previously the weak label decided whether the
+    follow-up counter reset, the counter went into the state the gate reads,
+    and the gate's answer was scored against that same weak label - a loop. In
+    practice the counter stopped meaning "follow-ups spent on this topic" and
+    became "turns since the conversation began": 8 resets across 92 turns, one
+    walk reaching 13, and 29 items sitting above the ceiling as pure artifact.
+
+    A thread here is a run of turns in the same life domain, with unmarked
+    turns inheriting the domain of the turn before. Lexical-overlap rules were
+    tried and rejected: they cut a new thread almost every turn (mean length
+    1.2) because adjacent answers in these interviews genuinely share few
+    words - each one answers a different question. Domain-stickiness gives 24
+    threads at a mean length of 3.8, which matches how these walks actually
+    move: early life, then career, then outside work.
+    """
+    threads: list[int] = []
+    current = 0
+    last_era: str | None = None
+    for i, text in enumerate(turns):
+        era = _era(text) or last_era
+        if i > 0 and era is not None and last_era is not None and era != last_era:
+            current += 1
+        threads.append(current)
+        if era is not None:
+            last_era = era
+    return threads
+
+
 def _era(text: str) -> str | None:
     toks = set(content_tokens(text))
     hits = {era: len(toks & markers) for era, markers in _ERA_MARKERS.items()}
@@ -108,8 +139,14 @@ def build(assessor=None) -> tuple[list[Item], list[Label]]:
         components = SufficiencyComponents()
         followups = 0
         spec, own = Specificity.S0, Ownership.O0
+        threads = segment_threads(turns)
 
         for i, text in enumerate(turns):
+            # Thread boundaries come from the text, never from the label.
+            if i > 0 and threads[i] != threads[i - 1]:
+                followups = 0
+                components = SufficiencyComponents()
+                spec, own = Specificity.S0, Ownership.O0
             assessment = assessor.assess(text, components)
             components, spec, own = (
                 assessment.components, assessment.specificity, assessment.ownership
@@ -129,13 +166,10 @@ def build(assessor=None) -> tuple[list[Item], list[Label]]:
             label.item_id = item_id
             labels.append(label)
 
+            # Only follow-ups consume budget; the reset is handled above, by
+            # the text-derived thread boundary rather than by this label.
             if label.action is Action.FOLLOW_UP:
                 followups += 1
-            else:
-                # a new thread starts fresh
-                followups = 0
-                components = SufficiencyComponents()
-                spec, own = Specificity.S0, Ownership.O0
 
     return items, labels
 
