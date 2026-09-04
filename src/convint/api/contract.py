@@ -24,6 +24,9 @@ class Options(BaseModel):
     generate_text: bool = True
     #: "deterministic" needs no network; "llm" requires a configured adapter
     assess: str = "deterministic"
+    #: derive the user signal from the latest turn when the caller left it NONE.
+    #: Set false if the consumer classifies intent itself.
+    detect_signal: bool = True
 
 
 class TurnRequest(BaseModel):

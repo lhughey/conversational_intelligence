@@ -11,8 +11,11 @@ HTTP, or subprocess), and fully testable on its own.
 
 ```bash
 make setup
-make test        # 144 tests, no network, no API key, ~1s
-make bench       # assessor agreement + corpus replay, offline
+make test             # 194 tests, no network, no API key, ~1s
+make bench            # assessor agreement + corpus replay, offline
+make bench-gate       # gate vs turn-decision labels + dumb baselines, offline
+make bench-assessors  # compare assessors across 5 models (live, cached)
+make dataset          # rebuild the turn-decision dataset
 ```
 
 Optional, and they cost or bind ports:
@@ -65,32 +68,47 @@ occur.
 | `ports/` + `adapters/` — Anthropic, OpenAI, fake | done |
 | `app/` — turn engine, move selection, generation | done (single register) |
 | `api/` — HTTP, MCP, CLI | done |
-| `bench/` — assessor agreement, corpus replay | seed set only |
-| Labelled turn-decision dataset | **not built** — the next milestone |
-| Artifact emission | **not built** |
+| `adapters/` — deterministic, **LLM**, and **hybrid** assessors | done |
+| `adapters/cache.py` — content-addressed response cache | done |
+| `domain/signals.py` — user-intent detection | done |
+| `dataset/` — 92 turn-decision items + weak labels | done (labels weak) |
+| `bench/` — assessor agreement, gate evaluation, corpus replay | done |
+| `app/artifact_builder.py` — Read emission with a truth floor | done |
+| Human-adjudicated labels | **not built** — the next milestone |
+| Fixtures where advancing is correct | **not built** — see gate results |
 
 ## Benchmark results, honestly
 
-The deterministic (regex) assessor against 23 hand-labelled turns:
+Full detail in `bench-results/`. Two headline findings:
 
-| metric | value |
-|---|---|
-| specificity exact | 74% |
-| specificity within one level | 100% |
-| ownership exact | 91% |
+**The hybrid assessor beats every model alone**, on all five models tested.
+Specificity goes to the model, ownership to the rules:
 
-Three caveats that matter more than the numbers:
+| assessor | specificity | ownership | both |
+|---|---|---|---|
+| deterministic | 74% | **96%** | 70% |
+| llm / haiku-4-5 | **91%** | 65% | 65% |
+| **hybrid / haiku-4-5** | **91%** | **96%** | **87%** |
+| hybrid / opus-5 | 83% | 96% | 78% |
+| hybrid / gpt-4.1 | 78% | 96% | 78% |
 
-1. **The seed set was used for tuning.** After seeing the first run, the
-   signpost rule was added to fix a category of miss. That makes 74% a floor,
-   not an unbiased estimate. A held-out set is needed before this number means
-   anything comparative.
-2. **23 items, one labeller.** Enough to catch a broken assessor, not enough to
-   rank two good ones.
-3. **The gate rarely fires on merit.** Replaying all 92 corpus turns, `ceiling_reached`
-   fires 19 times against `gate_met` 4 times — the regex assessor mostly fails to
-   recognise sufficiency, so the ceiling carries the conversation. That is the
-   argument for the model-backed assessor, and the reason the port exists.
+**Specificity scales inversely with model capability** — haiku 91% > sonnet 87%
+> opus 83%, monotonic across three tiers. Stronger models interpret more
+generously and inflate S2 into S3, where the rubric asks for conservatism. So
+the recommended configuration is `hybrid/haiku-4-5`: 5× cheaper than Opus and
+more accurate on this task. Not the expected result, which is why it was worth
+measuring.
+
+**The gate evaluation is not yet conclusive**, and says so: `always_follow_up`
+beats the gate on strict accuracy (78% vs 60%) because 72 of 92 labels are
+`follow_up` — every golden transcript was written to punish premature advance
+and none to punish stalling. The metric pair still does its job (that policy
+scores 0% premature advance and 100% stall), but the corpus needs fixtures
+where advancing is correct before it can rank real policies.
+
+Caveats bounding all of it: 23 sufficiency labels and 92 **weak** gate labels,
+one labeller, tuned against the same set, no confidence intervals, and an
+effective n nearer 11 than 92 given correlated transcripts. Directional only.
 
 ## Testing
 

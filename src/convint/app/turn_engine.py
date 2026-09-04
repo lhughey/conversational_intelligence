@@ -9,8 +9,9 @@ from __future__ import annotations
 from ..adapters.assessor_deterministic import DeterministicAssessor
 from ..api.contract import Diagnostics, Message, StateDelta, TurnRequest, TurnResponse
 from ..domain.artifact import artifact_readiness
-from ..domain.enums import Action, Ownership, Specificity
+from ..domain.enums import Action, Ownership, Specificity, UserSignal
 from ..domain.gate import decide
+from ..domain.signals import detect_signal
 from ..domain.sufficiency import Assessment
 from ..ports.assessor import SufficiencyAssessor
 from ..ports.llm import LLMPort
@@ -29,6 +30,10 @@ class TurnEngine:
 
         topic = state.current_topic()
         last_user = state.last_user_turn()
+
+        # Only fills a gap the caller left; never overrides an explicit signal.
+        if request.options.detect_signal and state.signal is UserSignal.NONE and last_user:
+            state.signal = detect_signal(last_user.content)
 
         if topic is not None and last_user is not None:
             assessment = self.assessor.assess(last_user.content, topic.components)
@@ -59,6 +64,14 @@ class TurnEngine:
                 has_earlier_material=len([t for t in state.topics if t.topic_id != topic.topic_id]) > 0,
             )
 
+        # Synthesis: emit only when the material genuinely supports it. An
+        # unready close returns readiness.missing instead of a fabricated Read.
+        artifact = None
+        if decision.action is Action.SYNTHESIZE and self.llm is not None and readiness.ready:
+            from .artifact_builder import build_artifact
+
+            artifact = build_artifact(self.llm, state, plan)
+
         wants_text = request.options.generate_text and decision.action is not Action.SYNTHESIZE
         if wants_text and self.llm is not None:
             from .generator import generate
@@ -81,6 +94,7 @@ class TurnEngine:
             assessment=assessment,
             readiness=readiness,
             message=message,
+            artifact=artifact,
             state_delta=StateDelta(
                 topics=state.topics,
                 coverage=state.coverage,

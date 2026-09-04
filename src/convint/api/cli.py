@@ -30,6 +30,11 @@ def main(argv: list[str] | None = None) -> int:
 
     p_bench = sub.add_parser("bench", help="assessor agreement + corpus replay")
     p_bench.add_argument("--json", action="store_true", help="machine-readable output")
+    p_bench.add_argument("--gate", action="store_true",
+                         help="evaluate the gate against the turn-decision labels")
+
+    p_ds = sub.add_parser("dataset", help="turn-decision dataset")
+    p_ds.add_argument("dataset_command", choices=["build", "stats"])
     sub.add_parser("contract", help="print the JSON Schema this build speaks")
 
     args = parser.parse_args(argv)
@@ -42,7 +47,36 @@ def main(argv: list[str] | None = None) -> int:
         }, indent=2))
         return 0
 
+    if args.command == "dataset":
+        from ..dataset.build import build, load, write
+
+        if args.dataset_command == "build":
+            items, labels = build()
+            ip, lp = write(items, labels)
+            print(f"wrote {len(items)} items -> {ip}")
+            print(f"wrote {len(labels)} labels -> {lp}")
+            return 0
+
+        items, labels = load()
+        from collections import Counter
+
+        print(json.dumps({
+            "items": len(items),
+            "actions": dict(Counter(l.action.value for l in labels)),
+            "signals": dict(Counter(i.signal.value for i in items)),
+            "label_sources": dict(Counter(l.source for l in labels)),
+        }, indent=2))
+        return 0
+
     if args.command == "bench":
+        if args.gate:
+            from ..bench.gate_eval import format_report as gate_report
+            from ..bench.gate_eval import run as gate_run
+
+            result = gate_run()
+            print(json.dumps(result, indent=2) if args.json else gate_report(result))
+            return 0
+
         from ..adapters.assessor_deterministic import DeterministicAssessor
         from ..bench import corpus
         from ..bench.evaluate import evaluate, format_report

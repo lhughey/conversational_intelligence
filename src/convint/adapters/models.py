@@ -10,7 +10,12 @@ against the API on 2026-09-03:
 
     error: "`temperature` is deprecated for this model."
 
-So on the current Opus/Sonnet models the field is accepted only at its default,
+`output_config.effort` is a SECOND per-model capability, split the other way:
+supported on the Opus/Sonnet 5 family, rejected with 400 on haiku-4-5
+("This model does not support the effort parameter"). So the cheapest model is
+the only one with a sampling knob and the only one without a depth knob.
+
+So on the current Opus/Sonnet models the temperature field is accepted only at its default,
 where it is a no-op: there is no sampling control. Setting it uniformly across a
 model matrix produces an unfair comparison that looks fair, which is why this is
 validated at CONFIG LOAD rather than discovered at request time.
@@ -33,6 +38,8 @@ class ModelSpec(BaseModel):
     provider: str
     model_id: str
     supports_sampling: bool
+    #: `output_config.effort` - the depth lever. Rejected by 400 on haiku-4-5.
+    supports_effort: bool = True
     #: input/output USD per million tokens
     price_in: float = 0.0
     price_out: float = 0.0
@@ -46,6 +53,11 @@ class ModelSpec(BaseModel):
             raise ValueError(
                 f"{self.model_id} does not support `temperature` "
                 f"(got {self.temperature}); the API returns 400. Omit it."
+            )
+        if self.effort is not None and not self.supports_effort:
+            raise ValueError(
+                f"{self.model_id} does not support `effort` (got {self.effort!r}); "
+                "the API returns 400. Omit it."
             )
         return self
 
@@ -61,9 +73,29 @@ REGISTRY: dict[str, ModelSpec] = {
         ModelSpec(key="sonnet-5", provider=ANTHROPIC, model_id="claude-sonnet-5",
                   supports_sampling=False, price_in=3.0, price_out=15.0),
         ModelSpec(key="haiku-4-5", provider=ANTHROPIC, model_id="claude-haiku-4-5",
-                  supports_sampling=True, price_in=1.0, price_out=5.0),
+                  supports_sampling=True, supports_effort=False,
+                  price_in=1.0, price_out=5.0),
+        # OpenAI: sampling is available, `effort` is Anthropic-specific.
+        ModelSpec(key="gpt-4.1", provider=OPENAI, model_id="gpt-4.1",
+                  supports_sampling=True, supports_effort=False,
+                  price_in=2.0, price_out=8.0),
+        ModelSpec(key="gpt-4.1-mini", provider=OPENAI, model_id="gpt-4.1-mini",
+                  supports_sampling=True, supports_effort=False,
+                  price_in=0.4, price_out=1.6),
     ]
 }
+
+
+def build_llm(key: str, **overrides):
+    """Construct the right adapter for a registry key."""
+    s = spec(key, **overrides)
+    if s.provider == ANTHROPIC:
+        from .llm_anthropic import AnthropicLLM
+
+        return AnthropicLLM(s)
+    from .llm_openai import OpenAILLM
+
+    return OpenAILLM(s.model_id, temperature=s.temperature)
 
 
 def spec(key: str, **overrides) -> ModelSpec:

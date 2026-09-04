@@ -76,3 +76,71 @@ def test_haiku_still_accepts_sampling_through_extra_body():
         messages=[LLMMessage(role="user", content="hi")], max_tokens=8,
     ))
     assert resp.text.strip()
+
+
+# --- assessor + artifact, against real models ------------------------------
+
+@requires_key
+def test_llm_assessor_classifies_the_canonical_cases():
+    """The three cases that separate the axes. Cached, so re-runs are free."""
+    from convint.adapters.assessor_llm import LLMAssessor
+    from convint.adapters.cache import CachingLLM
+    from convint.adapters.models import build_llm
+    from convint.domain import Ownership, Specificity
+    from convint.domain.sufficiency import SufficiencyComponents
+
+    a = LLMAssessor(CachingLLM(build_llm("haiku-4-5"), mode="rw"))
+
+    episode = a.assess(
+        "I remember one woman, furious about a dress. It was her daughter's graduation "
+        "and she was terrified of looking poor. I told my mom that. She comped the "
+        "cleaning and the woman cried.", SufficiencyComponents())
+    assert episode.specificity is Specificity.S3
+
+    confirmation = a.assess("Yes. That lands. That's me.", SufficiencyComponents())
+    assert confirmation.specificity is Specificity.S0, "a confirmation is a signpost, not material"
+
+
+@requires_key
+def test_artifact_emission_respects_the_truth_floor_live():
+    """A real model, a real Read, and the quote check run over its actual output."""
+    from convint.adapters.cache import CachingLLM
+    from convint.adapters.models import build_llm
+    from convint.app.artifact_builder import build_artifact, verify_quotes
+    from convint.domain import (
+        ConversationState, Ownership, Specificity, TopicRecord, Turn,
+    )
+
+    plan = InterviewPlan(
+        plan_id="live",
+        stages=[StageSpec(stage_id="early_life"), StageSpec(stage_id="career")],
+        topics=[TopicSpec(topic_id="childhood", stage="early_life"),
+                TopicSpec(topic_id="role", stage="career")],
+    )
+    state = ConversationState(
+        turns=[
+            Turn(role="user", content=(
+                "I remember one woman, furious about a dress. It was her daughter's "
+                "graduation and she was terrified of looking poor. I told my mom that. "
+                "She comped the cleaning and the woman cried.")),
+            Turn(role="user", content=(
+                "Billing and clinical blamed each other for months. I saw they were "
+                "using the same word to mean different things. I got them in a room "
+                "and the standoff dissolved in one session.")),
+        ],
+        topics=[
+            TopicRecord(topic_id="childhood", stage="early_life",
+                        specificity=Specificity.S3, ownership=Ownership.O1),
+            TopicRecord(topic_id="role", stage="career",
+                        specificity=Specificity.S3, ownership=Ownership.O1),
+        ],
+        coverage={"early_life": True, "career": True},
+        pattern_confirmed=True,
+    )
+
+    artifact = build_artifact(
+        CachingLLM(build_llm("haiku-4-5"), mode="rw"), state, plan
+    )
+    assert artifact["headline"].strip()
+    assert verify_quotes(artifact, state) == []
+    assert artifact["evidence"][0]["tier"] == "lived_episode"

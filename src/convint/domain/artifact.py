@@ -10,9 +10,9 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
-from .enums import Specificity
+from .enums import Ownership, Specificity
 from .plan import InterviewPlan
-from .state import ConversationState
+from .state import ConversationState, TopicRecord
 
 #: A pattern is a disposition only if it shows up in more than one domain.
 #: One domain is a job skill.
@@ -52,3 +52,70 @@ def artifact_readiness(state: ConversationState, plan: InterviewPlan) -> Artifac
         episodes=episodes,
         distinct_stages=len(grounded_stages),
     )
+
+
+# --------------------------------------------------------------------------
+# Evidence tiering
+# --------------------------------------------------------------------------
+
+#: Evidence strength, strongest first. Derived from the specificity ladder
+#: rather than invented separately, so tiering falls out of assessment instead
+#: of becoming a second judgement that can disagree with the first.
+TIER_BY_SPECIFICITY = {
+    Specificity.S3: "lived_episode",       # a bounded event they lived
+    Specificity.S2: "recurring_practice",  # something they repeatedly do
+    Specificity.S1: "self_report",         # a claim about themselves
+    Specificity.S0: "unsupported",         # nothing to stand on
+}
+
+TIER_RANK = {
+    "lived_episode": 3, "recurring_practice": 2, "self_report": 1, "unsupported": 0,
+}
+
+
+class EvidenceItem(BaseModel):
+    """One proof point. `where` is the topic it came from; `tier` is how much
+    weight it can carry."""
+
+    where: str
+    body: str
+    tier: str
+    specificity: Specificity
+    ownership: Ownership
+
+
+def tier_for(specificity: Specificity) -> str:
+    return TIER_BY_SPECIFICITY[specificity]
+
+
+def collect_evidence(state: ConversationState, min_tier: str = "recurring_practice") -> list[EvidenceItem]:
+    """Gather usable evidence, strongest first.
+
+    Anything below `min_tier` is excluded rather than padded - a Read built on
+    self-report is the horoscope failure, and the truth floor means emitting
+    less is always preferable to emitting more.
+    """
+    floor = TIER_RANK[min_tier]
+    items: list[EvidenceItem] = []
+    for topic in state.topics:
+        tier = tier_for(topic.specificity)
+        if TIER_RANK[tier] < floor:
+            continue
+        body = _best_quote(state, topic)
+        if not body:
+            continue
+        items.append(EvidenceItem(
+            where=topic.topic_id, body=body, tier=tier,
+            specificity=topic.specificity, ownership=topic.ownership,
+        ))
+    return sorted(items, key=lambda e: TIER_RANK[e.tier], reverse=True)
+
+
+def _best_quote(state: ConversationState, topic: TopicRecord) -> str:
+    """The longest user turn, as a stand-in for the moment this topic rests on.
+
+    Deliberately a verbatim quote: the truth floor requires evidence the user
+    actually produced, never a paraphrase that could drift.
+    """
+    user_turns = [t.content for t in state.turns if t.role == "user"]
+    return max(user_turns, key=len, default="")

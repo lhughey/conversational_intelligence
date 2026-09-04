@@ -37,6 +37,13 @@ class OpenAILLM:
         }
         if self.temperature is not None:
             kwargs["temperature"] = self.temperature
+        if request.response_schema is not None:
+            kwargs["response_format"] = {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "assessment", "strict": True, "schema": request.response_schema
+                },
+            }
 
         started = time.monotonic()
         resp = self.client.chat.completions.create(**kwargs)

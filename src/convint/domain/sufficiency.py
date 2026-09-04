@@ -105,12 +105,14 @@ _OUTCOME = [
 ]
 _REFLECTION = [
     r"\bI think I(?:'ve)?\b", r"\bI've always\b", r"\bI realize\b", r"\bI guess I(?:'m| am)\b",
-    r"\bwhat I care about\b", r"\bthat's me\b", r"\bI never thought of\b",
+    r"\bwhat I care about\b", r"\bI never thought of\b",
     r"\bit's how I\b", r"\bthat's the thing I\b", r"\blooking back\b",
 ]
 _CONFIRMATION = [
     r"^\s*(?:yes|yeah|yep|exactly|right)\b", r"\bthat lands\b", r"\bthat's exactly it\b",
     r"\bthat's it\b", r"\byou nailed it\b", r"\bI see it now\b",
+    # "that's me" ACCEPTS a framing; it does not derive one. O1, not O2.
+    r"\bthat's me\b",
 ]
 _SELF_LABEL = [
     r"\bI'm a\b", r"\bI am a\b", r"\bI'm the\b", r"\bmy pattern is\b",

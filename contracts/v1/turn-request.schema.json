@@ -114,6 +114,11 @@
           "title": "Assess",
           "type": "string"
         },
+        "detect_signal": {
+          "default": true,
+          "title": "Detect Signal",
+          "type": "boolean"
+        },
         "generate_text": {
           "default": true,
           "title": "Generate Text",

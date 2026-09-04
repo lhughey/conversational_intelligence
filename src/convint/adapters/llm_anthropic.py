@@ -38,9 +38,20 @@ class AnthropicLLM:
                 if m.role in ("user", "assistant")
             ],
         }
+        output_config: dict = {}
+        # Effort is a hint: dropped rather than fatal when the model lacks it,
+        # since it changes depth but not meaning. Sampling is different - it is
+        # validated at config load because it silently skews a comparison.
         effort = request.effort or self.spec.effort
-        if effort:
-            kwargs["output_config"] = {"effort": effort}
+        if effort and self.spec.supports_effort:
+            output_config["effort"] = effort
+        if request.response_schema is not None:
+            # Verified shape: output_config.format.type must be "json_schema".
+            output_config["format"] = {
+                "type": "json_schema", "schema": request.response_schema
+            }
+        if output_config:
+            kwargs["output_config"] = output_config
         # Sampling, when the model supports it at all, must go through
         # `extra_body`: anthropic-sdk 1.x removed `temperature`/`top_p`/`top_k`
         # from messages.create() entirely, so passing them as keywords raises

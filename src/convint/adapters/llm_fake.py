@@ -12,9 +12,16 @@ import json
 from ..ports.llm import LLMRequest, LLMResponse
 
 
-def request_key(request: LLMRequest) -> str:
+def request_key(request: LLMRequest, model_id: str = "") -> str:
+    """Content address for a request.
+
+    `model_id` is part of the key: identical prompts to different models are
+    different requests, and conflating them silently swaps one model's answers
+    for another's.
+    """
     payload = json.dumps(
-        request.model_dump(), sort_keys=True, ensure_ascii=False, separators=(",", ":")
+        {"model": model_id, "request": request.model_dump()},
+        sort_keys=True, ensure_ascii=False, separators=(",", ":"),
     )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
