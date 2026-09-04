@@ -1,15 +1,23 @@
 {
-  "run_at": "2026-09-03T22:59:36-05:00",
+  "run_at": "2026-09-03T23:03:32-05:00",
   "tag": "full",
   "live": true,
   "git": {
-    "commit": "46ab11b141a2d9033cf3086a135ff014adda9722",
+    "commit": "ebe755f08c20d66a196831d037c99807d6cff1ee",
     "branch": "main",
     "dirty": true,
     "dirty_files": [
-      "Makefile",
       "bench-results/LATEST.md",
-      "scripts/testbed.py"
+      "scripts/testbed.py",
+      "src/convint/app/generator.py",
+      "src/convint/domain/text.py",
+      "tests/test_engine.py",
+      "tests/test_live_adapter.py",
+      "tests/test_text.py",
+      "bench-results/testbed-2026-09-03T230002-clean.json",
+      "bench-results/testbed-2026-09-03T230002-clean.md",
+      "bench-results/testbed-2026-09-03T230204-full.json",
+      "bench-results/testbed-2026-09-03T230204-full.md"
     ]
   },
   "platform": {
@@ -36,36 +44,36 @@
       "suite": "offline",
       "exit_code": 0,
       "ok": true,
-      "summary": "210 passed, 0 failed, 0 errored, 0 skipped in 0.90s",
-      "tests": 210,
+      "summary": "213 passed, 0 failed, 0 errored, 0 skipped in 0.96s",
+      "tests": 213,
       "failures": 0,
       "errors": 0,
       "skipped": 0,
-      "time": 0.903,
-      "passed": 210
+      "time": 0.959,
+      "passed": 213
     },
     {
       "suite": "e2e",
       "exit_code": 0,
       "ok": true,
-      "summary": "1 passed, 0 failed, 0 errored, 0 skipped in 0.66s",
+      "summary": "1 passed, 0 failed, 0 errored, 0 skipped in 0.56s",
       "tests": 1,
       "failures": 0,
       "errors": 0,
       "skipped": 0,
-      "time": 0.656,
+      "time": 0.557,
       "passed": 1
     },
     {
       "suite": "live",
       "exit_code": 0,
       "ok": true,
-      "summary": "5 passed, 0 failed, 0 errored, 0 skipped in 2.48s",
+      "summary": "5 passed, 0 failed, 0 errored, 0 skipped in 2.08s",
       "tests": 5,
       "failures": 0,
       "errors": 0,
       "skipped": 0,
-      "time": 2.477,
+      "time": 2.075,
       "passed": 5
     }
   ],
@@ -361,5 +369,13 @@
       "ownership_exact": 0.9565217391304348,
       "both_exact": 0.782608695652174
     }
+  },
+  "invariants": {
+    "samples": 6,
+    "single_question_rate": 1.0,
+    "ends_with_question_rate": 1.0,
+    "grounded_rate": 1.0,
+    "mean_words": 13.833333333333334,
+    "errors": []
   }
 }

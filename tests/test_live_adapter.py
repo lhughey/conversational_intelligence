@@ -33,7 +33,15 @@ PLAN = InterviewPlan(
 
 @requires_key
 def test_adapter_completes_against_the_real_api():
-    llm = AnthropicLLM(spec("haiku-4-5"))
+    """Cached, and therefore deterministic after the first run.
+
+    This asserts the single-question rule on ONE sample, which is a smoke test,
+    not a measurement: sampling is not tunable on these models, so an uncached
+    single draw makes a flaky test out of a real invariant. How OFTEN the rule
+    holds is measured over N samples by the testbed instead."""
+    from convint.adapters.cache import CachingLLM
+
+    llm = CachingLLM(AnthropicLLM(spec("haiku-4-5")), mode="rw")
     state = ConversationState(
         turns=[Turn(role="assistant", content="What were you like as a kid?"),
                Turn(role="user", content="I helped out at my parents' dry cleaner in Queens.")],

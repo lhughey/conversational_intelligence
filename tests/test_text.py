@@ -53,3 +53,15 @@ def test_question_helpers():
     assert question_count("a? b?") == 2
     assert ends_with_question("really?  ")
     assert not ends_with_question("really")
+
+
+def test_possessives_lose_their_trailing_apostrophe():
+    """`parents'` kept its apostrophe and so never matched `parents`, silently
+    costing grounding credit on exactly the concrete nouns that matter most."""
+    assert "parents" in content_tokens("my parents' dry cleaner")
+    assert "parents'" not in content_tokens("my parents' dry cleaner")
+
+
+def test_possessive_grounding_now_matches():
+    user = "I helped at my parents' dry cleaner in Queens."
+    assert "parents" in grounding_overlap("What did your parents do there?", user)

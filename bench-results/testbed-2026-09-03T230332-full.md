@@ -1,16 +1,16 @@
-# Testbed run — 2026-09-03T22:59:36-05:00
+# Testbed run — 2026-09-03T23:03:32-05:00
 
-**commit** `46ab11b141a2` on `main`  ⚠️ **DIRTY TREE — not reproducible**
+**commit** `ebe755f08c20` on `main`  ⚠️ **DIRTY TREE — not reproducible**
 **mode** live (model calls made) · python 3.13.4
 
 ## Suites
 
 | suite | result | detail |
 |---|---|---|
-| offline | PASS | 210 passed, 0 failed, 0 errored, 0 skipped in 0.90s |
-| e2e | PASS | 1 passed, 0 failed, 0 errored, 0 skipped in 0.66s |
-| live | PASS | 5 passed, 0 failed, 0 errored, 0 skipped in 2.48s |
-| **total** | | **216 tests passed** |
+| offline | PASS | 213 passed, 0 failed, 0 errored, 0 skipped in 0.96s |
+| e2e | PASS | 1 passed, 0 failed, 0 errored, 0 skipped in 0.56s |
+| live | PASS | 5 passed, 0 failed, 0 errored, 0 skipped in 2.08s |
+| **total** | | **219 tests passed** |
 | coverage | 85% | statements |
 
 ## Dataset
@@ -67,6 +67,19 @@
 | hybrid/gpt-4.1-mini | 23 | 74% | 100% | 96% | 70% |
 | llm/gpt-4.1 | 23 | 78% | 100% | 87% | 65% |
 | hybrid/gpt-4.1 | 23 | 78% | 100% | 96% | 78% |
+
+## Generation invariants (live, cache off)
+
+Measured over 6 fresh samples, because sampling is not
+tunable on these models and a single draw cannot establish a rate.
+
+| property | rate |
+|---|---|
+| exactly one question | 100% |
+| ends with the question | 100% |
+| grounded in the user's words | 100% |
+| mean length | 14 words |
+
 
 ## Corpus replay
 

@@ -24,7 +24,18 @@ why will with would yeah yes you your youre
 
 
 def tokens(text: str) -> list[str]:
-    return [m.group(0).lower() for m in _WORD.finditer(text)]
+    """Lowercased words, with edge punctuation stripped.
+
+    The strip matters: a possessive like `parents'` kept its trailing
+    apostrophe and so never matched `parents`, silently costing grounding
+    credit on exactly the concrete nouns that matter most.
+    """
+    out = []
+    for match in _WORD.finditer(text):
+        word = match.group(0).lower().strip("'-")
+        if word:
+            out.append(word)
+    return out
 
 
 def content_tokens(text: str) -> list[str]:

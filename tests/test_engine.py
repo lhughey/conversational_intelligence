@@ -165,3 +165,15 @@ def test_rich_material_advances_after_the_floor():
     second = engine.run(_req(state))
     assert second.decision.action is Action.ADVANCE
     assert second.decision.completion_signal == "childhood_complete"
+
+
+def test_generated_question_is_anchored_in_concrete_nouns():
+    """The prompt hands the model the user's actual nouns. Measured live, asking
+    it to 'use their words' without doing so produced a 0% grounding rate."""
+    from convint.app.generator import build_request
+
+    state = _state(user_text="I helped at my parents' dry cleaner in Queens.")
+    from convint.domain.gate import decide
+    request = build_request(state, decide(state, PLAN), None)
+    instruction = request.messages[-1].content
+    assert "dry" in instruction and "cleaner" in instruction and "queens" in instruction

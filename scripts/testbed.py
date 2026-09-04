@@ -155,6 +155,61 @@ def _slim(result) -> dict:
             ("n", "specificity_exact", "specificity_within_1", "ownership_exact", "both_exact")}
 
 
+def run_invariant_sampling(samples: int = 6) -> dict:
+    """Measure how often generation obeys the single-question rule.
+
+    A stochastic property needs a rate, not a single assertion. Sampling is not
+    tunable on the current Opus/Sonnet models, so run-to-run variation is
+    inherent and the honest report is a proportion over N draws with the cache
+    deliberately OFF.
+    """
+    from convint.adapters.models import build_llm
+    from convint.api.contract import Options, TurnRequest
+    from convint.app.turn_engine import TurnEngine
+    from convint.domain import (
+        ConversationState, InterviewPlan, StageSpec, TopicRecord, TopicSpec, Turn,
+    )
+    from convint.domain.text import ends_with_question, question_count
+
+    plan = InterviewPlan(
+        plan_id="probe",
+        stages=[StageSpec(stage_id="early_life", completion_signal="childhood_complete")],
+        topics=[TopicSpec(topic_id="childhood", stage="early_life")],
+    )
+    state = ConversationState(
+        turns=[Turn(role="assistant", content="What were you like as a kid?"),
+               Turn(role="user", content="I helped at my parents' dry cleaner in Queens.")],
+        topics=[TopicRecord(topic_id="childhood", stage="early_life")],
+        current_topic_id="childhood",
+    )
+
+    single, ends_q, grounded, lengths, errors = 0, 0, 0, [], []
+    for _ in range(samples):
+        try:
+            engine = TurnEngine(llm=build_llm("haiku-4-5"))
+            resp = engine.run(TurnRequest(plan=plan, state=state,
+                                          options=Options(generate_text=True)))
+            text = resp.message.text
+            single += question_count(text) == 1
+            ends_q += ends_with_question(text)
+            grounded += bool(resp.message.grounded_on)
+            lengths.append(len(text.split()))
+        except Exception as exc:
+            errors.append(str(exc)[:120])
+
+    n = samples - len(errors)
+    if n == 0:
+        return {"samples": samples, "error": errors[0] if errors else "all failed"}
+    return {
+        "samples": n,
+        "single_question_rate": single / n,
+        "ends_with_question_rate": ends_q / n,
+        "grounded_rate": grounded / n,
+        "mean_words": sum(lengths) / len(lengths),
+        "errors": errors,
+    }
+
+
 def dataset_stats() -> dict:
     from convint.dataset.build import build
     from convint.dataset.synth import build_from_banks, minimal_pairs
@@ -220,6 +275,12 @@ def main() -> int:
     record["gate"] = run_gate_splits()
     record["corpus_replay"] = run_corpus_replay()
     record["assessors"] = run_assessors(args.live)
+    if args.live:
+        record["invariants"] = run_invariant_sampling()
+        inv = record["invariants"]
+        if "error" not in inv:
+            print(f"  {'invariants':<10} single-question {inv['single_question_rate']:.0%} "
+                  f"of {inv['samples']} samples, grounded {inv['grounded_rate']:.0%}")
     print(f"  {'benchmarks':<10} done")
 
     stamp = started.strftime("%Y-%m-%dT%H%M%S")
@@ -301,6 +362,17 @@ def render(r: dict) -> str:
             f"| {name} | {m['n']} | {m['specificity_exact']:.0%} | "
             f"{m['specificity_within_1']:.0%} | {m['ownership_exact']:.0%} | {m['both_exact']:.0%} |"
         )
+
+    inv = r.get("invariants")
+    if inv and "error" not in inv:
+        lines += ["", "## Generation invariants (live, cache off)", "",
+                  f"Measured over {inv['samples']} fresh samples, because sampling is not",
+                  "tunable on these models and a single draw cannot establish a rate.", "",
+                  "| property | rate |", "|---|---|",
+                  f"| exactly one question | {inv['single_question_rate']:.0%} |",
+                  f"| ends with the question | {inv['ends_with_question_rate']:.0%} |",
+                  f"| grounded in the user's words | {inv['grounded_rate']:.0%} |",
+                  f"| mean length | {inv['mean_words']:.0f} words |", ""]
 
     cr = r["corpus_replay"]
     lines += ["", "## Corpus replay", "",

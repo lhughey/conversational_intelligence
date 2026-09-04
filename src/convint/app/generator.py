@@ -12,7 +12,7 @@ import time
 from ..domain.enums import Action, MoveType
 from ..domain.gate import Decision
 from ..domain.state import ConversationState
-from ..domain.text import grounding_overlap
+from ..domain.text import content_tokens, grounding_overlap
 from ..ports.llm import LLMMessage, LLMPort, LLMRequest
 
 SYSTEM = """\
@@ -21,8 +21,11 @@ encouraging.
 
 Rules, all of them hard:
 - Ask exactly ONE question, then stop. Never stack questions.
-- Use the person's own words and concrete details. Never invent biography, \
-numbers, names, or events they did not state.
+- Name at least one CONCRETE THING they just mentioned - the place, the person, \
+the object. Do not fall back on "there", "that", or "it" when you could say the \
+thing itself. A question that would read identically to any other person has \
+failed, however well phrased.
+- Never invent biography, numbers, names, or events they did not state.
 - Reflect only what they actually said. Do not supply meaning they have not \
 produced themselves.
 - Be brief. A short, specific question beats a long, warm one.
@@ -81,9 +84,23 @@ def build_request(
             move or MoveType.REFLECT_AND_CHECK, _MOVE_INSTRUCTION[MoveType.REFLECT_AND_CHECK]
         )
 
+    # Surface the concrete nouns explicitly. Asking the model to "use their
+    # words" is not enough on its own: measured over 6 fresh samples the
+    # grounding rate was 0% - it wrote "working there" rather than naming the
+    # dry cleaner. Handing it the actual nouns is what closes that gap.
+    last_user = state.last_user_turn()
+    anchors = content_tokens(last_user.content)[:12] if last_user else []
+    anchor_note = (
+        f"\nConcrete things they just said: {', '.join(anchors)}. "
+        "Use at least one of these words literally."
+        if anchors else ""
+    )
+
     return LLMRequest(
         system=SYSTEM,
-        messages=_recent(state) + [LLMMessage(role="user", content=f"[instruction] {instruction}")],
+        messages=_recent(state) + [
+            LLMMessage(role="user", content=f"[instruction] {instruction}{anchor_note}")
+        ],
         max_tokens=max_tokens,
     )
 
