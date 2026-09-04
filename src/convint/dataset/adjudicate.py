@@ -88,9 +88,13 @@ def run_session(split: str, limit: int, disagreements_only: bool) -> int:  # pra
     print("=" * 78)
     print(f"  {total} item(s) queued in '{split}'; showing {len(shown)}.")
     print()
-    print("  For each one: given only what the person has said so far, and how many")
-    print("  follow-ups have already been spent on this thread — should the interviewer")
-    print("  ask another question about THIS thread, move on, or close and synthesize?")
+    print("  The '·' lines are the person's EARLIER answers, for context.")
+    print("  'THE TURN TO JUDGE' is their latest answer — that is what you are judging.")
+    print("  (Only the person's side is shown: these transcripts store user turns only.)")
+    print()
+    print("  Given all that, and how many follow-ups this thread has already used —")
+    print("  should the interviewer ask another question about THIS thread, move on,")
+    print("  or close and synthesize?")
     print()
     print("  [f] follow_up   [a] advance   [s] synthesize   [r] refuse")
     print("  [enter] accept the proposal    [?] why this item    [q] save and quit")
@@ -111,9 +115,19 @@ def run_session(split: str, limit: int, disagreements_only: bool) -> int:  # pra
               f"follow-ups spent: {item.followups_used} "
               f"(floor {item.floor}, ceiling {item.ceiling})   "
               f"signal: {item.signal.value}")
-        print(f"│  rule proposes: {label.action.value}")
+        # Name the proposal's provenance honestly: on the corpus split it is
+        # NOT the written rule, it is what the transcript's own next turn
+        # implies the interviewer must have asked.
+        origin = {
+            "weak": "transcript's next turn implies",
+            "spec": "written rule proposes",
+            "human": "previously recorded",
+        }.get(label.source, label.source)
+        print(f"│  {origin}: {label.action.value}")
+        print(f"│    ({label.rationale})")
         if disagreement:
-            print(f"│  implementation says: {disagreement}   <- they disagree, so your call settles it")
+            print(f"│  this code's gate would: {disagreement}")
+            print("│    <- they disagree, so your call settles it")
         print("└" + "─" * 60)
 
         chosen = None
@@ -126,7 +140,12 @@ def run_session(split: str, limit: int, disagreements_only: bool) -> int:  # pra
                 print(f"\nSaved {count} adjudication(s) -> {HUMAN}")
                 return 0
             if answer == "?":
-                print(f"  rationale: {label.rationale}")
+                print(f"  proposal source : {label.source}"
+                      f" ({'inferred from the next turn' if label.source == 'weak' else 'from the written rule'})")
+                print(f"  rationale       : {label.rationale}")
+                print(f"  sufficiency     : {item.specificity.value} = how concrete the material is;"
+                      f" {item.ownership.value} = who did the meaning-making")
+                print(f"  floor / ceiling : must ask at least {item.floor}, may not exceed {item.ceiling}")
                 continue
             if answer == "":
                 chosen = label.action.value
