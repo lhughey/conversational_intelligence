@@ -6,9 +6,9 @@
 
 from __future__ import annotations
 
-import os
-
 import pytest
+
+from convint import config
 
 from convint.adapters.llm_anthropic import AnthropicLLM
 from convint.adapters.models import spec
@@ -20,7 +20,8 @@ from convint.domain import (
 
 pytestmark = pytest.mark.live
 
-_HAS_KEY = bool(os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN"))
+config.load()  # this repo's .env only
+_HAS_KEY = config.has("ANTHROPIC_API_KEY") or config.has("ANTHROPIC_AUTH_TOKEN")
 requires_key = pytest.mark.skipif(not _HAS_KEY, reason="no Anthropic credential in the environment")
 
 PLAN = InterviewPlan(

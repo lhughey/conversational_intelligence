@@ -19,6 +19,7 @@ from ..domain.plan import Budget, InterviewPlan, StageSpec, TopicSpec
 from ..domain.state import ConversationState, TopicRecord, Turn
 from ..dataset.build import load
 from ..dataset.schema import Item, Label
+from ..dataset.synth import minimal_pairs
 
 
 def _plan(item: Item) -> InterviewPlan:
@@ -79,7 +80,8 @@ POLICIES = {
 
 # --- metrics ---------------------------------------------------------------
 
-def evaluate_policy(policy, items: list[Item], labels: dict[str, Label]) -> dict:
+def evaluate_policy(policy, items: list[Item], labels: dict[str, Label],
+                    pairs: list[tuple[str, str]] | None = None) -> dict:
     correct = strict = 0
     prem_n = prem_hit = stall_n = stall_hit = 0
 
@@ -100,9 +102,22 @@ def evaluate_policy(policy, items: list[Item], labels: dict[str, Label]) -> dict
             stall_n += 1
             stall_hit += predicted is Action.FOLLOW_UP
 
+    pair_total = pair_ok = 0
+    if pairs:
+        predictions = {i.item_id: policy(i) for i in items}
+        for a, b in pairs:
+            if a in predictions and b in predictions:
+                pair_total += 1
+                pair_ok += (
+                    labels[a].is_correct(predictions[a])
+                    and labels[b].is_correct(predictions[b])
+                )
+
     n = len(items)
     return {
         "n": n,
+        "minimal_pair_accuracy": (pair_ok / pair_total) if pair_total else None,
+        "minimal_pair_n": pair_total,
         "accuracy_strict": strict / n,
         "accuracy_acceptable": correct / n,
         "premature_advance_rate": (prem_hit / prem_n) if prem_n else None,
@@ -112,25 +127,55 @@ def evaluate_policy(policy, items: list[Item], labels: dict[str, Label]) -> dict
     }
 
 
-def run() -> dict:
-    items, label_list = load()
+def run(split: str = "synth") -> dict:
+    """Evaluate on one split. `synth` is balanced and carries minimal pairs;
+    `corpus` is realistic but skewed and weakly labelled."""
+    from ..dataset.build import build
+    from ..dataset.synth import build_from_banks
+
+    items, label_list = build_from_banks() if split == "synth" else build()
     labels = {l.item_id: l for l in label_list}
-    return {name: evaluate_policy(fn, items, labels) for name, fn in POLICIES.items()}
+    pairs = minimal_pairs(items, label_list) if split == "synth" else []
+    return {
+        name: evaluate_policy(fn, items, labels, pairs)
+        for name, fn in POLICIES.items()
+    }
 
 
-def format_report(result: dict) -> str:
+PROVENANCE = {
+    "synth": (
+        "labels are SPEC-derived (from the written rule, not human judgement).\n"
+        "  This measures CONFORMANCE and COVERAGE, not whether the rule is right.\n"
+        "  The gate scoring 100% here is expected and proves nothing about validity;\n"
+        "  the informative numbers are the BASELINES - note budget_only at 88%\n"
+        "  accuracy but 0% on minimal pairs, i.e. accurate-looking while blind to\n"
+        "  sufficiency."
+    ),
+    "corpus": (
+        "labels are WEAK (inferred from each transcript's own next user turn).\n"
+        "  Realistic but skewed: every golden punishes premature advance and none\n"
+        "  punishes stalling, so always_follow_up looks strong. Directional only."
+    ),
+    "human": "labels are HUMAN-ADJUDICATED. These are the only validity evidence.",
+}
+
+
+def format_report(result: dict, split: str = "synth") -> str:
     lines = [
-        "gate evaluation  (labels are WEAK - derived from each transcript's own",
-        "next turn, not independent human judgement. Directional only.)",
+        f"gate evaluation — split: {split}",
+        f"  {PROVENANCE.get(split, '')}",
         "",
-        f"  {'policy':<20} {'acc':>6} {'acc±':>6} {'premature↓':>11} {'stall↓':>8}",
+    ]
+    lines += [
+        f"  {'policy':<20} {'acc':>6} {'premature↓':>11} {'stall↓':>8} {'pairs':>7}",
     ]
     for name, m in result.items():
         prem = f"{m['premature_advance_rate']:.0%}" if m["premature_advance_rate"] is not None else "  n/a"
         stall = f"{m['stall_rate']:.0%}" if m["stall_rate"] is not None else "  n/a"
+        pair = f"{m['minimal_pair_accuracy']:.0%}" if m["minimal_pair_accuracy"] is not None else "  n/a"
         lines.append(
-            f"  {name:<20} {m['accuracy_strict']:>6.0%} {m['accuracy_acceptable']:>6.0%}"
-            f" {prem:>11} {stall:>8}"
+            f"  {name:<20} {m['accuracy_strict']:>6.0%}"
+            f" {prem:>11} {stall:>8} {pair:>7}"
         )
     first = next(iter(result.values()))
     lines += ["", f"  premature-advance denominator: {first['premature_advance_n']} items"

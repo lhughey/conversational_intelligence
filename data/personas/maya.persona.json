@@ -1,0 +1,177 @@
+{
+  "persona_id": "maya",
+  "display_name": "Maya",
+  "one_line": "Articulate healthcare-ops executive; gives episodes when drawn out.",
+  "synthetic": true,
+  "topics": [
+    {
+      "topic_id": "childhood.dry_cleaner",
+      "stage": "early_life",
+      "intents": [
+        "ask_childhood",
+        "ask_early_memory",
+        "ask_what_you_loved_as_kid"
+      ],
+      "rungs": [
+        {
+          "rung": "S1",
+          "text": "I helped out at my parents' shop a lot. Nothing that stands out.",
+          "specificity": "S1",
+          "ownership": "O0",
+          "requires_prior": [],
+          "source": null
+        },
+        {
+          "rung": "S2",
+          "text": "When I was a kid, my parents ran a dry cleaner in Queens. My dad spoke limited English so my mom handled the front. By the time I was seven I was the unofficial translator \u2014 not just of language but of meaning.",
+          "specificity": "S2",
+          "ownership": "O0",
+          "requires_prior": [
+            "S1"
+          ],
+          "source": "maya-full-walk#2"
+        },
+        {
+          "rung": "S3",
+          "text": "I remember one woman, furious about a dress. My mom was apologizing about the stain but I could see it wasn't about the dress \u2014 it was her daughter's graduation and she was terrified of looking poor in front of the other families. I told my mom that. She comped the cleaning and added a small alteration for free. The woman cried.",
+          "specificity": "S3",
+          "ownership": "O0",
+          "requires_prior": [
+            "S2"
+          ],
+          "source": "maya-full-walk#3"
+        },
+        {
+          "rung": "O2",
+          "text": "Yeah. I think I've always been able to see the real thing under what people are actually saying.",
+          "specificity": "S1",
+          "ownership": "O2",
+          "requires_prior": [
+            "S3"
+          ],
+          "source": "maya-full-walk#4"
+        }
+      ],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "career.terminology_standoff",
+      "stage": "career",
+      "intents": [
+        "ask_career",
+        "ask_proudest_moment",
+        "ask_hardest_problem"
+      ],
+      "rungs": [
+        {
+          "rung": "S1",
+          "text": "I worked in healthcare operations. Mostly cross-team stuff.",
+          "specificity": "S1",
+          "ownership": "O0",
+          "requires_prior": [],
+          "source": null
+        },
+        {
+          "rung": "S2",
+          "text": "A lot of it was untangling places where two groups thought they were arguing about process when they weren't.",
+          "specificity": "S2",
+          "ownership": "O0",
+          "requires_prior": [
+            "S1"
+          ],
+          "source": null
+        },
+        {
+          "rung": "S3",
+          "text": "The clearest moment: billing and clinical had been blaming each other for months over what everyone called a process failure. I saw it wasn't process \u2014 the two groups were using the same term to mean different things and didn't know it. I got them in a room and asked each side what the word meant. The standoff dissolved in one session.",
+          "specificity": "S3",
+          "ownership": "O0",
+          "requires_prior": [
+            "S2"
+          ],
+          "source": "maya-full-walk#5"
+        },
+        {
+          "rung": "O2",
+          "text": "What I care about most isn't being right, it's that people actually understand each other. Not just reach an agreement they can live with.",
+          "specificity": "S2",
+          "ownership": "O2",
+          "requires_prior": [
+            "S3"
+          ],
+          "source": "maya-full-walk#8"
+        }
+      ],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "outside.writing",
+      "stage": "outside_work",
+      "intents": [
+        "ask_outside_work",
+        "ask_hobbies"
+      ],
+      "rungs": [
+        {
+          "rung": "S1",
+          "text": "Outside work? Not much. I read a fair bit.",
+          "specificity": "S1",
+          "ownership": "O0",
+          "requires_prior": [],
+          "source": null
+        },
+        {
+          "rung": "S2",
+          "text": "Outside work? I write. Long essays nobody ever reads \u2014 I just work a thought over until it comes clear. It's how I think, honestly. I take something tangled and lay it out until the real shape shows.",
+          "specificity": "S2",
+          "ownership": "O2",
+          "requires_prior": [
+            "S1"
+          ],
+          "source": "maya-full-walk#7"
+        }
+      ],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "thrives.conditions",
+      "stage": "thrives",
+      "intents": [
+        "ask_environments",
+        "ask_what_drains",
+        "ask_where_you_thrive"
+      ],
+      "rungs": [
+        {
+          "rung": "S1",
+          "text": "I do better in some places than others. Hard to say why.",
+          "specificity": "S1",
+          "ownership": "O0",
+          "requires_prior": [],
+          "source": null
+        },
+        {
+          "rung": "S2",
+          "text": "I do my best work where the definitions are still contested and nobody has written them down yet. What drains me is a place where everything is already settled and I'm just executing someone else's map.",
+          "specificity": "S2",
+          "ownership": "O0",
+          "requires_prior": [
+            "S1"
+          ],
+          "source": null
+        },
+        {
+          "rung": "S3",
+          "text": "The twelve-state Medicaid program was the clearest case. Nobody agreed what 'eligible' meant across borders and families were falling through. I built the map of how one state's rules created gaps in another and flagged three before they cut anyone off. That was the most alive I've been at work.",
+          "specificity": "S3",
+          "ownership": "O1",
+          "requires_prior": [
+            "S2"
+          ],
+          "source": null
+        }
+      ],
+      "exhausted_response": "I think that's the whole of it."
+    }
+  ]
+}

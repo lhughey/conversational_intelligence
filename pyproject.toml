@@ -7,7 +7,7 @@ name = "convint"
 version = "0.1.0"
 description = "Conversational-intelligence component: interview depth-gating, decision-first."
 requires-python = ">=3.11"
-dependencies = ["pydantic>=2,<3"]
+dependencies = ["pydantic>=2,<3", "python-dotenv>=1.0"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "pytest-cov>=5"]

@@ -20,6 +20,10 @@ class OpenAILLM:
         if self._client is None:
             import openai  # lazy
 
+            from ..config import load
+
+            load()  # this repo's .env, never a sibling project's
+
             self._client = openai.OpenAI()
         return self._client
 

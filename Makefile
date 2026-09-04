@@ -23,8 +23,17 @@ test-live:                 ## opt in to tests that call a real model API
 bench-assessors:           ## compare assessors across models (live, cached)
 	$(PY) scripts/compare_assessors.py
 
-bench-gate:                ## evaluate the gate against turn-decision labels
-	$(PY) -m convint.api.cli bench --gate
+bench-gate:                ## evaluate the gate on the balanced split
+	$(PY) -m convint.api.cli bench --gate --split synth
+
+bench-gate-corpus:         ## same, on the realistic (skewed, weakly labelled) split
+	$(PY) -m convint.api.cli bench --gate --split corpus
+
+label:                     ## adjudicate the items where spec and gate disagree
+	$(PY) -m convint.api.cli label --split corpus --disagreements-only
+
+doctor:                    ## check credentials resolve from this repo's .env
+	$(PY) -m convint.api.cli doctor
 
 bench:                     ## assessor agreement + corpus replay (offline)
 	$(PY) -m convint.api.cli bench

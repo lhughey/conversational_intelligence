@@ -140,16 +140,29 @@ def build(assessor=None) -> tuple[list[Item], list[Label]]:
     return items, labels
 
 
-def write(items: list[Item], labels: list[Label]) -> tuple[pathlib.Path, pathlib.Path]:
+def write(items: list[Item], labels: list[Label],
+          prefix: str = "") -> tuple[pathlib.Path, pathlib.Path]:
     OUT.mkdir(parents=True, exist_ok=True)
-    ip, lp = OUT / "items.jsonl", OUT / "labels.jsonl"
+    ip, lp = OUT / f"{prefix}items.jsonl", OUT / f"{prefix}labels.jsonl"
     ip.write_text("\n".join(i.model_dump_json() for i in items) + "\n", encoding="utf-8")
     lp.write_text("\n".join(l.model_dump_json() for l in labels) + "\n", encoding="utf-8")
     return ip, lp
 
 
-def load() -> tuple[list[Item], list[Label]]:
-    ip, lp = OUT / "items.jsonl", OUT / "labels.jsonl"
+def load(prefix: str = "") -> tuple[list[Item], list[Label]]:
+    ip, lp = OUT / f"{prefix}items.jsonl", OUT / f"{prefix}labels.jsonl"
     items = [Item.model_validate_json(l) for l in ip.read_text(encoding="utf-8").splitlines() if l.strip()]
     labels = [Label.model_validate_json(l) for l in lp.read_text(encoding="utf-8").splitlines() if l.strip()]
     return items, labels
+
+
+def build_all() -> dict[str, tuple[list[Item], list[Label]]]:
+    """Both splits, kept separate because their label provenance differs.
+
+    `corpus` labels are WEAK (inferred from the transcript's next turn).
+    `synth` labels are SPEC (derived from the written rule).
+    Neither is human-adjudicated; mixing them would hide that.
+    """
+    from .synth import build_from_banks
+
+    return {"corpus": build(), "synth": build_from_banks()}

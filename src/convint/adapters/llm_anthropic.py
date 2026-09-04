@@ -22,6 +22,10 @@ class AnthropicLLM:
         if self._client is None:
             import anthropic  # lazy: keeps the core dependency-free
 
+            from ..config import load
+
+            load()  # this repo's .env, never a sibling project's
+
             # An unset ANTHROPIC_API_KEY does not mean no credentials; the SDK
             # resolves auth tokens and `ant auth login` profiles too.
             self._client = anthropic.Anthropic()

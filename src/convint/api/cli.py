@@ -32,12 +32,32 @@ def main(argv: list[str] | None = None) -> int:
     p_bench.add_argument("--json", action="store_true", help="machine-readable output")
     p_bench.add_argument("--gate", action="store_true",
                          help="evaluate the gate against the turn-decision labels")
+    p_bench.add_argument("--split", default="synth", choices=["synth", "corpus"],
+                         help="synth = balanced with minimal pairs; corpus = realistic but skewed")
 
     p_ds = sub.add_parser("dataset", help="turn-decision dataset")
     p_ds.add_argument("dataset_command", choices=["build", "stats"])
+
+    p_lab = sub.add_parser("label", help="adjudicate labels (the only path to validity)")
+    p_lab.add_argument("--split", default="synth", choices=["synth", "corpus"])
+    p_lab.add_argument("--limit", type=int, default=10)
+    p_lab.add_argument("--disagreements-only", action="store_true",
+                       help="only show items where the spec label and the gate disagree")
     sub.add_parser("contract", help="print the JSON Schema this build speaks")
+    sub.add_parser("doctor", help="check credentials resolve from this repo's .env")
 
     args = parser.parse_args(argv)
+
+    if args.command == "doctor":
+        from ..config import status
+
+        st = status()
+        print(json.dumps(st, indent=2))
+        missing = [k for k in ("anthropic", "openai") if not st[k]]
+        if missing:
+            print(f"\nmissing: {', '.join(missing)} — add to {st['env_file']}")
+            return 1
+        return 0
 
     if args.command == "contract":
         print(json.dumps({
@@ -47,14 +67,21 @@ def main(argv: list[str] | None = None) -> int:
         }, indent=2))
         return 0
 
+    if args.command == "label":
+        from ..dataset.adjudicate import run_session
+
+        return run_session(args.split, args.limit, args.disagreements_only)
+
     if args.command == "dataset":
         from ..dataset.build import build, load, write
 
         if args.dataset_command == "build":
-            items, labels = build()
-            ip, lp = write(items, labels)
-            print(f"wrote {len(items)} items -> {ip}")
-            print(f"wrote {len(labels)} labels -> {lp}")
+            from ..dataset.build import build_all
+
+            for split, (items, labels) in build_all().items():
+                prefix = "" if split == "corpus" else f"{split}_"
+                ip, lp = write(items, labels, prefix)
+                print(f"{split}: {len(items)} items -> {ip.name}, {lp.name}")
             return 0
 
         items, labels = load()
@@ -73,8 +100,9 @@ def main(argv: list[str] | None = None) -> int:
             from ..bench.gate_eval import format_report as gate_report
             from ..bench.gate_eval import run as gate_run
 
-            result = gate_run()
-            print(json.dumps(result, indent=2) if args.json else gate_report(result))
+            result = gate_run(args.split)
+            print(json.dumps(result, indent=2) if args.json
+                  else gate_report(result, args.split))
             return 0
 
         from ..adapters.assessor_deterministic import DeterministicAssessor

@@ -57,7 +57,7 @@ def test_text_prefix_guards_against_fixture_drift():
 # --- gate evaluation -------------------------------------------------------
 
 def test_gate_eval_reports_both_failure_directions():
-    result = gate_eval.run()
+    result = gate_eval.run("corpus")
     for name, metrics in result.items():
         assert metrics["premature_advance_rate"] is not None, name
         assert metrics["stall_rate"] is not None, name
@@ -66,22 +66,32 @@ def test_gate_eval_reports_both_failure_directions():
 def test_degenerate_policies_are_exposed_by_the_metric_pair():
     """Neither failure rate means anything alone; together they catch both
     ways of gaming the benchmark."""
-    result = gate_eval.run()
+    result = gate_eval.run("corpus")
     assert result["always_follow_up"]["premature_advance_rate"] == 0.0
     assert result["always_follow_up"]["stall_rate"] == 1.0
     assert result["always_advance"]["premature_advance_rate"] == 1.0
     assert result["always_advance"]["stall_rate"] == 0.0
 
 
-def test_gate_is_not_a_degenerate_policy():
-    """The whole point: the gate must sit between the two extremes rather than
-    collapsing onto one of them."""
-    gate = gate_eval.run()["gate"]
+def test_gate_is_not_a_degenerate_policy_on_the_realistic_split():
+    """On the weakly-labelled corpus the gate must sit between the extremes
+    rather than collapsing onto one of them."""
+    gate = gate_eval.run("corpus")["gate"]
     assert 0.0 < gate["premature_advance_rate"] < 1.0
+    assert 0.0 < gate["stall_rate"] < 1.0
     assert gate["accuracy_acceptable"] > 0.8
 
 
+def test_gate_conforms_exactly_on_the_spec_labelled_split():
+    """Different split, different claim: on spec labels this is a CONFORMANCE
+    check, and 100% is the expected result rather than evidence of quality."""
+    gate = gate_eval.run("synth")["gate"]
+    assert gate["accuracy_strict"] == 1.0
+    assert gate["premature_advance_rate"] == 0.0
+    assert gate["stall_rate"] == 0.0
+
+
 def test_denominators_are_reported_so_small_n_is_visible():
-    result = gate_eval.run()["gate"]
+    result = gate_eval.run("corpus")["gate"]
     assert result["premature_advance_n"] > 0
     assert result["stall_n"] > 0

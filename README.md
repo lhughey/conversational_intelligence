@@ -13,7 +13,9 @@ HTTP, or subprocess), and fully testable on its own.
 make setup
 make test             # 194 tests, no network, no API key, ~1s
 make bench            # assessor agreement + corpus replay, offline
-make bench-gate       # gate vs turn-decision labels + dumb baselines, offline
+make doctor           # confirm credentials resolve from this repo's .env
+make bench-gate       # gate vs the balanced split + dumb baselines, offline
+make label            # adjudicate the items where spec and gate disagree
 make bench-assessors  # compare assessors across 5 models (live, cached)
 make dataset          # rebuild the turn-decision dataset
 ```
@@ -74,8 +76,13 @@ occur.
 | `dataset/` — 92 turn-decision items + weak labels | done (labels weak) |
 | `bench/` — assessor agreement, gate evaluation, corpus replay | done |
 | `app/artifact_builder.py` — Read emission with a truth floor | done |
-| Human-adjudicated labels | **not built** — the next milestone |
-| Fixtures where advancing is correct | **not built** — see gate results |
+| `config.py` — credentials from this repo only | done |
+| `dataset/bank.py` — persona answer banks | done (Maya) |
+| `dataset/synth.py` — balanced set + minimal pairs | done |
+| `dataset/adjudicate.py` — human labelling CLI | done |
+| Human-adjudicated labels | **8 items queued** — run `make label` |
+| Banks for thin-responder / tries-to-rush | **not built** |
+| Held-out set never used for tuning | **not built** |
 
 ## Benchmark results, honestly
 
