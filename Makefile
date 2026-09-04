@@ -1,7 +1,7 @@
 VENV := .venv
 PY   := $(VENV)/bin/python
 
-.PHONY: setup test test-cov test-e2e test-live bench bench-gate bench-assessors dataset contracts clean
+.PHONY: setup test test-cov test-e2e test-live testbed testbed-live bench bench-gate bench-assessors dataset contracts clean
 
 setup:
 	python3 -m venv $(VENV)
@@ -19,6 +19,12 @@ test-e2e:                  ## cross-language proof: Node client vs live HTTP ser
 
 test-live:                 ## opt in to tests that call a real model API
 	$(PY) -m pytest -m live
+
+testbed:                   ## run everything offline and record the result
+	$(PY) scripts/testbed.py
+
+testbed-live:              ## same, including model-calling suites and assessors
+	$(PY) scripts/testbed.py --live
 
 bench-assessors:           ## compare assessors across models (live, cached)
 	$(PY) scripts/compare_assessors.py
