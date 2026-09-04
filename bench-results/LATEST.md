@@ -1,15 +1,15 @@
-# Testbed run — 2026-09-03T23:03:32-05:00
+# Testbed run — 2026-09-03T23:04:05-05:00
 
-**commit** `ebe755f08c20` on `main`  ⚠️ **DIRTY TREE — not reproducible**
+**commit** `ad26a7165246` on `main`
 **mode** live (model calls made) · python 3.13.4
 
 ## Suites
 
 | suite | result | detail |
 |---|---|---|
-| offline | PASS | 213 passed, 0 failed, 0 errored, 0 skipped in 0.96s |
-| e2e | PASS | 1 passed, 0 failed, 0 errored, 0 skipped in 0.56s |
-| live | PASS | 5 passed, 0 failed, 0 errored, 0 skipped in 2.08s |
+| offline | PASS | 213 passed, 0 failed, 0 errored, 0 skipped in 0.98s |
+| e2e | PASS | 1 passed, 0 failed, 0 errored, 0 skipped in 0.55s |
+| live | PASS | 5 passed, 0 failed, 0 errored, 0 skipped in 1.36s |
 | **total** | | **219 tests passed** |
 | coverage | 85% | statements |
 
@@ -78,7 +78,7 @@ tunable on these models and a single draw cannot establish a rate.
 | exactly one question | 100% |
 | ends with the question | 100% |
 | grounded in the user's words | 100% |
-| mean length | 14 words |
+| mean length | 13 words |
 
 
 ## Corpus replay

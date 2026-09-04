@@ -1,0 +1,369 @@
+{
+  "run_at": "2026-09-03T23:04:05-05:00",
+  "tag": "release",
+  "live": true,
+  "git": {
+    "commit": "ad26a7165246d23f65c380185868978e6600e78c",
+    "branch": "main",
+    "dirty": false,
+    "dirty_files": []
+  },
+  "platform": {
+    "python": "3.13.4",
+    "os": "macOS-26.5.2-arm64-arm-64bit-Mach-O"
+  },
+  "packages": {
+    "pydantic": "2.13.5",
+    "anthropic": "1.3.0",
+    "openai": "3.8.0",
+    "fastapi": "0.141.1",
+    "pytest": "9.1.1"
+  },
+  "dataset_hashes": {
+    "sufficiency.seed.jsonl": "0b107d7f45957839",
+    "human_labels.jsonl": "7552f88cc312407b",
+    "items.jsonl": "c566dfeba26bfa80",
+    "labels.jsonl": "b4280d53fb978da4",
+    "synth_items.jsonl": "96d1a029ef2d30a4",
+    "synth_labels.jsonl": "c5eae593b800fa25"
+  },
+  "suites": [
+    {
+      "suite": "offline",
+      "exit_code": 0,
+      "ok": true,
+      "summary": "213 passed, 0 failed, 0 errored, 0 skipped in 0.98s",
+      "tests": 213,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": 0.976,
+      "passed": 213
+    },
+    {
+      "suite": "e2e",
+      "exit_code": 0,
+      "ok": true,
+      "summary": "1 passed, 0 failed, 0 errored, 0 skipped in 0.55s",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": 0.548,
+      "passed": 1
+    },
+    {
+      "suite": "live",
+      "exit_code": 0,
+      "ok": true,
+      "summary": "5 passed, 0 failed, 0 errored, 0 skipped in 1.36s",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": 1.359,
+      "passed": 5
+    }
+  ],
+  "coverage": {
+    "exit_code": 0,
+    "total": "85%",
+    "ok": true
+  },
+  "dataset": {
+    "corpus_items": 92,
+    "synth_items": 52,
+    "minimal_pairs": 12,
+    "human_labels": 5,
+    "corpus_label_actions": {
+      "follow_up": 72,
+      "synthesize": 11,
+      "advance": 5,
+      "refuse_and_continue": 4
+    },
+    "synth_label_actions": {
+      "follow_up": 33,
+      "advance": 19
+    }
+  },
+  "gate": {
+    "synth": {
+      "gate": {
+        "n": 52,
+        "minimal_pair_accuracy": 1.0,
+        "minimal_pair_n": 12,
+        "accuracy_strict": 1.0,
+        "accuracy_acceptable": 1.0,
+        "premature_advance_rate": 0.0,
+        "premature_advance_n": 33,
+        "stall_rate": 0.0,
+        "stall_n": 19
+      },
+      "always_follow_up": {
+        "n": 52,
+        "minimal_pair_accuracy": 0.0,
+        "minimal_pair_n": 12,
+        "accuracy_strict": 0.6346153846153846,
+        "accuracy_acceptable": 0.6346153846153846,
+        "premature_advance_rate": 0.0,
+        "premature_advance_n": 33,
+        "stall_rate": 1.0,
+        "stall_n": 19
+      },
+      "always_advance": {
+        "n": 52,
+        "minimal_pair_accuracy": 0.0,
+        "minimal_pair_n": 12,
+        "accuracy_strict": 0.36538461538461536,
+        "accuracy_acceptable": 0.36538461538461536,
+        "premature_advance_rate": 1.0,
+        "premature_advance_n": 33,
+        "stall_rate": 0.0,
+        "stall_n": 19
+      },
+      "budget_only": {
+        "n": 52,
+        "minimal_pair_accuracy": 0.0,
+        "minimal_pair_n": 12,
+        "accuracy_strict": 0.8846153846153846,
+        "accuracy_acceptable": 0.8846153846153846,
+        "premature_advance_rate": 0.0,
+        "premature_advance_n": 33,
+        "stall_rate": 0.3157894736842105,
+        "stall_n": 19
+      },
+      "length_threshold": {
+        "n": 52,
+        "minimal_pair_accuracy": 0.3333333333333333,
+        "minimal_pair_n": 12,
+        "accuracy_strict": 0.5576923076923077,
+        "accuracy_acceptable": 0.5576923076923077,
+        "premature_advance_rate": 0.30303030303030304,
+        "premature_advance_n": 33,
+        "stall_rate": 0.6842105263157895,
+        "stall_n": 19
+      }
+    },
+    "corpus": {
+      "gate": {
+        "n": 92,
+        "minimal_pair_accuracy": null,
+        "minimal_pair_n": 0,
+        "accuracy_strict": 0.7717391304347826,
+        "accuracy_acceptable": 0.967391304347826,
+        "premature_advance_rate": 0.1,
+        "premature_advance_n": 10,
+        "stall_rate": 0.5,
+        "stall_n": 2
+      },
+      "always_follow_up": {
+        "n": 92,
+        "minimal_pair_accuracy": null,
+        "minimal_pair_n": 0,
+        "accuracy_strict": 0.782608695652174,
+        "accuracy_acceptable": 0.8152173913043478,
+        "premature_advance_rate": 0.0,
+        "premature_advance_n": 10,
+        "stall_rate": 1.0,
+        "stall_n": 2
+      },
+      "always_advance": {
+        "n": 92,
+        "minimal_pair_accuracy": null,
+        "minimal_pair_n": 0,
+        "accuracy_strict": 0.05434782608695652,
+        "accuracy_acceptable": 0.8478260869565217,
+        "premature_advance_rate": 1.0,
+        "premature_advance_n": 10,
+        "stall_rate": 0.0,
+        "stall_n": 2
+      },
+      "budget_only": {
+        "n": 92,
+        "minimal_pair_accuracy": null,
+        "minimal_pair_n": 0,
+        "accuracy_strict": 0.6630434782608695,
+        "accuracy_acceptable": 0.9021739130434783,
+        "premature_advance_rate": 0.1,
+        "premature_advance_n": 10,
+        "stall_rate": 0.5,
+        "stall_n": 2
+      },
+      "length_threshold": {
+        "n": 92,
+        "minimal_pair_accuracy": null,
+        "minimal_pair_n": 0,
+        "accuracy_strict": 0.4673913043478261,
+        "accuracy_acceptable": 0.717391304347826,
+        "premature_advance_rate": 1.0,
+        "premature_advance_n": 10,
+        "stall_rate": 0.5,
+        "stall_n": 2
+      }
+    },
+    "human": {
+      "gate": {
+        "n": 5,
+        "minimal_pair_accuracy": null,
+        "minimal_pair_n": 0,
+        "accuracy_strict": 0.8,
+        "accuracy_acceptable": 0.8,
+        "premature_advance_rate": 0.0,
+        "premature_advance_n": 3,
+        "stall_rate": 0.5,
+        "stall_n": 2
+      },
+      "always_follow_up": {
+        "n": 5,
+        "minimal_pair_accuracy": null,
+        "minimal_pair_n": 0,
+        "accuracy_strict": 0.6,
+        "accuracy_acceptable": 0.6,
+        "premature_advance_rate": 0.0,
+        "premature_advance_n": 3,
+        "stall_rate": 1.0,
+        "stall_n": 2
+      },
+      "always_advance": {
+        "n": 5,
+        "minimal_pair_accuracy": null,
+        "minimal_pair_n": 0,
+        "accuracy_strict": 0.4,
+        "accuracy_acceptable": 0.4,
+        "premature_advance_rate": 1.0,
+        "premature_advance_n": 3,
+        "stall_rate": 0.0,
+        "stall_n": 2
+      },
+      "budget_only": {
+        "n": 5,
+        "minimal_pair_accuracy": null,
+        "minimal_pair_n": 0,
+        "accuracy_strict": 0.8,
+        "accuracy_acceptable": 0.8,
+        "premature_advance_rate": 0.0,
+        "premature_advance_n": 3,
+        "stall_rate": 0.5,
+        "stall_n": 2
+      },
+      "length_threshold": {
+        "n": 5,
+        "minimal_pair_accuracy": null,
+        "minimal_pair_n": 0,
+        "accuracy_strict": 0.6,
+        "accuracy_acceptable": 0.6,
+        "premature_advance_rate": 0.6666666666666666,
+        "premature_advance_n": 3,
+        "stall_rate": 0.0,
+        "stall_n": 2
+      }
+    }
+  },
+  "corpus_replay": {
+    "transcripts": 11,
+    "turns": 92,
+    "actions": {
+      "follow_up": 63,
+      "advance": 19,
+      "synthesize": 6,
+      "refuse_and_continue": 4
+    },
+    "rules": {
+      "default_deepen": 33,
+      "floor_not_met": 25,
+      "ceiling_reached": 14,
+      "closing_honest_shortfall": 6,
+      "no_content_redirect": 5,
+      "adversarial_input": 4,
+      "gate_met": 4,
+      "acknowledgment_signpost": 1
+    }
+  },
+  "assessors": {
+    "deterministic": {
+      "n": 23,
+      "specificity_exact": 0.7391304347826086,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.9565217391304348,
+      "both_exact": 0.6956521739130435
+    },
+    "llm/haiku-4-5": {
+      "n": 23,
+      "specificity_exact": 0.9130434782608695,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.6521739130434783,
+      "both_exact": 0.6521739130434783
+    },
+    "hybrid/haiku-4-5": {
+      "n": 23,
+      "specificity_exact": 0.9130434782608695,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.9565217391304348,
+      "both_exact": 0.8695652173913043
+    },
+    "llm/sonnet-5": {
+      "n": 23,
+      "specificity_exact": 0.8695652173913043,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.8260869565217391,
+      "both_exact": 0.6956521739130435
+    },
+    "hybrid/sonnet-5": {
+      "n": 23,
+      "specificity_exact": 0.8695652173913043,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.9565217391304348,
+      "both_exact": 0.8260869565217391
+    },
+    "llm/opus-5": {
+      "n": 23,
+      "specificity_exact": 0.8260869565217391,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.782608695652174,
+      "both_exact": 0.6521739130434783
+    },
+    "hybrid/opus-5": {
+      "n": 23,
+      "specificity_exact": 0.8260869565217391,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.9565217391304348,
+      "both_exact": 0.782608695652174
+    },
+    "llm/gpt-4.1-mini": {
+      "n": 23,
+      "specificity_exact": 0.7391304347826086,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.8260869565217391,
+      "both_exact": 0.6086956521739131
+    },
+    "hybrid/gpt-4.1-mini": {
+      "n": 23,
+      "specificity_exact": 0.7391304347826086,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.9565217391304348,
+      "both_exact": 0.6956521739130435
+    },
+    "llm/gpt-4.1": {
+      "n": 23,
+      "specificity_exact": 0.782608695652174,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.8695652173913043,
+      "both_exact": 0.6521739130434783
+    },
+    "hybrid/gpt-4.1": {
+      "n": 23,
+      "specificity_exact": 0.782608695652174,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.9565217391304348,
+      "both_exact": 0.782608695652174
+    }
+  },
+  "invariants": {
+    "samples": 6,
+    "single_question_rate": 1.0,
+    "ends_with_question_rate": 1.0,
+    "grounded_rate": 1.0,
+    "mean_words": 13.0,
+    "errors": []
+  }
+}
