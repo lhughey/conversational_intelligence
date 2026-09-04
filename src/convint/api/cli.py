@@ -32,8 +32,9 @@ def main(argv: list[str] | None = None) -> int:
     p_bench.add_argument("--json", action="store_true", help="machine-readable output")
     p_bench.add_argument("--gate", action="store_true",
                          help="evaluate the gate against the turn-decision labels")
-    p_bench.add_argument("--split", default="synth", choices=["synth", "corpus"],
-                         help="synth = balanced with minimal pairs; corpus = realistic but skewed")
+    p_bench.add_argument("--split", default="synth", choices=["synth", "corpus", "human"],
+                         help="synth = balanced with minimal pairs; corpus = realistic but skewed; "
+                              "human = adjudicated items only (the only validity evidence)")
 
     p_ds = sub.add_parser("dataset", help="turn-decision dataset")
     p_ds.add_argument("dataset_command", choices=["build", "stats"])

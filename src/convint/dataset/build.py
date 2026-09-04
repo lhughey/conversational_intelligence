@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import pathlib
+import re
 
 from ..adapters.assessor_deterministic import DeterministicAssessor
 from ..domain.enums import Action, Ownership, Specificity, UserSignal
@@ -39,6 +40,19 @@ _ERA_MARKERS = {
     "career": {"career", "job", "role", "work", "company", "team", "manager", "startup"},
     "outside": {"outside", "hobby", "weekend", "garden", "write", "writing", "volunteer"},
 }
+
+
+#: A new instance within the same life domain also starts a thread. Rachel's
+#: walk is role-by-role: "second role", "third role is where I am now" are all
+#: `career`, but each is a separate topic with its own budget. Without this the
+#: counter climbed 0-5 across three different jobs.
+_INSTANCE = re.compile(
+    r"\b(second|third|fourth|next|another|last)\s+(role|job|company|position)\b"
+    r"|\bmy (first|second|third) role\b|\bafter that (i|we)\b"
+    r"|\bthen i (moved|joined|went)\b|\bwhere i am now\b"
+    r"|\boutside of work\b|\boutside work\b",
+    re.IGNORECASE,
+)
 
 
 def segment_threads(turns: list[str]) -> list[int]:
@@ -64,7 +78,10 @@ def segment_threads(turns: list[str]) -> list[int]:
     last_era: str | None = None
     for i, text in enumerate(turns):
         era = _era(text) or last_era
-        if i > 0 and era is not None and last_era is not None and era != last_era:
+        shifted = (
+            i > 0 and era is not None and last_era is not None and era != last_era
+        )
+        if shifted or (i > 0 and _INSTANCE.search(text)):
             current += 1
         threads.append(current)
         if era is not None:

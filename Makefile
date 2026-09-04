@@ -29,7 +29,13 @@ bench-gate:                ## evaluate the gate on the balanced split
 bench-gate-corpus:         ## same, on the realistic (skewed, weakly labelled) split
 	$(PY) -m convint.api.cli bench --gate --split corpus
 
-label:                     ## interactive: judge the items where rule and gate disagree
+bench-gate-human:          ## score against YOUR labels - the only validity evidence
+	$(PY) -m convint.api.cli bench --gate --split human
+
+label:                     ## interactive: judge the most informative unlabelled items
+	$(PY) -m convint.api.cli label --split corpus --limit 15
+
+label-conflicts:           ## only the items where rule and code disagree
 	$(PY) -m convint.api.cli label --split corpus --disagreements-only --limit 20
 
 label-all:                 ## interactive: judge every unlabelled item

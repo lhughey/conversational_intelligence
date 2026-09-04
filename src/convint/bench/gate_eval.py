@@ -127,6 +127,21 @@ def evaluate_policy(policy, items: list[Item], labels: dict[str, Label],
     }
 
 
+def load_human_labels() -> dict[str, Action]:
+    import json
+    import pathlib
+
+    from ..dataset.adjudicate import HUMAN
+
+    if not HUMAN.exists():
+        return {}
+    return {
+        (r := json.loads(line))["item_id"]: Action(r["action"])
+        for line in pathlib.Path(HUMAN).read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    }
+
+
 def run(split: str = "synth") -> dict:
     """Evaluate on one split. `synth` is balanced and carries minimal pairs;
     `corpus` is realistic but skewed and weakly labelled."""
@@ -135,6 +150,17 @@ def run(split: str = "synth") -> dict:
 
     items, label_list = build_from_banks() if split == "synth" else build()
     labels = {l.item_id: l for l in label_list}
+
+    if split == "human":
+        # Only adjudicated items, scored against the human's call.
+        human = load_human_labels()
+        if not human:
+            raise RuntimeError("no human labels yet — run `make label` first")
+        items = [i for i in items if i.item_id in human]
+        labels = {
+            iid: Label(item_id=iid, action=action, source="human", confidence="high")
+            for iid, action in human.items()
+        }
     pairs = minimal_pairs(items, label_list) if split == "synth" else []
     return {
         name: evaluate_policy(fn, items, labels, pairs)

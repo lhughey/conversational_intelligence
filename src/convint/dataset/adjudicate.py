@@ -45,6 +45,26 @@ def _load_split(split: str) -> tuple[list[Item], list[Label]]:
     return build_from_banks() if split == "synth" else build()
 
 
+def _information(item: Item, disagrees: bool) -> tuple[int, str]:
+    """Rank by how much an opinion would settle.
+
+    1. The rule and the code disagree - the answer resolves a conflict.
+    2. The item sits exactly on a budget boundary - floor or ceiling - where
+       the decision hinges on the budget rather than the material, which is
+       where the ceiling-rigidity question lives.
+    3. A signal fired (closing, impatience, adversarial) - these bypass the
+       depth rule entirely, so a wrong reading is more costly than a wrong level.
+    4. Everything else.
+    """
+    if disagrees:
+        return (0, "rule and code disagree")
+    if item.followups_used in (item.floor, item.ceiling):
+        return (1, f"on a budget boundary ({item.followups_used})")
+    if item.signal.value != "none":
+        return (2, f"signal: {item.signal.value}")
+    return (3, "")
+
+
 def queue(split: str, disagreements_only: bool = False) -> list[tuple[Item, Label, str]]:
     """Items worth a human's attention, most informative first."""
     items, labels = _load_split(split)
@@ -62,8 +82,8 @@ def queue(split: str, disagreements_only: bool = False) -> list[tuple[Item, Labe
             continue
         rows.append((item, label, predicted.value if disagrees else ""))
 
-    # disagreements first: those are where an opinion changes something
-    rows.sort(key=lambda r: (r[2] == "", r[0].item_id))
+    # most informative first: a human's time is the scarce input here
+    rows.sort(key=lambda r: (_information(r[0], bool(r[2]))[0], r[0].item_id))
     return rows
 
 
@@ -103,7 +123,8 @@ def run_session(split: str, limit: int, disagreements_only: bool) -> int:  # pra
     count = 0
     for n, (item, label, disagreement) in enumerate(shown, 1):
         print()
-        print(f"┌─ {n}/{len(shown)}  {item.item_id}")
+        _, why = _information(item, bool(disagreement))
+        print(f"┌─ {n}/{len(shown)}  {item.item_id}" + (f"   [{why}]" if why else ""))
         print("│")
         for turn in item.user_turns[:-1][-3:]:
             print(_wrap(turn[:400], indent="│  · "))
