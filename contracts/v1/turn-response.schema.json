@@ -1,0 +1,415 @@
+{
+  "$defs": {
+    "Action": {
+      "description": "What the interviewer should do next.",
+      "enum": [
+        "follow_up",
+        "advance",
+        "synthesize",
+        "refuse_and_continue"
+      ],
+      "title": "Action",
+      "type": "string"
+    },
+    "ArtifactReadiness": {
+      "properties": {
+        "distinct_stages": {
+          "default": 0,
+          "title": "Distinct Stages",
+          "type": "integer"
+        },
+        "episodes": {
+          "default": 0,
+          "title": "Episodes",
+          "type": "integer"
+        },
+        "missing": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Missing",
+          "type": "array"
+        },
+        "ready": {
+          "title": "Ready",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "ready"
+      ],
+      "title": "ArtifactReadiness",
+      "type": "object"
+    },
+    "Assessment": {
+      "description": "A topic's accumulated sufficiency.",
+      "properties": {
+        "assessor": {
+          "default": "deterministic",
+          "title": "Assessor",
+          "type": "string"
+        },
+        "components": {
+          "$ref": "#/$defs/SufficiencyComponents"
+        },
+        "confidence": {
+          "default": 0.5,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "ownership": {
+          "$ref": "#/$defs/Ownership"
+        },
+        "specificity": {
+          "$ref": "#/$defs/Specificity"
+        }
+      },
+      "required": [
+        "specificity",
+        "ownership"
+      ],
+      "title": "Assessment",
+      "type": "object"
+    },
+    "Decision": {
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/Action"
+        },
+        "completion_signal": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Completion Signal"
+        },
+        "rationale": {
+          "title": "Rationale",
+          "type": "string"
+        },
+        "rule_fired": {
+          "title": "Rule Fired",
+          "type": "string"
+        },
+        "sub_action": {
+          "$ref": "#/$defs/SubAction"
+        },
+        "topic_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Topic Id"
+        }
+      },
+      "required": [
+        "action",
+        "sub_action",
+        "rule_fired",
+        "rationale"
+      ],
+      "title": "Decision",
+      "type": "object"
+    },
+    "Diagnostics": {
+      "properties": {
+        "assessor": {
+          "default": "deterministic",
+          "title": "Assessor",
+          "type": "string"
+        },
+        "latency_ms": {
+          "default": 0,
+          "title": "Latency Ms",
+          "type": "integer"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model"
+        },
+        "usage": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Usage",
+          "type": "object"
+        }
+      },
+      "title": "Diagnostics",
+      "type": "object"
+    },
+    "Message": {
+      "properties": {
+        "grounded_on": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Grounded On",
+          "type": "array"
+        },
+        "move_type": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MoveType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "Message",
+      "type": "object"
+    },
+    "MoveType": {
+      "description": "The kind of follow-up. Selecting from a taxonomy produces variety\nstructurally, rather than relying on sampling randomness.",
+      "enum": [
+        "ask_for_scene",
+        "ask_what_was_at_stake",
+        "ask_what_they_did",
+        "ask_what_surprised",
+        "reflect_and_check",
+        "contrast_with_earlier"
+      ],
+      "title": "MoveType",
+      "type": "string"
+    },
+    "Ownership": {
+      "description": "Who did the meaning-making. Ordinal; compare via `rank`.",
+      "enum": [
+        "O0",
+        "O1",
+        "O2"
+      ],
+      "title": "Ownership",
+      "type": "string"
+    },
+    "Specificity": {
+      "description": "How concrete the material on a topic is. Ordinal; compare via `rank`.",
+      "enum": [
+        "S0",
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "title": "Specificity",
+      "type": "string"
+    },
+    "StateDelta": {
+      "description": "The fields the caller should persist before the next call.\n\nReturned in full rather than as a patch: the component is stateless and the\ncaller is the system of record, so an unambiguous overwrite beats a merge\nthe consumer has to implement correctly.",
+      "properties": {
+        "coverage": {
+          "additionalProperties": {
+            "type": "boolean"
+          },
+          "title": "Coverage",
+          "type": "object"
+        },
+        "current_topic_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Current Topic Id"
+        },
+        "pattern_confirmed": {
+          "default": false,
+          "title": "Pattern Confirmed",
+          "type": "boolean"
+        },
+        "topics": {
+          "items": {
+            "$ref": "#/$defs/TopicRecord"
+          },
+          "title": "Topics",
+          "type": "array"
+        }
+      },
+      "title": "StateDelta",
+      "type": "object"
+    },
+    "SubAction": {
+      "description": "How the action is carried out. Secondary to `Action`.",
+      "enum": [
+        "deepen",
+        "redirect",
+        "reflect_pattern",
+        "handoff",
+        "hold",
+        "refuse"
+      ],
+      "title": "SubAction",
+      "type": "string"
+    },
+    "SufficiencyComponents": {
+      "description": "The parts of an episode. S3 requires all four narrative components.",
+      "properties": {
+        "action": {
+          "default": false,
+          "title": "Action",
+          "type": "boolean"
+        },
+        "evidence": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Evidence",
+          "type": "object"
+        },
+        "outcome": {
+          "default": false,
+          "title": "Outcome",
+          "type": "boolean"
+        },
+        "reflection": {
+          "default": false,
+          "title": "Reflection",
+          "type": "boolean"
+        },
+        "scene": {
+          "default": false,
+          "title": "Scene",
+          "type": "boolean"
+        },
+        "stakes": {
+          "default": false,
+          "title": "Stakes",
+          "type": "boolean"
+        }
+      },
+      "title": "SufficiencyComponents",
+      "type": "object"
+    },
+    "TopicRecord": {
+      "description": "Everything the gate needs to know about one topic under discussion.",
+      "properties": {
+        "asked_questions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Asked Questions",
+          "type": "array"
+        },
+        "closed": {
+          "default": false,
+          "title": "Closed",
+          "type": "boolean"
+        },
+        "components": {
+          "$ref": "#/$defs/SufficiencyComponents"
+        },
+        "followups_used": {
+          "default": 0,
+          "title": "Followups Used",
+          "type": "integer"
+        },
+        "ownership": {
+          "$ref": "#/$defs/Ownership",
+          "default": "O0"
+        },
+        "specificity": {
+          "$ref": "#/$defs/Specificity",
+          "default": "S0"
+        },
+        "stage": {
+          "title": "Stage",
+          "type": "string"
+        },
+        "topic_id": {
+          "title": "Topic Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "topic_id",
+        "stage"
+      ],
+      "title": "TopicRecord",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "artifact": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Artifact"
+    },
+    "assessment": {
+      "$ref": "#/$defs/Assessment"
+    },
+    "contract_version": {
+      "default": "1.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "decision": {
+      "$ref": "#/$defs/Decision"
+    },
+    "diagnostics": {
+      "$ref": "#/$defs/Diagnostics"
+    },
+    "message": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Message"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "readiness": {
+      "$ref": "#/$defs/ArtifactReadiness"
+    },
+    "state_delta": {
+      "$ref": "#/$defs/StateDelta"
+    }
+  },
+  "required": [
+    "decision",
+    "assessment",
+    "readiness"
+  ],
+  "title": "TurnResponse",
+  "type": "object"
+}

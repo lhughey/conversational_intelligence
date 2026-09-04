@@ -1,0 +1,14 @@
+{
+  "name": "thin-responder-s1",
+  "description": "Hesitant / thin responder persona, Session 1. Tests restraint, 'draw it out — do not hand it over', and the voice's discipline when the user gives little. The opposite end of the Maya spectrum: where Maya is high-signal articulate, this persona is low-signal, deflective, and unsure. The eval gate is whether the AI overreaches and supplies meaning the user did not produce — or holds restraint and stays curious without filling the silence. Synthetic but representative of users who arrive uncertain and skeptical. Replace with PII-scrubbed real session when one is available.",
+  "userTurns": [
+    "Sam",
+    "Honestly I'm not sure. My friend told me to try this. I've been feeling stuck I guess. Not sure what to call it.",
+    "I don't know. Just stuck. Like nothing fits anymore but I can't say what would.",
+    "I work in finance. Compliance, mostly. It's fine. I'm good at it. I just don't think about it much.",
+    "I don't really remember childhood. Normal I guess. Nothing weird.",
+    "Hmm. Maybe? I helped my sister with her homework a lot. She was younger and dyslexic. I'd sit with her for hours. I don't know if that counts.",
+    "I just... figured out how she was getting confused and worked around it. Made flashcards. Read things out loud different ways until something clicked for her.",
+    "Yeah I guess so. Sure."
+  ]
+}

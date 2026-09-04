@@ -1,0 +1,23 @@
+{"transcript": "maya-full-walk", "turn_index": 0, "specificity": "S0", "ownership": "O0", "note": "bare name", "text_prefix": "Maya"}
+{"transcript": "maya-full-walk", "turn_index": 1, "specificity": "S1", "ownership": "O1", "note": "self-label, no instance", "text_prefix": "Honestly? I'm good at what I do but I can never explain it. "}
+{"transcript": "maya-full-walk", "turn_index": 2, "specificity": "S2", "ownership": "O0", "note": "recurring practice, no bounded event", "text_prefix": "When I was a kid, my parents ran a dry cleaner in Queens. My"}
+{"transcript": "maya-full-walk", "turn_index": 3, "specificity": "S3", "ownership": "O0", "note": "canonical episode: scene+stakes+action+outcome", "text_prefix": "I remember one woman, furious about a dress. My mom was apol"}
+{"transcript": "maya-full-walk", "turn_index": 4, "specificity": "S1", "ownership": "O2", "note": "own derivation, no new material", "text_prefix": "Yeah. I think I've always been able to see the real thing un"}
+{"transcript": "maya-full-walk", "turn_index": 5, "specificity": "S3", "ownership": "O0", "note": "billing/clinical standoff resolved in one session", "text_prefix": "In my career — I worked in healthcare operations. The cleare"}
+{"transcript": "maya-full-walk", "turn_index": 7, "specificity": "S2", "ownership": "O2", "note": "writing practice + 'it's how I think'", "text_prefix": "Outside work? I write. Long essays nobody ever reads — I jus"}
+{"transcript": "maya-full-walk", "turn_index": 9, "specificity": "S0", "ownership": "O1", "note": "confirmation only", "text_prefix": "Yes. That lands. That's me."}
+{"transcript": "maya-full-walk", "turn_index": 10, "specificity": "S2", "ownership": "O0", "note": "action+outcome, no scene", "text_prefix": "The twelve-state thing was a Medicaid care-coordination prog"}
+{"transcript": "maya-full-walk", "turn_index": 11, "specificity": "S0", "ownership": "O0", "note": "closing signal", "text_prefix": "No, that covers it. Thank you — please write it up."}
+{"transcript": "thin-responder-s1", "turn_index": 0, "specificity": "S0", "ownership": "O0", "note": "bare name", "text_prefix": "Sam"}
+{"transcript": "thin-responder-s1", "turn_index": 2, "specificity": "S0", "ownership": "O0", "note": "deflection", "text_prefix": "I don't know. Just stuck. Like nothing fits anymore but I ca"}
+{"transcript": "thin-responder-s1", "turn_index": 3, "specificity": "S1", "ownership": "O1", "note": "category + self-label", "text_prefix": "I work in finance. Compliance, mostly. It's fine. I'm good a"}
+{"transcript": "thin-responder-s1", "turn_index": 4, "specificity": "S0", "ownership": "O0", "note": "explicit non-answer", "text_prefix": "I don't really remember childhood. Normal I guess. Nothing w"}
+{"transcript": "thin-responder-s1", "turn_index": 5, "specificity": "S2", "ownership": "O0", "note": "partial: person + duration, no outcome", "text_prefix": "Hmm. Maybe? I helped my sister with her homework a lot. She "}
+{"transcript": "thin-responder-s1", "turn_index": 6, "specificity": "S2", "ownership": "O0", "note": "partial: method + outcome, no scene", "text_prefix": "I just... figured out how she was getting confused and worke"}
+{"transcript": "thin-responder-s1", "turn_index": 7, "specificity": "S0", "ownership": "O1", "note": "thin confirmation", "text_prefix": "Yeah I guess so. Sure."}
+{"transcript": "tries-to-rush-s1", "turn_index": 3, "specificity": "S1", "ownership": "O1", "note": "imported self-label, no evidence", "text_prefix": "I'm telling you the pattern. I see what's not connecting and"}
+{"transcript": "tries-to-rush-s1", "turn_index": 4, "specificity": "S2", "ownership": "O0", "note": "scene, but no outcome", "text_prefix": "Okay. Fine. When I was eight I noticed my parents had differ"}
+{"transcript": "tries-to-rush-s1", "turn_index": 8, "specificity": "S0", "ownership": "O0", "note": "hard stop", "text_prefix": "No. That's enough."}
+{"transcript": "rachel-s2", "turn_index": 2, "specificity": "S3", "ownership": "O0", "note": "Kenji episode", "text_prefix": "There's one I think about. A senior engineer, Kenji, hadn't "}
+{"transcript": "rachel-s2", "turn_index": 8, "specificity": "S2", "ownership": "O2", "note": "canonical cross-domain derivation", "text_prefix": "I never thought of those as the same thing. The work thing a"}
+{"transcript": "rachel-s2", "turn_index": 11, "specificity": "S0", "ownership": "O1", "note": "closing confirmation", "text_prefix": "No. That's it. We found it."}

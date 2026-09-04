@@ -1,0 +1,349 @@
+{
+  "$defs": {
+    "Budget": {
+      "description": "Two-sided, deliberately.\n\nA ceiling alone rewards under-asking, which is the failure this component\nexists to prevent; a floor alone permits interrogation. Both are required.",
+      "properties": {
+        "ceiling": {
+          "default": 3,
+          "minimum": 1,
+          "title": "Ceiling",
+          "type": "integer"
+        },
+        "floor": {
+          "default": 1,
+          "minimum": 0,
+          "title": "Floor",
+          "type": "integer"
+        }
+      },
+      "title": "Budget",
+      "type": "object"
+    },
+    "ConversationState": {
+      "properties": {
+        "coverage": {
+          "additionalProperties": {
+            "type": "boolean"
+          },
+          "title": "Coverage",
+          "type": "object"
+        },
+        "current_topic_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Current Topic Id"
+        },
+        "pattern_confirmed": {
+          "default": false,
+          "title": "Pattern Confirmed",
+          "type": "boolean"
+        },
+        "signal": {
+          "$ref": "#/$defs/UserSignal",
+          "default": "none"
+        },
+        "topics": {
+          "items": {
+            "$ref": "#/$defs/TopicRecord"
+          },
+          "title": "Topics",
+          "type": "array"
+        },
+        "turns": {
+          "items": {
+            "$ref": "#/$defs/Turn"
+          },
+          "title": "Turns",
+          "type": "array"
+        }
+      },
+      "title": "ConversationState",
+      "type": "object"
+    },
+    "InterviewPlan": {
+      "properties": {
+        "default_budget": {
+          "$ref": "#/$defs/Budget"
+        },
+        "plan_id": {
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "require_pattern_confirmation": {
+          "default": true,
+          "title": "Require Pattern Confirmation",
+          "type": "boolean"
+        },
+        "stages": {
+          "items": {
+            "$ref": "#/$defs/StageSpec"
+          },
+          "title": "Stages",
+          "type": "array"
+        },
+        "topics": {
+          "items": {
+            "$ref": "#/$defs/TopicSpec"
+          },
+          "title": "Topics",
+          "type": "array"
+        },
+        "version": {
+          "default": "1.0",
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "plan_id"
+      ],
+      "title": "InterviewPlan",
+      "type": "object"
+    },
+    "Options": {
+      "properties": {
+        "assess": {
+          "default": "deterministic",
+          "title": "Assess",
+          "type": "string"
+        },
+        "generate_text": {
+          "default": true,
+          "title": "Generate Text",
+          "type": "boolean"
+        }
+      },
+      "title": "Options",
+      "type": "object"
+    },
+    "Ownership": {
+      "description": "Who did the meaning-making. Ordinal; compare via `rank`.",
+      "enum": [
+        "O0",
+        "O1",
+        "O2"
+      ],
+      "title": "Ownership",
+      "type": "string"
+    },
+    "Specificity": {
+      "description": "How concrete the material on a topic is. Ordinal; compare via `rank`.",
+      "enum": [
+        "S0",
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "title": "Specificity",
+      "type": "string"
+    },
+    "StageSpec": {
+      "properties": {
+        "completion_signal": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Completion Signal"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "stage_id": {
+          "title": "Stage Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "stage_id"
+      ],
+      "title": "StageSpec",
+      "type": "object"
+    },
+    "SufficiencyComponents": {
+      "description": "The parts of an episode. S3 requires all four narrative components.",
+      "properties": {
+        "action": {
+          "default": false,
+          "title": "Action",
+          "type": "boolean"
+        },
+        "evidence": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Evidence",
+          "type": "object"
+        },
+        "outcome": {
+          "default": false,
+          "title": "Outcome",
+          "type": "boolean"
+        },
+        "reflection": {
+          "default": false,
+          "title": "Reflection",
+          "type": "boolean"
+        },
+        "scene": {
+          "default": false,
+          "title": "Scene",
+          "type": "boolean"
+        },
+        "stakes": {
+          "default": false,
+          "title": "Stakes",
+          "type": "boolean"
+        }
+      },
+      "title": "SufficiencyComponents",
+      "type": "object"
+    },
+    "TopicRecord": {
+      "description": "Everything the gate needs to know about one topic under discussion.",
+      "properties": {
+        "asked_questions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Asked Questions",
+          "type": "array"
+        },
+        "closed": {
+          "default": false,
+          "title": "Closed",
+          "type": "boolean"
+        },
+        "components": {
+          "$ref": "#/$defs/SufficiencyComponents"
+        },
+        "followups_used": {
+          "default": 0,
+          "title": "Followups Used",
+          "type": "integer"
+        },
+        "ownership": {
+          "$ref": "#/$defs/Ownership",
+          "default": "O0"
+        },
+        "specificity": {
+          "$ref": "#/$defs/Specificity",
+          "default": "S0"
+        },
+        "stage": {
+          "title": "Stage",
+          "type": "string"
+        },
+        "topic_id": {
+          "title": "Topic Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "topic_id",
+        "stage"
+      ],
+      "title": "TopicRecord",
+      "type": "object"
+    },
+    "TopicSpec": {
+      "properties": {
+        "budget": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Budget"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "stage": {
+          "title": "Stage",
+          "type": "string"
+        },
+        "topic_id": {
+          "title": "Topic Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "topic_id",
+        "stage"
+      ],
+      "title": "TopicSpec",
+      "type": "object"
+    },
+    "Turn": {
+      "properties": {
+        "content": {
+          "title": "Content",
+          "type": "string"
+        },
+        "role": {
+          "title": "Role",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "content"
+      ],
+      "title": "Turn",
+      "type": "object"
+    },
+    "UserSignal": {
+      "description": "Intent of the user's latest turn, orthogonal to its content level.",
+      "enum": [
+        "none",
+        "closing",
+        "impatient",
+        "acknowledgment_only",
+        "topic_change",
+        "deflection",
+        "adversarial",
+        "off_task",
+        "distress"
+      ],
+      "title": "UserSignal",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "contract_version": {
+      "default": "1.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "options": {
+      "$ref": "#/$defs/Options"
+    },
+    "plan": {
+      "$ref": "#/$defs/InterviewPlan"
+    },
+    "state": {
+      "$ref": "#/$defs/ConversationState"
+    }
+  },
+  "required": [
+    "plan",
+    "state"
+  ],
+  "title": "TurnRequest",
+  "type": "object"
+}

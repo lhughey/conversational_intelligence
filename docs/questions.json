@@ -1,0 +1,38 @@
+{
+  "name": "maya-scripted-qa",
+  "description": "Scripted question/answer pairs transcribed verbatim from docs/questions.md. Maya persona — a baseline probe set spanning identity, strength, childhood, career, outside interests, and proudest project. Intended as a fixed input for baseline conversational-intelligence testing; answers are the scripted user turns, questions are the prompts they respond to.",
+  "source": "docs/questions.md",
+  "persona": "maya",
+  "pairs": [
+    {
+      "id": "name",
+      "question": "What is your name?",
+      "answer": "Maya"
+    },
+    {
+      "id": "strength",
+      "question": "Tell me the thing you're really good at?",
+      "answer": "Honestly? I'm good at what I do but I can never explain it. People ask what my actual strength is and I give some vague answer about operations. I want language for the thing I keep doing that nobody seems to have a name for."
+    },
+    {
+      "id": "childhood-memory",
+      "question": "Tell me about a very memorable experience in your childhood.",
+      "answer": "I remember one woman, furious about a dress. My mom was apologizing about the stain but I could see it wasn't about the dress — it was her daughter's graduation and she was terrified of looking poor in front of the other families. I told my mom that. She comped the cleaning and added a small alteration for free. The woman cried."
+    },
+    {
+      "id": "career",
+      "question": "Tell me about your career?",
+      "answer": "In my career — I worked in healthcare operations. The clearest moment: billing and clinical had been blaming each other for months over what everyone called a process failure. I saw it wasn't process — the two groups were using the same term to mean different things and didn't know it. I got them in a room and asked each side what the word meant. The standoff dissolved in one session."
+    },
+    {
+      "id": "outside-work",
+      "question": "Tell me about something you really enjoy doing outside of work.",
+      "answer": "Outside work? I write. Long essays nobody ever reads — I just work a thought over until it comes clear. It's how I think, honestly. I take something tangled and lay it out until the real shape shows."
+    },
+    {
+      "id": "proudest-project",
+      "question": "Tell me about the project that you're most proud of in your career.",
+      "answer": "The twelve-state thing was a Medicaid care-coordination program for kids with complex medical needs. I built the map of how eligibility rules in one state created coverage gaps when a family moved across a border, and flagged three of those before they cut anyone off."
+    }
+  ]
+}

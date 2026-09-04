@@ -1,0 +1,18 @@
+{
+  "name": "maya-full-walk",
+  "description": "Maya — a full single-conversation walk (early life → career → interests → pattern) intended to reach emit_full_artifact. Turn 1 answers the new 'what brought you here' opening; the AI then bridges into early life. Validates the Phase-4 Read schema: the AI should emit headline / changes / thrives / brings / evidence[] with tiers. Synthetic but representative.",
+  "userTurns": [
+    "Maya",
+    "Honestly? I'm good at what I do but I can never explain it. People ask what my actual strength is and I give some vague answer about operations. I want language for the thing I keep doing that nobody seems to have a name for.",
+    "When I was a kid, my parents ran a dry cleaner in Queens. My dad spoke limited English so my mom handled the front. By the time I was seven I was the unofficial translator — not just of language but of meaning. A customer would be upset about a stain and I'd figure out what was really going on underneath: a job interview, a wedding, a funeral. I'd help my mom respond to that, not just the complaint.",
+    "I remember one woman, furious about a dress. My mom was apologizing about the stain but I could see it wasn't about the dress — it was her daughter's graduation and she was terrified of looking poor in front of the other families. I told my mom that. She comped the cleaning and added a small alteration for free. The woman cried.",
+    "Yeah. I think I've always been able to see the real thing under what people are actually saying.",
+    "In my career — I worked in healthcare operations. The clearest moment: billing and clinical had been blaming each other for months over what everyone called a process failure. I saw it wasn't process — the two groups were using the same term to mean different things and didn't know it. I got them in a room and asked each side what the word meant. The standoff dissolved in one session.",
+    "I couldn't put a dollar figure on it. But it had been stuck for months and it cleared in an afternoon. Later, on a twelve-state care initiative, I mapped how a decision in one state created downstream gaps in others — caught breakdowns before they happened that the regional teams couldn't see.",
+    "Outside work? I write. Long essays nobody ever reads — I just work a thought over until it comes clear. It's how I think, honestly. I take something tangled and lay it out until the real shape shows.",
+    "Yes — that's exactly it. And honestly what I care about most isn't being right, it's that people actually understand each other. Not just reach an agreement they can live with.",
+    "Yes. That lands. That's me.",
+    "The twelve-state thing was a Medicaid care-coordination program for kids with complex medical needs. I built the map of how eligibility rules in one state created coverage gaps when a family moved across a border, and flagged three of those before they cut anyone off.",
+    "No, that covers it. Thank you — please write it up."
+  ]
+}

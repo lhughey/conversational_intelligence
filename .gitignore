@@ -1,0 +1,31 @@
+# macOS
+.DS_Store
+._*
+__MACOSX/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+build/
+dist/
+
+# env / secrets
+.env
+.env.*
+!.env.example
+
+# run outputs + caches (runs/ is intentionally NOT ignored)
+cache/
+
+# redundant archive: byte-identical duplicate of docs/golden-transcripts/
+docs/golden-transcripts.zip
+
+# coverage
+.coverage
+coverage.xml
+htmlcov/

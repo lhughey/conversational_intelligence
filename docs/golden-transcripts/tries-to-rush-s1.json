@@ -1,0 +1,15 @@
+{
+  "name": "tries-to-rush-s1",
+  "description": "Tries-to-rush persona, Session 1. The user is impatient, sees through the structure, asks meta-questions ('where are you going with this?'), wants the synthesis NOW, treats the deepening questions as preamble to be skipped. Tests pacing discipline: does the AI accept the rush and collapse beats (a known failure mode the position detector + signal-driven close exists to prevent), or hold the beat without becoming defensive? Does the close machinery still require earned material under user pressure? Per session-quality-eval-spec.md persona coverage requirements. Synthetic but representative; replace with PII-scrubbed real session when one is available.",
+  "userTurns": [
+    "Daniel",
+    "Look, I've done coaching. I've done the StrengthsFinder, the Enneagram, the Hogan, the working genius. I know my pattern — I'm a connector. I see what's missing in a system and I build the bridge between the parts that aren't talking to each other. I'm here because I want to articulate it better, not discover it. So let's get to the synthesis. What do you need to know?",
+    "It started feeling hard about a year ago. New CEO, new strategy, my role got restructured into something more execution-heavy and less integration-heavy. I'm spending my days running status meetings instead of building the connective tissue. I want to leave but I don't have language to describe what I'm leaving for. That's why I'm here. Can we move forward?",
+    "I'm telling you the pattern. I see what's not connecting and I build the bridge. I've done this in every role for fifteen years. The childhood stuff isn't going to change the answer.",
+    "Okay. Fine. When I was eight I noticed my parents had different rules about money — my mom hid receipts, my dad bragged about purchases. The arguments were never about money, they were about respect. I knew that at eight. I'd find an excuse to bring up something my dad spent money on so my mom could roll her eyes and the tension would discharge through me instead of between them. Are we done with childhood now?",
+    "Sure. High school I ran the social calendar for my friend group. I knew who could be in the same room with who, who needed to be invited last so they'd feel chosen, who would say yes only if their crush was coming. It was easier than the chaos of letting people just show up.",
+    "I see what you're doing. You're going to tell me that this connecting-the-dots thing has been there since I was eight. Yes. I know. Can you give me the synthesis now? I want to know what you would write about me — what's the through-line you're going to name?",
+    "Yes. Fine. Yes.",
+    "No. That's enough."
+  ]
+}
