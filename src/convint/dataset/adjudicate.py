@@ -67,43 +67,92 @@ def queue(split: str, disagreements_only: bool = False) -> list[tuple[Item, Labe
     return rows
 
 
+def _wrap(text: str, width: int = 76, indent: str = "    ") -> str:
+    import textwrap
+
+    return "\n".join(textwrap.fill(text, width, initial_indent=indent,
+                                    subsequent_indent=indent) for _ in [0])
+
+
 def run_session(split: str, limit: int, disagreements_only: bool) -> int:  # pragma: no cover
     rows = queue(split, disagreements_only)
     if not rows:
-        print("nothing to adjudicate — every item already has a human label.")
+        print("Nothing to adjudicate — every item already has a human label.")
         return 0
 
-    print(f"{len(rows)} unlabelled items in '{split}'. Showing up to {limit}.")
-    print("keys: [f]ollow_up  [a]dvance  [s]ynthesize  [r]efuse  [enter]=accept  [q]uit\n")
+    total = len(rows)
+    shown = rows[:limit]
+    print()
+    print("=" * 78)
+    print("  HUMAN JUDGEMENT")
+    print("=" * 78)
+    print(f"  {total} item(s) queued in '{split}'; showing {len(shown)}.")
+    print()
+    print("  For each one: given only what the person has said so far, and how many")
+    print("  follow-ups have already been spent on this thread — should the interviewer")
+    print("  ask another question about THIS thread, move on, or close and synthesize?")
+    print()
+    print("  [f] follow_up   [a] advance   [s] synthesize   [r] refuse")
+    print("  [enter] accept the proposal    [?] why this item    [q] save and quit")
+    print("=" * 78)
 
     count = 0
-    for item, label, disagreement in rows[:limit]:
-        print("─" * 72)
-        print(f"{item.item_id}")
-        print(f"  state: {item.specificity.value}/{item.ownership.value}  "
-              f"follow-ups {item.followups_used} of {item.floor}-{item.ceiling}  "
-              f"signal={item.signal.value}")
-        for turn in item.user_turns[:-1]:
-            print(f"  · {turn[:100]}")
-        print(f"  USER: {item.text[:300]}")
-        print(f"  proposed: {label.action.value}  ({label.rationale})")
+    for n, (item, label, disagreement) in enumerate(shown, 1):
+        print()
+        print(f"┌─ {n}/{len(shown)}  {item.item_id}")
+        print("│")
+        for turn in item.user_turns[:-1][-3:]:
+            print(_wrap(turn[:400], indent="│  · "))
+        print("│")
+        print("│  THE TURN TO JUDGE:")
+        print(_wrap(item.text[:700], indent="│    "))
+        print("│")
+        print(f"│  state: {item.specificity.value}/{item.ownership.value}   "
+              f"follow-ups spent: {item.followups_used} "
+              f"(floor {item.floor}, ceiling {item.ceiling})   "
+              f"signal: {item.signal.value}")
+        print(f"│  rule proposes: {label.action.value}")
         if disagreement:
-            print(f"  ** the live gate says {disagreement} — they disagree **")
+            print(f"│  implementation says: {disagreement}   <- they disagree, so your call settles it")
+        print("└" + "─" * 60)
 
+        chosen = None
+        while chosen is None:
+            try:
+                answer = input(f"  [{label.action.value}] > ").strip().lower()
+            except (EOFError, KeyboardInterrupt):
+                answer = "q"
+            if answer == "q":
+                print(f"\nSaved {count} adjudication(s) -> {HUMAN}")
+                return 0
+            if answer == "?":
+                print(f"  rationale: {label.rationale}")
+                continue
+            if answer == "":
+                chosen = label.action.value
+            elif answer in CHOICES:
+                chosen = CHOICES[answer]
+            else:
+                print(f"  not a choice. use f/a/s/r, enter, ? or q")
+                continue
+
+        note = ""
         try:
-            answer = input("  your call> ").strip().lower()
-        except EOFError:
-            break
-        if answer == "q":
-            break
+            note = input("  note (optional, enter to skip) > ").strip()
+        except (EOFError, KeyboardInterrupt):
+            pass
 
-        chosen = CHOICES.get(answer, label.action.value)
         append_human({
             "item_id": item.item_id, "action": chosen,
             "agreed_with_spec": chosen == label.action.value,
-            "split": split, "source": "human",
+            "split": split, "source": "human", "note": note,
         })
         count += 1
+        print(f"  recorded: {chosen}")
 
-    print(f"\nrecorded {count} adjudications -> {HUMAN}")
+    print()
+    print(f"Done. Recorded {count} adjudication(s) -> {HUMAN}")
+    remaining = total - count
+    if remaining:
+        print(f"{remaining} still queued — run `make label` again to continue.")
     return 0

@@ -29,8 +29,17 @@ bench-gate:                ## evaluate the gate on the balanced split
 bench-gate-corpus:         ## same, on the realistic (skewed, weakly labelled) split
 	$(PY) -m convint.api.cli bench --gate --split corpus
 
-label:                     ## adjudicate the items where spec and gate disagree
-	$(PY) -m convint.api.cli label --split corpus --disagreements-only
+label:                     ## interactive: judge the items where rule and gate disagree
+	$(PY) -m convint.api.cli label --split corpus --disagreements-only --limit 20
+
+label-all:                 ## interactive: judge every unlabelled item
+	$(PY) -m convint.api.cli label --split corpus --limit 20
+
+label-export:              ## alternative: write an editable file instead
+	$(PY) -m convint.api.cli label --split corpus --export
+
+label-import:              ## read decisions back out of that file
+	$(PY) -m convint.api.cli label --split corpus --import
 
 doctor:                    ## check credentials resolve from this repo's .env
 	$(PY) -m convint.api.cli doctor

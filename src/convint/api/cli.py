@@ -43,6 +43,10 @@ def main(argv: list[str] | None = None) -> int:
     p_lab.add_argument("--limit", type=int, default=10)
     p_lab.add_argument("--disagreements-only", action="store_true",
                        help="only show items where the spec label and the gate disagree")
+    p_lab.add_argument("--export", action="store_true",
+                       help="write an editable review file instead of prompting")
+    p_lab.add_argument("--import", dest="do_import", action="store_true",
+                       help="read decisions back out of the review file")
     sub.add_parser("contract", help="print the JSON Schema this build speaks")
     sub.add_parser("doctor", help="check credentials resolve from this repo's .env")
 
@@ -68,6 +72,16 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "label":
+        from ..dataset.review import export, import_decisions
+
+        if args.do_import:
+            print(json.dumps(import_decisions(args.split), indent=2))
+            return 0
+        if args.export:
+            path, count = export(args.split)
+            print(f"wrote {count} items for review -> {path}")
+            return 0
+
         from ..dataset.adjudicate import run_session
 
         return run_session(args.split, args.limit, args.disagreements_only)
