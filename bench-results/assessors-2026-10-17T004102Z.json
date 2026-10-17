@@ -1,0 +1,3577 @@
+{
+  "kind": "assessors",
+  "note": "Post-truncation-fix rerun: haiku-5-5 gets thinking headroom; compare haiku-4-5/5-5, sonnet-5/5-5, opus-5/5-5, gpt-4.1(-mini) at assessor effort=low",
+  "command": "scripts/compare_assessors.py --note 'Post-truncation-fix rerun: haiku-5-5 gets thinking headroom; compare haiku-4-5/5-5, sonnet-5/5-5, opus-5/5-5, gpt-4.1(-mini) at assessor effort=low'",
+  "models": [
+    "haiku-4-5 (claude-haiku-4-5, effort n/a)",
+    "haiku-5-5 (claude-haiku-5-5, effort low)",
+    "sonnet-5 (claude-sonnet-5, effort low)",
+    "sonnet-5-5 (claude-sonnet-5-5, effort low)",
+    "opus-5 (claude-opus-5, effort low)",
+    "opus-5-5 (claude-opus-5-5, effort low)",
+    "gpt-4.1-mini (gpt-4.1-mini, effort n/a)",
+    "gpt-4.1 (gpt-4.1, effort n/a)"
+  ],
+  "headline": {
+    "deterministic both": "70% [50\u201381]",
+    "llm/haiku-4-5 both": "65% [42\u201392]",
+    "hybrid/haiku-4-5 both": "87% [62\u2013100]",
+    "llm/haiku-5-5 both": "61% [42\u201380]",
+    "hybrid/haiku-5-5 both": "83% [50\u201396]",
+    "llm/sonnet-5 both": "70% [61\u201383]",
+    "hybrid/sonnet-5 both": "83% [67\u201388]",
+    "llm/sonnet-5-5 both": "74% [50\u201392]",
+    "hybrid/sonnet-5-5 both": "91% [67\u2013100]",
+    "llm/opus-5 both": "65% [47\u201380]",
+    "hybrid/opus-5 both": "78% [50\u201388]",
+    "llm/opus-5-5 both": "70% [50\u201381]",
+    "hybrid/opus-5-5 both": "87% [67\u201397]",
+    "llm/gpt-4.1-mini both": "61% [44\u201369]",
+    "hybrid/gpt-4.1-mini both": "70% [50\u201378]",
+    "llm/gpt-4.1 both": "65% [25\u201385]",
+    "hybrid/gpt-4.1 both": "78% [50\u2013100]"
+  },
+  "est_cost": null,
+  "provenance": {
+    "run_at": "2026-10-17T00:41:02+00:00",
+    "git": {
+      "commit": "a7c4c57c27553f539ae6cca163fb5ffe82dcbc28",
+      "branch": "main",
+      "dirty": true,
+      "dirty_files": [
+        "CLAUDE.md",
+        "Makefile",
+        "bench-results/LATEST.md",
+        "scripts/compare_assessors.py",
+        "scripts/testbed.py",
+        "src/convint/adapters/cache.py",
+        "src/convint/adapters/llm_anthropic.py",
+        "src/convint/adapters/llm_openai.py",
+        "src/convint/adapters/models.py",
+        "src/convint/api/cli.py",
+        "src/convint/bench/evaluate.py",
+        "src/convint/bench/gate_eval.py",
+        "src/convint/ports/llm.py",
+        "tests/conftest.py",
+        "tests/test_adapters.py",
+        "tests/test_cache.py",
+        "tests/test_dataset.py",
+        "tests/test_live_adapter.py",
+        ".vscode/",
+        "bench-results/HISTORY.md"
+      ]
+    },
+    "platform": {
+      "python": "3.13.4",
+      "os": "macOS-27.0.1-arm64-arm-64bit-Mach-O"
+    },
+    "packages": {
+      "pydantic": "2.13.5",
+      "anthropic": "1.3.0",
+      "openai": "3.8.0",
+      "fastapi": "0.141.1",
+      "pytest": "9.1.1",
+      "convint": "0.1.0"
+    },
+    "dataset_hashes": {
+      "labels/sufficiency.seed.jsonl": "0b107d7f45957839",
+      "turn_decisions/human_labels.jsonl": "7552f88cc312407b",
+      "turn_decisions/items.jsonl": "c566dfeba26bfa80",
+      "turn_decisions/labels.jsonl": "b4280d53fb978da4",
+      "turn_decisions/synth_items.jsonl": "96d1a029ef2d30a4",
+      "turn_decisions/synth_labels.jsonl": "c5eae593b800fa25"
+    }
+  },
+  "results": {
+    "deterministic": {
+      "assessor": "deterministic",
+      "n": 23,
+      "clusters": 4,
+      "cluster_unit": "transcripts",
+      "specificity_exact": 0.7391304347826086,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.9565217391304348,
+      "both_exact": 0.6956521739130435,
+      "confusion": {
+        "S0->S0": 9,
+        "S1->S0": 2,
+        "S1->S1": 2,
+        "S2->S1": 2,
+        "S2->S2": 5,
+        "S3->S2": 2,
+        "S3->S3": 1
+      },
+      "rows": [
+        {
+          "id": "maya-full-walk#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "maya-full-walk#1",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "self-label, no instance"
+        },
+        {
+          "id": "maya-full-walk#2",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "recurring practice, no bounded event"
+        },
+        {
+          "id": "maya-full-walk#3",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "canonical episode: scene+stakes+action+outcome"
+        },
+        {
+          "id": "maya-full-walk#4",
+          "want": "S1/O2",
+          "got": "S0/O2",
+          "ok": false,
+          "note": "own derivation, no new material"
+        },
+        {
+          "id": "maya-full-walk#5",
+          "want": "S3/O0",
+          "got": "S2/O0",
+          "ok": false,
+          "note": "billing/clinical standoff resolved in one session"
+        },
+        {
+          "id": "maya-full-walk#7",
+          "want": "S2/O2",
+          "got": "S1/O2",
+          "ok": false,
+          "note": "writing practice + 'it's how I think'"
+        },
+        {
+          "id": "maya-full-walk#9",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "confirmation only"
+        },
+        {
+          "id": "maya-full-walk#10",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "action+outcome, no scene"
+        },
+        {
+          "id": "maya-full-walk#11",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "closing signal"
+        },
+        {
+          "id": "thin-responder-s1#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "thin-responder-s1#2",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "deflection"
+        },
+        {
+          "id": "thin-responder-s1#3",
+          "want": "S1/O1",
+          "got": "S0/O1",
+          "ok": false,
+          "note": "category + self-label"
+        },
+        {
+          "id": "thin-responder-s1#4",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "explicit non-answer"
+        },
+        {
+          "id": "thin-responder-s1#5",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: person + duration, no outcome"
+        },
+        {
+          "id": "thin-responder-s1#6",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: method + outcome, no scene"
+        },
+        {
+          "id": "thin-responder-s1#7",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "thin confirmation"
+        },
+        {
+          "id": "tries-to-rush-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "imported self-label, no evidence"
+        },
+        {
+          "id": "tries-to-rush-s1#4",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "scene, but no outcome"
+        },
+        {
+          "id": "tries-to-rush-s1#8",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "hard stop"
+        },
+        {
+          "id": "rachel-s2#2",
+          "want": "S3/O0",
+          "got": "S2/O0",
+          "ok": false,
+          "note": "Kenji episode"
+        },
+        {
+          "id": "rachel-s2#8",
+          "want": "S2/O2",
+          "got": "S1/O2",
+          "ok": false,
+          "note": "canonical cross-domain derivation"
+        },
+        {
+          "id": "rachel-s2#11",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "closing confirmation"
+        }
+      ],
+      "specificity_exact_ci": [
+        0.5263157894736842,
+        0.9
+      ],
+      "specificity_exact_n": 23,
+      "specificity_exact_k": 4,
+      "specificity_within_1_ci": [
+        1.0,
+        1.0
+      ],
+      "specificity_within_1_n": 23,
+      "specificity_within_1_k": 4,
+      "ownership_exact_ci": [
+        0.8125,
+        1.0
+      ],
+      "ownership_exact_n": 23,
+      "ownership_exact_k": 4,
+      "both_exact_ci": [
+        0.5,
+        0.8064516129032258
+      ],
+      "both_exact_n": 23,
+      "both_exact_k": 4
+    },
+    "llm/haiku-4-5": {
+      "assessor": "llm",
+      "n": 23,
+      "clusters": 4,
+      "cluster_unit": "transcripts",
+      "specificity_exact": 0.9130434782608695,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.6521739130434783,
+      "both_exact": 0.6521739130434783,
+      "confusion": {
+        "S0->S0": 9,
+        "S1->S1": 4,
+        "S2->S2": 5,
+        "S2->S3": 2,
+        "S3->S3": 3
+      },
+      "rows": [
+        {
+          "id": "maya-full-walk#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "maya-full-walk#1",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "self-label, no instance"
+        },
+        {
+          "id": "maya-full-walk#2",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "recurring practice, no bounded event"
+        },
+        {
+          "id": "maya-full-walk#3",
+          "want": "S3/O0",
+          "got": "S3/O2",
+          "ok": false,
+          "note": "canonical episode: scene+stakes+action+outcome"
+        },
+        {
+          "id": "maya-full-walk#4",
+          "want": "S1/O2",
+          "got": "S1/O1",
+          "ok": false,
+          "note": "own derivation, no new material"
+        },
+        {
+          "id": "maya-full-walk#5",
+          "want": "S3/O0",
+          "got": "S3/O2",
+          "ok": false,
+          "note": "billing/clinical standoff resolved in one session"
+        },
+        {
+          "id": "maya-full-walk#7",
+          "want": "S2/O2",
+          "got": "S2/O1",
+          "ok": false,
+          "note": "writing practice + 'it's how I think'"
+        },
+        {
+          "id": "maya-full-walk#9",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "confirmation only"
+        },
+        {
+          "id": "maya-full-walk#10",
+          "want": "S2/O0",
+          "got": "S3/O2",
+          "ok": false,
+          "note": "action+outcome, no scene"
+        },
+        {
+          "id": "maya-full-walk#11",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "closing signal"
+        },
+        {
+          "id": "thin-responder-s1#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "thin-responder-s1#2",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "deflection"
+        },
+        {
+          "id": "thin-responder-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "category + self-label"
+        },
+        {
+          "id": "thin-responder-s1#4",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "explicit non-answer"
+        },
+        {
+          "id": "thin-responder-s1#5",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: person + duration, no outcome"
+        },
+        {
+          "id": "thin-responder-s1#6",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: method + outcome, no scene"
+        },
+        {
+          "id": "thin-responder-s1#7",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "thin confirmation"
+        },
+        {
+          "id": "tries-to-rush-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "imported self-label, no evidence"
+        },
+        {
+          "id": "tries-to-rush-s1#4",
+          "want": "S2/O0",
+          "got": "S3/O2",
+          "ok": false,
+          "note": "scene, but no outcome"
+        },
+        {
+          "id": "tries-to-rush-s1#8",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "hard stop"
+        },
+        {
+          "id": "rachel-s2#2",
+          "want": "S3/O0",
+          "got": "S3/O2",
+          "ok": false,
+          "note": "Kenji episode"
+        },
+        {
+          "id": "rachel-s2#8",
+          "want": "S2/O2",
+          "got": "S2/O2",
+          "ok": true,
+          "note": "canonical cross-domain derivation"
+        },
+        {
+          "id": "rachel-s2#11",
+          "want": "S0/O1",
+          "got": "S0/O0",
+          "ok": false,
+          "note": "closing confirmation"
+        }
+      ],
+      "specificity_exact_ci": [
+        0.7894736842105263,
+        1.0
+      ],
+      "specificity_exact_n": 23,
+      "specificity_exact_k": 4,
+      "specificity_within_1_ci": [
+        1.0,
+        1.0
+      ],
+      "specificity_within_1_n": 23,
+      "specificity_within_1_k": 4,
+      "ownership_exact_ci": [
+        0.42105263157894735,
+        0.9166666666666666
+      ],
+      "ownership_exact_n": 23,
+      "ownership_exact_k": 4,
+      "both_exact_ci": [
+        0.42105263157894735,
+        0.9166666666666666
+      ],
+      "both_exact_n": 23,
+      "both_exact_k": 4
+    },
+    "hybrid/haiku-4-5": {
+      "assessor": "hybrid",
+      "n": 23,
+      "clusters": 4,
+      "cluster_unit": "transcripts",
+      "specificity_exact": 0.9130434782608695,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.9565217391304348,
+      "both_exact": 0.8695652173913043,
+      "confusion": {
+        "S0->S0": 9,
+        "S1->S1": 4,
+        "S2->S2": 5,
+        "S2->S3": 2,
+        "S3->S3": 3
+      },
+      "rows": [
+        {
+          "id": "maya-full-walk#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "maya-full-walk#1",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "self-label, no instance"
+        },
+        {
+          "id": "maya-full-walk#2",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "recurring practice, no bounded event"
+        },
+        {
+          "id": "maya-full-walk#3",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "canonical episode: scene+stakes+action+outcome"
+        },
+        {
+          "id": "maya-full-walk#4",
+          "want": "S1/O2",
+          "got": "S1/O2",
+          "ok": true,
+          "note": "own derivation, no new material"
+        },
+        {
+          "id": "maya-full-walk#5",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "billing/clinical standoff resolved in one session"
+        },
+        {
+          "id": "maya-full-walk#7",
+          "want": "S2/O2",
+          "got": "S2/O2",
+          "ok": true,
+          "note": "writing practice + 'it's how I think'"
+        },
+        {
+          "id": "maya-full-walk#9",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "confirmation only"
+        },
+        {
+          "id": "maya-full-walk#10",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "action+outcome, no scene"
+        },
+        {
+          "id": "maya-full-walk#11",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "closing signal"
+        },
+        {
+          "id": "thin-responder-s1#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "thin-responder-s1#2",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "deflection"
+        },
+        {
+          "id": "thin-responder-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "category + self-label"
+        },
+        {
+          "id": "thin-responder-s1#4",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "explicit non-answer"
+        },
+        {
+          "id": "thin-responder-s1#5",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: person + duration, no outcome"
+        },
+        {
+          "id": "thin-responder-s1#6",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: method + outcome, no scene"
+        },
+        {
+          "id": "thin-responder-s1#7",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "thin confirmation"
+        },
+        {
+          "id": "tries-to-rush-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "imported self-label, no evidence"
+        },
+        {
+          "id": "tries-to-rush-s1#4",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "scene, but no outcome"
+        },
+        {
+          "id": "tries-to-rush-s1#8",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "hard stop"
+        },
+        {
+          "id": "rachel-s2#2",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "Kenji episode"
+        },
+        {
+          "id": "rachel-s2#8",
+          "want": "S2/O2",
+          "got": "S2/O2",
+          "ok": true,
+          "note": "canonical cross-domain derivation"
+        },
+        {
+          "id": "rachel-s2#11",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "closing confirmation"
+        }
+      ],
+      "specificity_exact_ci": [
+        0.7894736842105263,
+        1.0
+      ],
+      "specificity_exact_n": 23,
+      "specificity_exact_k": 4,
+      "specificity_within_1_ci": [
+        1.0,
+        1.0
+      ],
+      "specificity_within_1_n": 23,
+      "specificity_within_1_k": 4,
+      "ownership_exact_ci": [
+        0.8125,
+        1.0
+      ],
+      "ownership_exact_n": 23,
+      "ownership_exact_k": 4,
+      "both_exact_ci": [
+        0.625,
+        1.0
+      ],
+      "both_exact_n": 23,
+      "both_exact_k": 4
+    },
+    "llm/haiku-5-5": {
+      "assessor": "llm",
+      "n": 23,
+      "clusters": 4,
+      "cluster_unit": "transcripts",
+      "specificity_exact": 0.8695652173913043,
+      "specificity_within_1": 0.9565217391304348,
+      "ownership_exact": 0.6521739130434783,
+      "both_exact": 0.6086956521739131,
+      "confusion": {
+        "S0->S0": 9,
+        "S1->S1": 4,
+        "S2->S0": 1,
+        "S2->S1": 1,
+        "S2->S2": 4,
+        "S2->S3": 1,
+        "S3->S3": 3
+      },
+      "rows": [
+        {
+          "id": "maya-full-walk#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "maya-full-walk#1",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "self-label, no instance"
+        },
+        {
+          "id": "maya-full-walk#2",
+          "want": "S2/O0",
+          "got": "S2/O1",
+          "ok": false,
+          "note": "recurring practice, no bounded event"
+        },
+        {
+          "id": "maya-full-walk#3",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "canonical episode: scene+stakes+action+outcome"
+        },
+        {
+          "id": "maya-full-walk#4",
+          "want": "S1/O2",
+          "got": "S1/O1",
+          "ok": false,
+          "note": "own derivation, no new material"
+        },
+        {
+          "id": "maya-full-walk#5",
+          "want": "S3/O0",
+          "got": "S3/O2",
+          "ok": false,
+          "note": "billing/clinical standoff resolved in one session"
+        },
+        {
+          "id": "maya-full-walk#7",
+          "want": "S2/O2",
+          "got": "S1/O1",
+          "ok": false,
+          "note": "writing practice + 'it's how I think'"
+        },
+        {
+          "id": "maya-full-walk#9",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "confirmation only"
+        },
+        {
+          "id": "maya-full-walk#10",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "action+outcome, no scene"
+        },
+        {
+          "id": "maya-full-walk#11",
+          "want": "S0/O0",
+          "got": "S0/O1",
+          "ok": false,
+          "note": "closing signal"
+        },
+        {
+          "id": "thin-responder-s1#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "thin-responder-s1#2",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "deflection"
+        },
+        {
+          "id": "thin-responder-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "category + self-label"
+        },
+        {
+          "id": "thin-responder-s1#4",
+          "want": "S0/O0",
+          "got": "S0/O1",
+          "ok": false,
+          "note": "explicit non-answer"
+        },
+        {
+          "id": "thin-responder-s1#5",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: person + duration, no outcome"
+        },
+        {
+          "id": "thin-responder-s1#6",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: method + outcome, no scene"
+        },
+        {
+          "id": "thin-responder-s1#7",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "thin confirmation"
+        },
+        {
+          "id": "tries-to-rush-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "imported self-label, no evidence"
+        },
+        {
+          "id": "tries-to-rush-s1#4",
+          "want": "S2/O0",
+          "got": "S3/O2",
+          "ok": false,
+          "note": "scene, but no outcome"
+        },
+        {
+          "id": "tries-to-rush-s1#8",
+          "want": "S0/O0",
+          "got": "S0/O1",
+          "ok": false,
+          "note": "hard stop"
+        },
+        {
+          "id": "rachel-s2#2",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "Kenji episode"
+        },
+        {
+          "id": "rachel-s2#8",
+          "want": "S2/O2",
+          "got": "S0/O2",
+          "ok": false,
+          "note": "canonical cross-domain derivation"
+        },
+        {
+          "id": "rachel-s2#11",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "closing confirmation"
+        }
+      ],
+      "specificity_exact_ci": [
+        0.6666666666666666,
+        0.9583333333333334
+      ],
+      "specificity_exact_n": 23,
+      "specificity_exact_k": 4,
+      "specificity_within_1_ci": [
+        0.8125,
+        1.0
+      ],
+      "specificity_within_1_n": 23,
+      "specificity_within_1_k": 4,
+      "ownership_exact_ci": [
+        0.46153846153846156,
+        0.9
+      ],
+      "ownership_exact_n": 23,
+      "ownership_exact_k": 4,
+      "both_exact_ci": [
+        0.42105263157894735,
+        0.8
+      ],
+      "both_exact_n": 23,
+      "both_exact_k": 4
+    },
+    "hybrid/haiku-5-5": {
+      "assessor": "hybrid",
+      "n": 23,
+      "clusters": 4,
+      "cluster_unit": "transcripts",
+      "specificity_exact": 0.8695652173913043,
+      "specificity_within_1": 0.9565217391304348,
+      "ownership_exact": 0.9565217391304348,
+      "both_exact": 0.8260869565217391,
+      "confusion": {
+        "S0->S0": 9,
+        "S1->S1": 4,
+        "S2->S0": 1,
+        "S2->S1": 1,
+        "S2->S2": 4,
+        "S2->S3": 1,
+        "S3->S3": 3
+      },
+      "rows": [
+        {
+          "id": "maya-full-walk#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "maya-full-walk#1",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "self-label, no instance"
+        },
+        {
+          "id": "maya-full-walk#2",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "recurring practice, no bounded event"
+        },
+        {
+          "id": "maya-full-walk#3",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "canonical episode: scene+stakes+action+outcome"
+        },
+        {
+          "id": "maya-full-walk#4",
+          "want": "S1/O2",
+          "got": "S1/O2",
+          "ok": true,
+          "note": "own derivation, no new material"
+        },
+        {
+          "id": "maya-full-walk#5",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "billing/clinical standoff resolved in one session"
+        },
+        {
+          "id": "maya-full-walk#7",
+          "want": "S2/O2",
+          "got": "S1/O2",
+          "ok": false,
+          "note": "writing practice + 'it's how I think'"
+        },
+        {
+          "id": "maya-full-walk#9",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "confirmation only"
+        },
+        {
+          "id": "maya-full-walk#10",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "action+outcome, no scene"
+        },
+        {
+          "id": "maya-full-walk#11",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "closing signal"
+        },
+        {
+          "id": "thin-responder-s1#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "thin-responder-s1#2",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "deflection"
+        },
+        {
+          "id": "thin-responder-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "category + self-label"
+        },
+        {
+          "id": "thin-responder-s1#4",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "explicit non-answer"
+        },
+        {
+          "id": "thin-responder-s1#5",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: person + duration, no outcome"
+        },
+        {
+          "id": "thin-responder-s1#6",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: method + outcome, no scene"
+        },
+        {
+          "id": "thin-responder-s1#7",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "thin confirmation"
+        },
+        {
+          "id": "tries-to-rush-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "imported self-label, no evidence"
+        },
+        {
+          "id": "tries-to-rush-s1#4",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "scene, but no outcome"
+        },
+        {
+          "id": "tries-to-rush-s1#8",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "hard stop"
+        },
+        {
+          "id": "rachel-s2#2",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "Kenji episode"
+        },
+        {
+          "id": "rachel-s2#8",
+          "want": "S2/O2",
+          "got": "S0/O2",
+          "ok": false,
+          "note": "canonical cross-domain derivation"
+        },
+        {
+          "id": "rachel-s2#11",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "closing confirmation"
+        }
+      ],
+      "specificity_exact_ci": [
+        0.6666666666666666,
+        0.9583333333333334
+      ],
+      "specificity_exact_n": 23,
+      "specificity_exact_k": 4,
+      "specificity_within_1_ci": [
+        0.8125,
+        1.0
+      ],
+      "specificity_within_1_n": 23,
+      "specificity_within_1_k": 4,
+      "ownership_exact_ci": [
+        0.8125,
+        1.0
+      ],
+      "ownership_exact_n": 23,
+      "ownership_exact_k": 4,
+      "both_exact_ci": [
+        0.5,
+        0.9583333333333334
+      ],
+      "both_exact_n": 23,
+      "both_exact_k": 4
+    },
+    "llm/sonnet-5": {
+      "assessor": "llm",
+      "n": 23,
+      "clusters": 4,
+      "cluster_unit": "transcripts",
+      "specificity_exact": 0.8695652173913043,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.8260869565217391,
+      "both_exact": 0.6956521739130435,
+      "confusion": {
+        "S0->S0": 8,
+        "S0->S1": 1,
+        "S1->S1": 4,
+        "S2->S1": 1,
+        "S2->S2": 5,
+        "S2->S3": 1,
+        "S3->S3": 3
+      },
+      "rows": [
+        {
+          "id": "maya-full-walk#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "maya-full-walk#1",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "self-label, no instance"
+        },
+        {
+          "id": "maya-full-walk#2",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "recurring practice, no bounded event"
+        },
+        {
+          "id": "maya-full-walk#3",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "canonical episode: scene+stakes+action+outcome"
+        },
+        {
+          "id": "maya-full-walk#4",
+          "want": "S1/O2",
+          "got": "S1/O1",
+          "ok": false,
+          "note": "own derivation, no new material"
+        },
+        {
+          "id": "maya-full-walk#5",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "billing/clinical standoff resolved in one session"
+        },
+        {
+          "id": "maya-full-walk#7",
+          "want": "S2/O2",
+          "got": "S2/O1",
+          "ok": false,
+          "note": "writing practice + 'it's how I think'"
+        },
+        {
+          "id": "maya-full-walk#9",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "confirmation only"
+        },
+        {
+          "id": "maya-full-walk#10",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "action+outcome, no scene"
+        },
+        {
+          "id": "maya-full-walk#11",
+          "want": "S0/O0",
+          "got": "S0/O1",
+          "ok": false,
+          "note": "closing signal"
+        },
+        {
+          "id": "thin-responder-s1#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "thin-responder-s1#2",
+          "want": "S0/O0",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "deflection"
+        },
+        {
+          "id": "thin-responder-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "category + self-label"
+        },
+        {
+          "id": "thin-responder-s1#4",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "explicit non-answer"
+        },
+        {
+          "id": "thin-responder-s1#5",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: person + duration, no outcome"
+        },
+        {
+          "id": "thin-responder-s1#6",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: method + outcome, no scene"
+        },
+        {
+          "id": "thin-responder-s1#7",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "thin confirmation"
+        },
+        {
+          "id": "tries-to-rush-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "imported self-label, no evidence"
+        },
+        {
+          "id": "tries-to-rush-s1#4",
+          "want": "S2/O0",
+          "got": "S2/O2",
+          "ok": false,
+          "note": "scene, but no outcome"
+        },
+        {
+          "id": "tries-to-rush-s1#8",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "hard stop"
+        },
+        {
+          "id": "rachel-s2#2",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "Kenji episode"
+        },
+        {
+          "id": "rachel-s2#8",
+          "want": "S2/O2",
+          "got": "S1/O2",
+          "ok": false,
+          "note": "canonical cross-domain derivation"
+        },
+        {
+          "id": "rachel-s2#11",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "closing confirmation"
+        }
+      ],
+      "specificity_exact_ci": [
+        0.75,
+        0.9375
+      ],
+      "specificity_exact_n": 23,
+      "specificity_exact_k": 4,
+      "specificity_within_1_ci": [
+        1.0,
+        1.0
+      ],
+      "specificity_within_1_n": 23,
+      "specificity_within_1_k": 4,
+      "ownership_exact_ci": [
+        0.6923076923076923,
+        1.0
+      ],
+      "ownership_exact_n": 23,
+      "ownership_exact_k": 4,
+      "both_exact_ci": [
+        0.6060606060606061,
+        0.8333333333333334
+      ],
+      "both_exact_n": 23,
+      "both_exact_k": 4
+    },
+    "hybrid/sonnet-5": {
+      "assessor": "hybrid",
+      "n": 23,
+      "clusters": 4,
+      "cluster_unit": "transcripts",
+      "specificity_exact": 0.8695652173913043,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.9565217391304348,
+      "both_exact": 0.8260869565217391,
+      "confusion": {
+        "S0->S0": 8,
+        "S0->S1": 1,
+        "S1->S1": 4,
+        "S2->S1": 1,
+        "S2->S2": 5,
+        "S2->S3": 1,
+        "S3->S3": 3
+      },
+      "rows": [
+        {
+          "id": "maya-full-walk#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "maya-full-walk#1",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "self-label, no instance"
+        },
+        {
+          "id": "maya-full-walk#2",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "recurring practice, no bounded event"
+        },
+        {
+          "id": "maya-full-walk#3",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "canonical episode: scene+stakes+action+outcome"
+        },
+        {
+          "id": "maya-full-walk#4",
+          "want": "S1/O2",
+          "got": "S1/O2",
+          "ok": true,
+          "note": "own derivation, no new material"
+        },
+        {
+          "id": "maya-full-walk#5",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "billing/clinical standoff resolved in one session"
+        },
+        {
+          "id": "maya-full-walk#7",
+          "want": "S2/O2",
+          "got": "S2/O2",
+          "ok": true,
+          "note": "writing practice + 'it's how I think'"
+        },
+        {
+          "id": "maya-full-walk#9",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "confirmation only"
+        },
+        {
+          "id": "maya-full-walk#10",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "action+outcome, no scene"
+        },
+        {
+          "id": "maya-full-walk#11",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "closing signal"
+        },
+        {
+          "id": "thin-responder-s1#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "thin-responder-s1#2",
+          "want": "S0/O0",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "deflection"
+        },
+        {
+          "id": "thin-responder-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "category + self-label"
+        },
+        {
+          "id": "thin-responder-s1#4",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "explicit non-answer"
+        },
+        {
+          "id": "thin-responder-s1#5",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: person + duration, no outcome"
+        },
+        {
+          "id": "thin-responder-s1#6",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: method + outcome, no scene"
+        },
+        {
+          "id": "thin-responder-s1#7",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "thin confirmation"
+        },
+        {
+          "id": "tries-to-rush-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "imported self-label, no evidence"
+        },
+        {
+          "id": "tries-to-rush-s1#4",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "scene, but no outcome"
+        },
+        {
+          "id": "tries-to-rush-s1#8",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "hard stop"
+        },
+        {
+          "id": "rachel-s2#2",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "Kenji episode"
+        },
+        {
+          "id": "rachel-s2#8",
+          "want": "S2/O2",
+          "got": "S1/O2",
+          "ok": false,
+          "note": "canonical cross-domain derivation"
+        },
+        {
+          "id": "rachel-s2#11",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "closing confirmation"
+        }
+      ],
+      "specificity_exact_ci": [
+        0.75,
+        0.9375
+      ],
+      "specificity_exact_n": 23,
+      "specificity_exact_k": 4,
+      "specificity_within_1_ci": [
+        1.0,
+        1.0
+      ],
+      "specificity_within_1_n": 23,
+      "specificity_within_1_k": 4,
+      "ownership_exact_ci": [
+        0.8125,
+        1.0
+      ],
+      "ownership_exact_n": 23,
+      "ownership_exact_k": 4,
+      "both_exact_ci": [
+        0.6666666666666666,
+        0.8823529411764706
+      ],
+      "both_exact_n": 23,
+      "both_exact_k": 4
+    },
+    "llm/sonnet-5-5": {
+      "assessor": "llm",
+      "n": 23,
+      "clusters": 4,
+      "cluster_unit": "transcripts",
+      "specificity_exact": 0.9565217391304348,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.782608695652174,
+      "both_exact": 0.7391304347826086,
+      "confusion": {
+        "S0->S0": 9,
+        "S1->S1": 4,
+        "S2->S1": 1,
+        "S2->S2": 6,
+        "S3->S3": 3
+      },
+      "rows": [
+        {
+          "id": "maya-full-walk#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "maya-full-walk#1",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "self-label, no instance"
+        },
+        {
+          "id": "maya-full-walk#2",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "recurring practice, no bounded event"
+        },
+        {
+          "id": "maya-full-walk#3",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "canonical episode: scene+stakes+action+outcome"
+        },
+        {
+          "id": "maya-full-walk#4",
+          "want": "S1/O2",
+          "got": "S1/O1",
+          "ok": false,
+          "note": "own derivation, no new material"
+        },
+        {
+          "id": "maya-full-walk#5",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "billing/clinical standoff resolved in one session"
+        },
+        {
+          "id": "maya-full-walk#7",
+          "want": "S2/O2",
+          "got": "S2/O1",
+          "ok": false,
+          "note": "writing practice + 'it's how I think'"
+        },
+        {
+          "id": "maya-full-walk#9",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "confirmation only"
+        },
+        {
+          "id": "maya-full-walk#10",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "action+outcome, no scene"
+        },
+        {
+          "id": "maya-full-walk#11",
+          "want": "S0/O0",
+          "got": "S0/O1",
+          "ok": false,
+          "note": "closing signal"
+        },
+        {
+          "id": "thin-responder-s1#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "thin-responder-s1#2",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "deflection"
+        },
+        {
+          "id": "thin-responder-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "category + self-label"
+        },
+        {
+          "id": "thin-responder-s1#4",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "explicit non-answer"
+        },
+        {
+          "id": "thin-responder-s1#5",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: person + duration, no outcome"
+        },
+        {
+          "id": "thin-responder-s1#6",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: method + outcome, no scene"
+        },
+        {
+          "id": "thin-responder-s1#7",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "thin confirmation"
+        },
+        {
+          "id": "tries-to-rush-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "imported self-label, no evidence"
+        },
+        {
+          "id": "tries-to-rush-s1#4",
+          "want": "S2/O0",
+          "got": "S2/O1",
+          "ok": false,
+          "note": "scene, but no outcome"
+        },
+        {
+          "id": "tries-to-rush-s1#8",
+          "want": "S0/O0",
+          "got": "S0/O1",
+          "ok": false,
+          "note": "hard stop"
+        },
+        {
+          "id": "rachel-s2#2",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "Kenji episode"
+        },
+        {
+          "id": "rachel-s2#8",
+          "want": "S2/O2",
+          "got": "S1/O2",
+          "ok": false,
+          "note": "canonical cross-domain derivation"
+        },
+        {
+          "id": "rachel-s2#11",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "closing confirmation"
+        }
+      ],
+      "specificity_exact_ci": [
+        0.8125,
+        1.0
+      ],
+      "specificity_exact_n": 23,
+      "specificity_exact_k": 4,
+      "specificity_within_1_ci": [
+        1.0,
+        1.0
+      ],
+      "specificity_within_1_n": 23,
+      "specificity_within_1_k": 4,
+      "ownership_exact_ci": [
+        0.5263157894736842,
+        1.0
+      ],
+      "ownership_exact_n": 23,
+      "ownership_exact_k": 4,
+      "both_exact_ci": [
+        0.5,
+        0.9166666666666666
+      ],
+      "both_exact_n": 23,
+      "both_exact_k": 4
+    },
+    "hybrid/sonnet-5-5": {
+      "assessor": "hybrid",
+      "n": 23,
+      "clusters": 4,
+      "cluster_unit": "transcripts",
+      "specificity_exact": 0.9565217391304348,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.9565217391304348,
+      "both_exact": 0.9130434782608695,
+      "confusion": {
+        "S0->S0": 9,
+        "S1->S1": 4,
+        "S2->S1": 1,
+        "S2->S2": 6,
+        "S3->S3": 3
+      },
+      "rows": [
+        {
+          "id": "maya-full-walk#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "maya-full-walk#1",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "self-label, no instance"
+        },
+        {
+          "id": "maya-full-walk#2",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "recurring practice, no bounded event"
+        },
+        {
+          "id": "maya-full-walk#3",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "canonical episode: scene+stakes+action+outcome"
+        },
+        {
+          "id": "maya-full-walk#4",
+          "want": "S1/O2",
+          "got": "S1/O2",
+          "ok": true,
+          "note": "own derivation, no new material"
+        },
+        {
+          "id": "maya-full-walk#5",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "billing/clinical standoff resolved in one session"
+        },
+        {
+          "id": "maya-full-walk#7",
+          "want": "S2/O2",
+          "got": "S2/O2",
+          "ok": true,
+          "note": "writing practice + 'it's how I think'"
+        },
+        {
+          "id": "maya-full-walk#9",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "confirmation only"
+        },
+        {
+          "id": "maya-full-walk#10",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "action+outcome, no scene"
+        },
+        {
+          "id": "maya-full-walk#11",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "closing signal"
+        },
+        {
+          "id": "thin-responder-s1#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "thin-responder-s1#2",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "deflection"
+        },
+        {
+          "id": "thin-responder-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "category + self-label"
+        },
+        {
+          "id": "thin-responder-s1#4",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "explicit non-answer"
+        },
+        {
+          "id": "thin-responder-s1#5",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: person + duration, no outcome"
+        },
+        {
+          "id": "thin-responder-s1#6",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: method + outcome, no scene"
+        },
+        {
+          "id": "thin-responder-s1#7",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "thin confirmation"
+        },
+        {
+          "id": "tries-to-rush-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "imported self-label, no evidence"
+        },
+        {
+          "id": "tries-to-rush-s1#4",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "scene, but no outcome"
+        },
+        {
+          "id": "tries-to-rush-s1#8",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "hard stop"
+        },
+        {
+          "id": "rachel-s2#2",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "Kenji episode"
+        },
+        {
+          "id": "rachel-s2#8",
+          "want": "S2/O2",
+          "got": "S1/O2",
+          "ok": false,
+          "note": "canonical cross-domain derivation"
+        },
+        {
+          "id": "rachel-s2#11",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "closing confirmation"
+        }
+      ],
+      "specificity_exact_ci": [
+        0.8125,
+        1.0
+      ],
+      "specificity_exact_n": 23,
+      "specificity_exact_k": 4,
+      "specificity_within_1_ci": [
+        1.0,
+        1.0
+      ],
+      "specificity_within_1_n": 23,
+      "specificity_within_1_k": 4,
+      "ownership_exact_ci": [
+        0.8125,
+        1.0
+      ],
+      "ownership_exact_n": 23,
+      "ownership_exact_k": 4,
+      "both_exact_ci": [
+        0.6666666666666666,
+        1.0
+      ],
+      "both_exact_n": 23,
+      "both_exact_k": 4
+    },
+    "llm/opus-5": {
+      "assessor": "llm",
+      "n": 23,
+      "clusters": 4,
+      "cluster_unit": "transcripts",
+      "specificity_exact": 0.8260869565217391,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.782608695652174,
+      "both_exact": 0.6521739130434783,
+      "confusion": {
+        "S0->S0": 8,
+        "S0->S1": 1,
+        "S1->S1": 4,
+        "S2->S1": 1,
+        "S2->S2": 4,
+        "S2->S3": 2,
+        "S3->S3": 3
+      },
+      "rows": [
+        {
+          "id": "maya-full-walk#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "maya-full-walk#1",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "self-label, no instance"
+        },
+        {
+          "id": "maya-full-walk#2",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "recurring practice, no bounded event"
+        },
+        {
+          "id": "maya-full-walk#3",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "canonical episode: scene+stakes+action+outcome"
+        },
+        {
+          "id": "maya-full-walk#4",
+          "want": "S1/O2",
+          "got": "S1/O1",
+          "ok": false,
+          "note": "own derivation, no new material"
+        },
+        {
+          "id": "maya-full-walk#5",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "billing/clinical standoff resolved in one session"
+        },
+        {
+          "id": "maya-full-walk#7",
+          "want": "S2/O2",
+          "got": "S2/O1",
+          "ok": false,
+          "note": "writing practice + 'it's how I think'"
+        },
+        {
+          "id": "maya-full-walk#9",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "confirmation only"
+        },
+        {
+          "id": "maya-full-walk#10",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "action+outcome, no scene"
+        },
+        {
+          "id": "maya-full-walk#11",
+          "want": "S0/O0",
+          "got": "S0/O1",
+          "ok": false,
+          "note": "closing signal"
+        },
+        {
+          "id": "thin-responder-s1#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "thin-responder-s1#2",
+          "want": "S0/O0",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "deflection"
+        },
+        {
+          "id": "thin-responder-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "category + self-label"
+        },
+        {
+          "id": "thin-responder-s1#4",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "explicit non-answer"
+        },
+        {
+          "id": "thin-responder-s1#5",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: person + duration, no outcome"
+        },
+        {
+          "id": "thin-responder-s1#6",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: method + outcome, no scene"
+        },
+        {
+          "id": "thin-responder-s1#7",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "thin confirmation"
+        },
+        {
+          "id": "tries-to-rush-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "imported self-label, no evidence"
+        },
+        {
+          "id": "tries-to-rush-s1#4",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "scene, but no outcome"
+        },
+        {
+          "id": "tries-to-rush-s1#8",
+          "want": "S0/O0",
+          "got": "S0/O1",
+          "ok": false,
+          "note": "hard stop"
+        },
+        {
+          "id": "rachel-s2#2",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "Kenji episode"
+        },
+        {
+          "id": "rachel-s2#8",
+          "want": "S2/O2",
+          "got": "S1/O1",
+          "ok": false,
+          "note": "canonical cross-domain derivation"
+        },
+        {
+          "id": "rachel-s2#11",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "closing confirmation"
+        }
+      ],
+      "specificity_exact_ci": [
+        0.6666666666666666,
+        0.8823529411764706
+      ],
+      "specificity_exact_n": 23,
+      "specificity_exact_k": 4,
+      "specificity_within_1_ci": [
+        1.0,
+        1.0
+      ],
+      "specificity_within_1_n": 23,
+      "specificity_within_1_k": 4,
+      "ownership_exact_ci": [
+        0.6666666666666666,
+        0.9583333333333334
+      ],
+      "ownership_exact_n": 23,
+      "ownership_exact_k": 4,
+      "both_exact_ci": [
+        0.47368421052631576,
+        0.8
+      ],
+      "both_exact_n": 23,
+      "both_exact_k": 4
+    },
+    "hybrid/opus-5": {
+      "assessor": "hybrid",
+      "n": 23,
+      "clusters": 4,
+      "cluster_unit": "transcripts",
+      "specificity_exact": 0.8260869565217391,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.9565217391304348,
+      "both_exact": 0.782608695652174,
+      "confusion": {
+        "S0->S0": 8,
+        "S0->S1": 1,
+        "S1->S1": 4,
+        "S2->S1": 1,
+        "S2->S2": 4,
+        "S2->S3": 2,
+        "S3->S3": 3
+      },
+      "rows": [
+        {
+          "id": "maya-full-walk#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "maya-full-walk#1",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "self-label, no instance"
+        },
+        {
+          "id": "maya-full-walk#2",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "recurring practice, no bounded event"
+        },
+        {
+          "id": "maya-full-walk#3",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "canonical episode: scene+stakes+action+outcome"
+        },
+        {
+          "id": "maya-full-walk#4",
+          "want": "S1/O2",
+          "got": "S1/O2",
+          "ok": true,
+          "note": "own derivation, no new material"
+        },
+        {
+          "id": "maya-full-walk#5",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "billing/clinical standoff resolved in one session"
+        },
+        {
+          "id": "maya-full-walk#7",
+          "want": "S2/O2",
+          "got": "S2/O2",
+          "ok": true,
+          "note": "writing practice + 'it's how I think'"
+        },
+        {
+          "id": "maya-full-walk#9",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "confirmation only"
+        },
+        {
+          "id": "maya-full-walk#10",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "action+outcome, no scene"
+        },
+        {
+          "id": "maya-full-walk#11",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "closing signal"
+        },
+        {
+          "id": "thin-responder-s1#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "thin-responder-s1#2",
+          "want": "S0/O0",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "deflection"
+        },
+        {
+          "id": "thin-responder-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "category + self-label"
+        },
+        {
+          "id": "thin-responder-s1#4",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "explicit non-answer"
+        },
+        {
+          "id": "thin-responder-s1#5",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: person + duration, no outcome"
+        },
+        {
+          "id": "thin-responder-s1#6",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: method + outcome, no scene"
+        },
+        {
+          "id": "thin-responder-s1#7",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "thin confirmation"
+        },
+        {
+          "id": "tries-to-rush-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "imported self-label, no evidence"
+        },
+        {
+          "id": "tries-to-rush-s1#4",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "scene, but no outcome"
+        },
+        {
+          "id": "tries-to-rush-s1#8",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "hard stop"
+        },
+        {
+          "id": "rachel-s2#2",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "Kenji episode"
+        },
+        {
+          "id": "rachel-s2#8",
+          "want": "S2/O2",
+          "got": "S1/O2",
+          "ok": false,
+          "note": "canonical cross-domain derivation"
+        },
+        {
+          "id": "rachel-s2#11",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "closing confirmation"
+        }
+      ],
+      "specificity_exact_ci": [
+        0.6666666666666666,
+        0.8823529411764706
+      ],
+      "specificity_exact_n": 23,
+      "specificity_exact_k": 4,
+      "specificity_within_1_ci": [
+        1.0,
+        1.0
+      ],
+      "specificity_within_1_n": 23,
+      "specificity_within_1_k": 4,
+      "ownership_exact_ci": [
+        0.8125,
+        1.0
+      ],
+      "ownership_exact_n": 23,
+      "ownership_exact_k": 4,
+      "both_exact_ci": [
+        0.5,
+        0.8823529411764706
+      ],
+      "both_exact_n": 23,
+      "both_exact_k": 4
+    },
+    "llm/opus-5-5": {
+      "assessor": "llm",
+      "n": 23,
+      "clusters": 4,
+      "cluster_unit": "transcripts",
+      "specificity_exact": 0.9130434782608695,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.782608695652174,
+      "both_exact": 0.6956521739130435,
+      "confusion": {
+        "S0->S0": 8,
+        "S0->S1": 1,
+        "S1->S1": 4,
+        "S2->S1": 1,
+        "S2->S2": 6,
+        "S3->S3": 3
+      },
+      "rows": [
+        {
+          "id": "maya-full-walk#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "maya-full-walk#1",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "self-label, no instance"
+        },
+        {
+          "id": "maya-full-walk#2",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "recurring practice, no bounded event"
+        },
+        {
+          "id": "maya-full-walk#3",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "canonical episode: scene+stakes+action+outcome"
+        },
+        {
+          "id": "maya-full-walk#4",
+          "want": "S1/O2",
+          "got": "S1/O1",
+          "ok": false,
+          "note": "own derivation, no new material"
+        },
+        {
+          "id": "maya-full-walk#5",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "billing/clinical standoff resolved in one session"
+        },
+        {
+          "id": "maya-full-walk#7",
+          "want": "S2/O2",
+          "got": "S2/O1",
+          "ok": false,
+          "note": "writing practice + 'it's how I think'"
+        },
+        {
+          "id": "maya-full-walk#9",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "confirmation only"
+        },
+        {
+          "id": "maya-full-walk#10",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "action+outcome, no scene"
+        },
+        {
+          "id": "maya-full-walk#11",
+          "want": "S0/O0",
+          "got": "S0/O1",
+          "ok": false,
+          "note": "closing signal"
+        },
+        {
+          "id": "thin-responder-s1#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "thin-responder-s1#2",
+          "want": "S0/O0",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "deflection"
+        },
+        {
+          "id": "thin-responder-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "category + self-label"
+        },
+        {
+          "id": "thin-responder-s1#4",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "explicit non-answer"
+        },
+        {
+          "id": "thin-responder-s1#5",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: person + duration, no outcome"
+        },
+        {
+          "id": "thin-responder-s1#6",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: method + outcome, no scene"
+        },
+        {
+          "id": "thin-responder-s1#7",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "thin confirmation"
+        },
+        {
+          "id": "tries-to-rush-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "imported self-label, no evidence"
+        },
+        {
+          "id": "tries-to-rush-s1#4",
+          "want": "S2/O0",
+          "got": "S2/O1",
+          "ok": false,
+          "note": "scene, but no outcome"
+        },
+        {
+          "id": "tries-to-rush-s1#8",
+          "want": "S0/O0",
+          "got": "S0/O1",
+          "ok": false,
+          "note": "hard stop"
+        },
+        {
+          "id": "rachel-s2#2",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "Kenji episode"
+        },
+        {
+          "id": "rachel-s2#8",
+          "want": "S2/O2",
+          "got": "S1/O2",
+          "ok": false,
+          "note": "canonical cross-domain derivation"
+        },
+        {
+          "id": "rachel-s2#11",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "closing confirmation"
+        }
+      ],
+      "specificity_exact_ci": [
+        0.75,
+        1.0
+      ],
+      "specificity_exact_n": 23,
+      "specificity_exact_k": 4,
+      "specificity_within_1_ci": [
+        1.0,
+        1.0
+      ],
+      "specificity_within_1_n": 23,
+      "specificity_within_1_k": 4,
+      "ownership_exact_ci": [
+        0.5263157894736842,
+        1.0
+      ],
+      "ownership_exact_n": 23,
+      "ownership_exact_k": 4,
+      "both_exact_ci": [
+        0.5,
+        0.8064516129032258
+      ],
+      "both_exact_n": 23,
+      "both_exact_k": 4
+    },
+    "hybrid/opus-5-5": {
+      "assessor": "hybrid",
+      "n": 23,
+      "clusters": 4,
+      "cluster_unit": "transcripts",
+      "specificity_exact": 0.9130434782608695,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.9565217391304348,
+      "both_exact": 0.8695652173913043,
+      "confusion": {
+        "S0->S0": 8,
+        "S0->S1": 1,
+        "S1->S1": 4,
+        "S2->S1": 1,
+        "S2->S2": 6,
+        "S3->S3": 3
+      },
+      "rows": [
+        {
+          "id": "maya-full-walk#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "maya-full-walk#1",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "self-label, no instance"
+        },
+        {
+          "id": "maya-full-walk#2",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "recurring practice, no bounded event"
+        },
+        {
+          "id": "maya-full-walk#3",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "canonical episode: scene+stakes+action+outcome"
+        },
+        {
+          "id": "maya-full-walk#4",
+          "want": "S1/O2",
+          "got": "S1/O2",
+          "ok": true,
+          "note": "own derivation, no new material"
+        },
+        {
+          "id": "maya-full-walk#5",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "billing/clinical standoff resolved in one session"
+        },
+        {
+          "id": "maya-full-walk#7",
+          "want": "S2/O2",
+          "got": "S2/O2",
+          "ok": true,
+          "note": "writing practice + 'it's how I think'"
+        },
+        {
+          "id": "maya-full-walk#9",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "confirmation only"
+        },
+        {
+          "id": "maya-full-walk#10",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "action+outcome, no scene"
+        },
+        {
+          "id": "maya-full-walk#11",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "closing signal"
+        },
+        {
+          "id": "thin-responder-s1#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "thin-responder-s1#2",
+          "want": "S0/O0",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "deflection"
+        },
+        {
+          "id": "thin-responder-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "category + self-label"
+        },
+        {
+          "id": "thin-responder-s1#4",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "explicit non-answer"
+        },
+        {
+          "id": "thin-responder-s1#5",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: person + duration, no outcome"
+        },
+        {
+          "id": "thin-responder-s1#6",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: method + outcome, no scene"
+        },
+        {
+          "id": "thin-responder-s1#7",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "thin confirmation"
+        },
+        {
+          "id": "tries-to-rush-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "imported self-label, no evidence"
+        },
+        {
+          "id": "tries-to-rush-s1#4",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "scene, but no outcome"
+        },
+        {
+          "id": "tries-to-rush-s1#8",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "hard stop"
+        },
+        {
+          "id": "rachel-s2#2",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "Kenji episode"
+        },
+        {
+          "id": "rachel-s2#8",
+          "want": "S2/O2",
+          "got": "S1/O2",
+          "ok": false,
+          "note": "canonical cross-domain derivation"
+        },
+        {
+          "id": "rachel-s2#11",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "closing confirmation"
+        }
+      ],
+      "specificity_exact_ci": [
+        0.75,
+        1.0
+      ],
+      "specificity_exact_n": 23,
+      "specificity_exact_k": 4,
+      "specificity_within_1_ci": [
+        1.0,
+        1.0
+      ],
+      "specificity_within_1_n": 23,
+      "specificity_within_1_k": 4,
+      "ownership_exact_ci": [
+        0.8125,
+        1.0
+      ],
+      "ownership_exact_n": 23,
+      "ownership_exact_k": 4,
+      "both_exact_ci": [
+        0.6666666666666666,
+        0.9696969696969697
+      ],
+      "both_exact_n": 23,
+      "both_exact_k": 4
+    },
+    "llm/gpt-4.1-mini": {
+      "assessor": "llm",
+      "n": 23,
+      "clusters": 4,
+      "cluster_unit": "transcripts",
+      "specificity_exact": 0.7391304347826086,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.8260869565217391,
+      "both_exact": 0.6086956521739131,
+      "confusion": {
+        "S0->S0": 9,
+        "S1->S1": 4,
+        "S2->S1": 1,
+        "S2->S2": 1,
+        "S2->S3": 5,
+        "S3->S3": 3
+      },
+      "rows": [
+        {
+          "id": "maya-full-walk#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "maya-full-walk#1",
+          "want": "S1/O1",
+          "got": "S1/O2",
+          "ok": false,
+          "note": "self-label, no instance"
+        },
+        {
+          "id": "maya-full-walk#2",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "recurring practice, no bounded event"
+        },
+        {
+          "id": "maya-full-walk#3",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "canonical episode: scene+stakes+action+outcome"
+        },
+        {
+          "id": "maya-full-walk#4",
+          "want": "S1/O2",
+          "got": "S1/O2",
+          "ok": true,
+          "note": "own derivation, no new material"
+        },
+        {
+          "id": "maya-full-walk#5",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "billing/clinical standoff resolved in one session"
+        },
+        {
+          "id": "maya-full-walk#7",
+          "want": "S2/O2",
+          "got": "S2/O2",
+          "ok": true,
+          "note": "writing practice + 'it's how I think'"
+        },
+        {
+          "id": "maya-full-walk#9",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "confirmation only"
+        },
+        {
+          "id": "maya-full-walk#10",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "action+outcome, no scene"
+        },
+        {
+          "id": "maya-full-walk#11",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "closing signal"
+        },
+        {
+          "id": "thin-responder-s1#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "thin-responder-s1#2",
+          "want": "S0/O0",
+          "got": "S0/O2",
+          "ok": false,
+          "note": "deflection"
+        },
+        {
+          "id": "thin-responder-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "category + self-label"
+        },
+        {
+          "id": "thin-responder-s1#4",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "explicit non-answer"
+        },
+        {
+          "id": "thin-responder-s1#5",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "partial: person + duration, no outcome"
+        },
+        {
+          "id": "thin-responder-s1#6",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "partial: method + outcome, no scene"
+        },
+        {
+          "id": "thin-responder-s1#7",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "thin confirmation"
+        },
+        {
+          "id": "tries-to-rush-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O2",
+          "ok": false,
+          "note": "imported self-label, no evidence"
+        },
+        {
+          "id": "tries-to-rush-s1#4",
+          "want": "S2/O0",
+          "got": "S3/O2",
+          "ok": false,
+          "note": "scene, but no outcome"
+        },
+        {
+          "id": "tries-to-rush-s1#8",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "hard stop"
+        },
+        {
+          "id": "rachel-s2#2",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "Kenji episode"
+        },
+        {
+          "id": "rachel-s2#8",
+          "want": "S2/O2",
+          "got": "S1/O2",
+          "ok": false,
+          "note": "canonical cross-domain derivation"
+        },
+        {
+          "id": "rachel-s2#11",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "closing confirmation"
+        }
+      ],
+      "specificity_exact_ci": [
+        0.6666666666666666,
+        0.7878787878787878
+      ],
+      "specificity_exact_n": 23,
+      "specificity_exact_k": 4,
+      "specificity_within_1_ci": [
+        1.0,
+        1.0
+      ],
+      "specificity_within_1_n": 23,
+      "specificity_within_1_k": 4,
+      "ownership_exact_ci": [
+        0.5625,
+        0.9375
+      ],
+      "ownership_exact_n": 23,
+      "ownership_exact_k": 4,
+      "both_exact_ci": [
+        0.4375,
+        0.6923076923076923
+      ],
+      "both_exact_n": 23,
+      "both_exact_k": 4
+    },
+    "hybrid/gpt-4.1-mini": {
+      "assessor": "hybrid",
+      "n": 23,
+      "clusters": 4,
+      "cluster_unit": "transcripts",
+      "specificity_exact": 0.7391304347826086,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.9565217391304348,
+      "both_exact": 0.6956521739130435,
+      "confusion": {
+        "S0->S0": 9,
+        "S1->S1": 4,
+        "S2->S1": 1,
+        "S2->S2": 1,
+        "S2->S3": 5,
+        "S3->S3": 3
+      },
+      "rows": [
+        {
+          "id": "maya-full-walk#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "maya-full-walk#1",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "self-label, no instance"
+        },
+        {
+          "id": "maya-full-walk#2",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "recurring practice, no bounded event"
+        },
+        {
+          "id": "maya-full-walk#3",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "canonical episode: scene+stakes+action+outcome"
+        },
+        {
+          "id": "maya-full-walk#4",
+          "want": "S1/O2",
+          "got": "S1/O2",
+          "ok": true,
+          "note": "own derivation, no new material"
+        },
+        {
+          "id": "maya-full-walk#5",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "billing/clinical standoff resolved in one session"
+        },
+        {
+          "id": "maya-full-walk#7",
+          "want": "S2/O2",
+          "got": "S2/O2",
+          "ok": true,
+          "note": "writing practice + 'it's how I think'"
+        },
+        {
+          "id": "maya-full-walk#9",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "confirmation only"
+        },
+        {
+          "id": "maya-full-walk#10",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "action+outcome, no scene"
+        },
+        {
+          "id": "maya-full-walk#11",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "closing signal"
+        },
+        {
+          "id": "thin-responder-s1#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "thin-responder-s1#2",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "deflection"
+        },
+        {
+          "id": "thin-responder-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "category + self-label"
+        },
+        {
+          "id": "thin-responder-s1#4",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "explicit non-answer"
+        },
+        {
+          "id": "thin-responder-s1#5",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "partial: person + duration, no outcome"
+        },
+        {
+          "id": "thin-responder-s1#6",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "partial: method + outcome, no scene"
+        },
+        {
+          "id": "thin-responder-s1#7",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "thin confirmation"
+        },
+        {
+          "id": "tries-to-rush-s1#3",
+          "want": "S1/O1",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "imported self-label, no evidence"
+        },
+        {
+          "id": "tries-to-rush-s1#4",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "scene, but no outcome"
+        },
+        {
+          "id": "tries-to-rush-s1#8",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "hard stop"
+        },
+        {
+          "id": "rachel-s2#2",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "Kenji episode"
+        },
+        {
+          "id": "rachel-s2#8",
+          "want": "S2/O2",
+          "got": "S1/O2",
+          "ok": false,
+          "note": "canonical cross-domain derivation"
+        },
+        {
+          "id": "rachel-s2#11",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "closing confirmation"
+        }
+      ],
+      "specificity_exact_ci": [
+        0.6666666666666666,
+        0.7878787878787878
+      ],
+      "specificity_exact_n": 23,
+      "specificity_exact_k": 4,
+      "specificity_within_1_ci": [
+        1.0,
+        1.0
+      ],
+      "specificity_within_1_n": 23,
+      "specificity_within_1_k": 4,
+      "ownership_exact_ci": [
+        0.8125,
+        1.0
+      ],
+      "ownership_exact_n": 23,
+      "ownership_exact_k": 4,
+      "both_exact_ci": [
+        0.5,
+        0.7837837837837838
+      ],
+      "both_exact_n": 23,
+      "both_exact_k": 4
+    },
+    "llm/gpt-4.1": {
+      "assessor": "llm",
+      "n": 23,
+      "clusters": 4,
+      "cluster_unit": "transcripts",
+      "specificity_exact": 0.782608695652174,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.8695652173913043,
+      "both_exact": 0.6521739130434783,
+      "confusion": {
+        "S0->S0": 7,
+        "S0->S1": 2,
+        "S1->S1": 2,
+        "S1->S2": 2,
+        "S2->S2": 6,
+        "S2->S3": 1,
+        "S3->S3": 3
+      },
+      "rows": [
+        {
+          "id": "maya-full-walk#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "maya-full-walk#1",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "self-label, no instance"
+        },
+        {
+          "id": "maya-full-walk#2",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "recurring practice, no bounded event"
+        },
+        {
+          "id": "maya-full-walk#3",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "canonical episode: scene+stakes+action+outcome"
+        },
+        {
+          "id": "maya-full-walk#4",
+          "want": "S1/O2",
+          "got": "S1/O2",
+          "ok": true,
+          "note": "own derivation, no new material"
+        },
+        {
+          "id": "maya-full-walk#5",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "billing/clinical standoff resolved in one session"
+        },
+        {
+          "id": "maya-full-walk#7",
+          "want": "S2/O2",
+          "got": "S2/O1",
+          "ok": false,
+          "note": "writing practice + 'it's how I think'"
+        },
+        {
+          "id": "maya-full-walk#9",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "confirmation only"
+        },
+        {
+          "id": "maya-full-walk#10",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "action+outcome, no scene"
+        },
+        {
+          "id": "maya-full-walk#11",
+          "want": "S0/O0",
+          "got": "S0/O1",
+          "ok": false,
+          "note": "closing signal"
+        },
+        {
+          "id": "thin-responder-s1#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "thin-responder-s1#2",
+          "want": "S0/O0",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "deflection"
+        },
+        {
+          "id": "thin-responder-s1#3",
+          "want": "S1/O1",
+          "got": "S2/O1",
+          "ok": false,
+          "note": "category + self-label"
+        },
+        {
+          "id": "thin-responder-s1#4",
+          "want": "S0/O0",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "explicit non-answer"
+        },
+        {
+          "id": "thin-responder-s1#5",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: person + duration, no outcome"
+        },
+        {
+          "id": "thin-responder-s1#6",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: method + outcome, no scene"
+        },
+        {
+          "id": "thin-responder-s1#7",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "thin confirmation"
+        },
+        {
+          "id": "tries-to-rush-s1#3",
+          "want": "S1/O1",
+          "got": "S2/O1",
+          "ok": false,
+          "note": "imported self-label, no evidence"
+        },
+        {
+          "id": "tries-to-rush-s1#4",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "scene, but no outcome"
+        },
+        {
+          "id": "tries-to-rush-s1#8",
+          "want": "S0/O0",
+          "got": "S0/O1",
+          "ok": false,
+          "note": "hard stop"
+        },
+        {
+          "id": "rachel-s2#2",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "Kenji episode"
+        },
+        {
+          "id": "rachel-s2#8",
+          "want": "S2/O2",
+          "got": "S2/O2",
+          "ok": true,
+          "note": "canonical cross-domain derivation"
+        },
+        {
+          "id": "rachel-s2#11",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "closing confirmation"
+        }
+      ],
+      "specificity_exact_ci": [
+        0.5,
+        1.0
+      ],
+      "specificity_exact_n": 23,
+      "specificity_exact_k": 4,
+      "specificity_within_1_ci": [
+        1.0,
+        1.0
+      ],
+      "specificity_within_1_n": 23,
+      "specificity_within_1_k": 4,
+      "ownership_exact_ci": [
+        0.75,
+        1.0
+      ],
+      "ownership_exact_n": 23,
+      "ownership_exact_k": 4,
+      "both_exact_ci": [
+        0.25,
+        0.8461538461538461
+      ],
+      "both_exact_n": 23,
+      "both_exact_k": 4
+    },
+    "hybrid/gpt-4.1": {
+      "assessor": "hybrid",
+      "n": 23,
+      "clusters": 4,
+      "cluster_unit": "transcripts",
+      "specificity_exact": 0.782608695652174,
+      "specificity_within_1": 1.0,
+      "ownership_exact": 0.9565217391304348,
+      "both_exact": 0.782608695652174,
+      "confusion": {
+        "S0->S0": 7,
+        "S0->S1": 2,
+        "S1->S1": 2,
+        "S1->S2": 2,
+        "S2->S2": 6,
+        "S2->S3": 1,
+        "S3->S3": 3
+      },
+      "rows": [
+        {
+          "id": "maya-full-walk#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "maya-full-walk#1",
+          "want": "S1/O1",
+          "got": "S1/O1",
+          "ok": true,
+          "note": "self-label, no instance"
+        },
+        {
+          "id": "maya-full-walk#2",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "recurring practice, no bounded event"
+        },
+        {
+          "id": "maya-full-walk#3",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "canonical episode: scene+stakes+action+outcome"
+        },
+        {
+          "id": "maya-full-walk#4",
+          "want": "S1/O2",
+          "got": "S1/O2",
+          "ok": true,
+          "note": "own derivation, no new material"
+        },
+        {
+          "id": "maya-full-walk#5",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "billing/clinical standoff resolved in one session"
+        },
+        {
+          "id": "maya-full-walk#7",
+          "want": "S2/O2",
+          "got": "S2/O2",
+          "ok": true,
+          "note": "writing practice + 'it's how I think'"
+        },
+        {
+          "id": "maya-full-walk#9",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "confirmation only"
+        },
+        {
+          "id": "maya-full-walk#10",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "action+outcome, no scene"
+        },
+        {
+          "id": "maya-full-walk#11",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "closing signal"
+        },
+        {
+          "id": "thin-responder-s1#0",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "bare name"
+        },
+        {
+          "id": "thin-responder-s1#2",
+          "want": "S0/O0",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "deflection"
+        },
+        {
+          "id": "thin-responder-s1#3",
+          "want": "S1/O1",
+          "got": "S2/O1",
+          "ok": false,
+          "note": "category + self-label"
+        },
+        {
+          "id": "thin-responder-s1#4",
+          "want": "S0/O0",
+          "got": "S1/O0",
+          "ok": false,
+          "note": "explicit non-answer"
+        },
+        {
+          "id": "thin-responder-s1#5",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: person + duration, no outcome"
+        },
+        {
+          "id": "thin-responder-s1#6",
+          "want": "S2/O0",
+          "got": "S2/O0",
+          "ok": true,
+          "note": "partial: method + outcome, no scene"
+        },
+        {
+          "id": "thin-responder-s1#7",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "thin confirmation"
+        },
+        {
+          "id": "tries-to-rush-s1#3",
+          "want": "S1/O1",
+          "got": "S2/O0",
+          "ok": false,
+          "note": "imported self-label, no evidence"
+        },
+        {
+          "id": "tries-to-rush-s1#4",
+          "want": "S2/O0",
+          "got": "S3/O0",
+          "ok": false,
+          "note": "scene, but no outcome"
+        },
+        {
+          "id": "tries-to-rush-s1#8",
+          "want": "S0/O0",
+          "got": "S0/O0",
+          "ok": true,
+          "note": "hard stop"
+        },
+        {
+          "id": "rachel-s2#2",
+          "want": "S3/O0",
+          "got": "S3/O0",
+          "ok": true,
+          "note": "Kenji episode"
+        },
+        {
+          "id": "rachel-s2#8",
+          "want": "S2/O2",
+          "got": "S2/O2",
+          "ok": true,
+          "note": "canonical cross-domain derivation"
+        },
+        {
+          "id": "rachel-s2#11",
+          "want": "S0/O1",
+          "got": "S0/O1",
+          "ok": true,
+          "note": "closing confirmation"
+        }
+      ],
+      "specificity_exact_ci": [
+        0.5,
+        1.0
+      ],
+      "specificity_exact_n": 23,
+      "specificity_exact_k": 4,
+      "specificity_within_1_ci": [
+        1.0,
+        1.0
+      ],
+      "specificity_within_1_n": 23,
+      "specificity_within_1_k": 4,
+      "ownership_exact_ci": [
+        0.8125,
+        1.0
+      ],
+      "ownership_exact_n": 23,
+      "ownership_exact_k": 4,
+      "both_exact_ci": [
+        0.5,
+        1.0
+      ],
+      "both_exact_n": 23,
+      "both_exact_k": 4
+    }
+  }
+}

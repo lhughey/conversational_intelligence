@@ -21,6 +21,19 @@ from .llm_fake import request_key
 
 DEFAULT_DIR = pathlib.Path("cache")
 
+#: Stop reasons whose response is not an answer and must never be served or
+#: stored. Adapters raise on these before returning; this is the second line.
+_UNUSABLE_STOPS = {"max_tokens", "model_context_window_exceeded", "refusal"}
+
+
+def usable(response: LLMResponse) -> bool:
+    """False for a response that must not be cached: empty, cut off, declined.
+
+    A persisted bad response is worse than a failed call - every rerun replays
+    it for free, so the failure looks deterministic and never self-corrects.
+    """
+    return bool(response.text.strip()) and response.stop_reason not in _UNUSABLE_STOPS
+
 
 class CacheMiss(RuntimeError):
     pass
@@ -71,8 +84,12 @@ class CachingLLM:
 
         path = self._path(request)
         if path.exists():
-            self.hits += 1
-            return LLMResponse.model_validate_json(path.read_text(encoding="utf-8"))
+            cached = LLMResponse.model_validate_json(path.read_text(encoding="utf-8"))
+            # A poisoned entry (written before the write guard existed) is a
+            # miss, and the fresh answer below overwrites it: self-healing.
+            if usable(cached):
+                self.hits += 1
+                return cached
 
         self.misses += 1
         if self.mode == "offline":
@@ -82,6 +99,10 @@ class CachingLLM:
             )
 
         response = self.inner.complete(request)
+        if not usable(response):
+            # Adapters raise before reaching here; an inner that does not
+            # (fake, OpenAI) still never gets its bad answer persisted.
+            return response
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(response.model_dump_json(), encoding="utf-8")
         return response

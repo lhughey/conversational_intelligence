@@ -1,0 +1,65 @@
+{"id": "ho-d3730d", "specificity": "S0", "ownership": "O0", "boundary": null, "pair": null, "rationale": "how they got here; nothing about them"}
+{"id": "ho-f7854e", "specificity": "S0", "ownership": "O0", "boundary": null, "pair": null, "rationale": "meta-comment"}
+{"id": "ho-f37e1f", "specificity": "S1", "ownership": "O0", "boundary": "S1/S2", "pair": null, "rationale": "domain + tenure, no practice detail"}
+{"id": "ho-daeacf", "specificity": "S2", "ownership": "O0", "boundary": null, "pair": null, "rationale": "recurring practice with real detail, no single event"}
+{"id": "ho-5e87c4", "specificity": "S2", "ownership": "O0", "boundary": "S1/S2", "pair": null, "rationale": "recurring problem with a concrete detail; thin"}
+{"id": "ho-abcbe8", "specificity": "S0", "ownership": "O0", "boundary": "S0/S1", "pair": null, "rationale": "deflection"}
+{"id": "ho-ff9ade", "specificity": "S1", "ownership": "O1", "boundary": null, "pair": null, "rationale": "self-label, no instance"}
+{"id": "ho-b8a488", "specificity": "S3", "ownership": "O0", "boundary": null, "pair": "mp-wren-stakes", "rationale": "scene + stated stakes + action + outcome"}
+{"id": "ho-be4543", "specificity": "S2", "ownership": "O0", "boundary": "S2/S3", "pair": "mp-wren-stakes", "rationale": "same event with the stakes sentence removed; stakes only implied"}
+{"id": "ho-4caddd", "specificity": "S3", "ownership": "O0", "boundary": null, "pair": null, "rationale": "short but complete episode"}
+{"id": "ho-74f22b", "specificity": "S1", "ownership": "O0", "boundary": "S0/S1", "pair": null, "rationale": "one generalizing fact inside a deflection"}
+{"id": "ho-c2891c", "specificity": "S2", "ownership": "O0", "boundary": null, "pair": "mp-wren-tackle", "rationale": "habitual practice with detail, no conclusion"}
+{"id": "ho-dd0bdd", "specificity": "S2", "ownership": "O2", "boundary": null, "pair": "mp-wren-tackle", "rationale": "same practice plus a new cross-domain connection in their own words"}
+{"id": "ho-01c845", "specificity": "S0", "ownership": "O0", "boundary": "S0/S1", "pair": null, "rationale": "near one-word answer"}
+{"id": "ho-2b144a", "specificity": "S1", "ownership": "O0", "boundary": null, "pair": "mp-wren-puzzles", "rationale": "names an activity, no detail"}
+{"id": "ho-3ce533", "specificity": "S2", "ownership": "O0", "boundary": null, "pair": "mp-wren-puzzles", "rationale": "same activity with a concrete habitual method"}
+{"id": "ho-f03949", "specificity": "S1", "ownership": "O0", "boundary": "O0/O1", "pair": null, "rationale": "preference generalization; not a self-label"}
+{"id": "ho-1edd9f", "specificity": "S2", "ownership": "O0", "boundary": "S1/S2", "pair": null, "rationale": "concrete contrast, no event"}
+{"id": "ho-11fbf0", "specificity": "S0", "ownership": "O1", "boundary": null, "pair": null, "rationale": "thin acceptance of the offered frame"}
+{"id": "ho-e6d297", "specificity": "S0", "ownership": "O0", "boundary": "O0/O1", "pair": null, "rationale": "declines to take up the frame"}
+{"id": "ho-81c58d", "specificity": "S1", "ownership": "O2", "boundary": "O1/O2", "pair": null, "rationale": "new self-claim in own words, no instance"}
+{"id": "ho-52cc39", "specificity": "S1", "ownership": "O0", "boundary": "S1/S2", "pair": null, "rationale": "mentions one event with no detail at all"}
+{"id": "ho-e41997", "specificity": "S0", "ownership": "O0", "boundary": null, "pair": null, "rationale": "meta / pacing"}
+{"id": "ho-8cf9aa", "specificity": "S1", "ownership": "O0", "boundary": "S1/S2", "pair": null, "rationale": "domain + tenure, no practice detail"}
+{"id": "ho-523783", "specificity": "S3", "ownership": "O0", "boundary": null, "pair": "mp-hollis-crane", "rationale": "compressed one-line episode with all four parts"}
+{"id": "ho-c676be", "specificity": "S2", "ownership": "O0", "boundary": "S2/S3", "pair": "mp-hollis-crane", "rationale": "same episode with the outcome removed"}
+{"id": "ho-cd57e2", "specificity": "S2", "ownership": "O0", "boundary": "S2/S3", "pair": null, "rationale": "scene + stakes, no specific action or outcome"}
+{"id": "ho-7e0e04", "specificity": "S1", "ownership": "O1", "boundary": null, "pair": "mp-hollis-closer", "rationale": "imported self-label, no instance"}
+{"id": "ho-36fea0", "specificity": "S2", "ownership": "O0", "boundary": null, "pair": null, "rationale": "habitual practice with real detail"}
+{"id": "ho-b99d23", "specificity": "S1", "ownership": "O1", "boundary": null, "pair": "mp-hollis-diner", "rationale": "self-label + vague practice"}
+{"id": "ho-0bcdf9", "specificity": "S2", "ownership": "O1", "boundary": null, "pair": "mp-hollis-diner", "rationale": "same self-label, now with a concrete habitual method"}
+{"id": "ho-feea40", "specificity": "S0", "ownership": "O0", "boundary": null, "pair": null, "rationale": "impatience / meta"}
+{"id": "ho-a8dcd1", "specificity": "S2", "ownership": "O0", "boundary": null, "pair": null, "rationale": "recurring practice with detail"}
+{"id": "ho-11466a", "specificity": "S3", "ownership": "O0", "boundary": null, "pair": "mp-hollis-sixteen", "rationale": "compressed episode, no conclusion"}
+{"id": "ho-16eed5", "specificity": "S3", "ownership": "O2", "boundary": null, "pair": "mp-hollis-sixteen", "rationale": "same episode plus a self-derivation"}
+{"id": "ho-246ace", "specificity": "S1", "ownership": "O0", "boundary": "S0/S1", "pair": null, "rationale": "names one activity"}
+{"id": "ho-d879ad", "specificity": "S2", "ownership": "O0", "boundary": null, "pair": null, "rationale": "practice with real detail"}
+{"id": "ho-ab17ea", "specificity": "S1", "ownership": "O1", "boundary": "O0/O1", "pair": null, "rationale": "condition + self-description"}
+{"id": "ho-6f8628", "specificity": "S1", "ownership": "O2", "boundary": "S1/S2", "pair": null, "rationale": "named phase, no instance; explicit new realization"}
+{"id": "ho-67f58c", "specificity": "S0", "ownership": "O1", "boundary": null, "pair": null, "rationale": "confirmation + pacing"}
+{"id": "ho-545996", "specificity": "S0", "ownership": "O0", "boundary": "O0/O1", "pair": null, "rationale": "assent to move on, not acceptance of the frame"}
+{"id": "ho-f2e1d4", "specificity": "S0", "ownership": "O0", "boundary": null, "pair": null, "rationale": "closing signal"}
+{"id": "ho-a61971", "specificity": "S3", "ownership": "O1", "boundary": null, "pair": null, "rationale": "imported label + complete episode"}
+{"id": "ho-cd353c", "specificity": "S1", "ownership": "O2", "boundary": "O1/O2", "pair": "mp-hollis-closer", "rationale": "rejects the imported label for a self-derived one"}
+{"id": "ho-00de9c", "specificity": "S1", "ownership": "O1", "boundary": null, "pair": null, "rationale": "long self-label, no instance"}
+{"id": "ho-b4bdfb", "specificity": "S0", "ownership": "O1", "boundary": "S0/S1", "pair": null, "rationale": "meta-instruction to the interviewer carrying a self-description"}
+{"id": "ho-026259", "specificity": "S1", "ownership": "O1", "boundary": null, "pair": null, "rationale": "confident abstraction, no instance"}
+{"id": "ho-c6604c", "specificity": "S2", "ownership": "O0", "boundary": null, "pair": null, "rationale": "recurring practice with real detail"}
+{"id": "ho-c30dca", "specificity": "S2", "ownership": "O0", "boundary": null, "pair": null, "rationale": "habitual routine with detail"}
+{"id": "ho-3dd96f", "specificity": "S2", "ownership": "O1", "boundary": "S1/S2", "pair": null, "rationale": "self-label backed by a concrete biographical detail"}
+{"id": "ho-57d0b6", "specificity": "S1", "ownership": "O1", "boundary": "S1/S2", "pair": null, "rationale": "named place, abstract before/after, self-assessment"}
+{"id": "ho-206b83", "specificity": "S3", "ownership": "O0", "boundary": null, "pair": "mp-lucian-letters", "rationale": "complete episode"}
+{"id": "ho-b1c21a", "specificity": "S2", "ownership": "O0", "boundary": "S2/S3", "pair": "mp-lucian-letters", "rationale": "same episode with the outcome removed"}
+{"id": "ho-c44757", "specificity": "S1", "ownership": "O1", "boundary": "O1/O2", "pair": null, "rationale": "sounds reflective but restates a standing self-label"}
+{"id": "ho-67eba3", "specificity": "S2", "ownership": "O0", "boundary": null, "pair": "mp-lucian-dinner", "rationale": "recurring practice with detail, no conclusion"}
+{"id": "ho-5c2690", "specificity": "S2", "ownership": "O2", "boundary": null, "pair": "mp-lucian-dinner", "rationale": "same practice plus a new cross-domain derivation"}
+{"id": "ho-14b3b4", "specificity": "S1", "ownership": "O1", "boundary": null, "pair": null, "rationale": "self-label + named fields, no practice detail"}
+{"id": "ho-827cda", "specificity": "S2", "ownership": "O0", "boundary": null, "pair": "mp-lucian-bees", "rationale": "practice with real detail"}
+{"id": "ho-767ef2", "specificity": "S1", "ownership": "O1", "boundary": null, "pair": null, "rationale": "confident self-description, no instance"}
+{"id": "ho-6ba2ed", "specificity": "S3", "ownership": "O1", "boundary": null, "pair": null, "rationale": "self-label wrapped around a complete episode"}
+{"id": "ho-c51632", "specificity": "S1", "ownership": "O1", "boundary": "S0/S1", "pair": null, "rationale": "acceptance plus a re-labelling; no material"}
+{"id": "ho-1ff715", "specificity": "S1", "ownership": "O2", "boundary": "S1/S2", "pair": null, "rationale": "new self-derivation that only points back at earlier material"}
+{"id": "ho-af9e4e", "specificity": "S1", "ownership": "O1", "boundary": "O1/O2", "pair": null, "rationale": "reflective phrasing over imported labels"}
+{"id": "ho-d8dc7c", "specificity": "S0", "ownership": "O0", "boundary": null, "pair": null, "rationale": "long closing signal; a signpost, not material"}
+{"id": "ho-d40c0f", "specificity": "S2", "ownership": "O2", "boundary": null, "pair": "mp-lucian-bees", "rationale": "same practice plus a new self-observation"}

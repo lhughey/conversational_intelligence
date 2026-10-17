@@ -11,7 +11,7 @@ HTTP, or subprocess), and fully testable on its own.
 
 ```bash
 make setup
-make test             # 194 tests, no network, no API key, ~1s
+make test             # 287 tests, no network, no API key, ~2s
 make bench            # assessor agreement + corpus replay, offline
 make doctor           # confirm credentials resolve from this repo's .env
 make bench-gate       # gate vs the balanced split + dumb baselines, offline
@@ -82,40 +82,52 @@ occur.
 | `dataset/adjudicate.py` — human labelling CLI | done |
 | Human-adjudicated labels | **8 items queued** — run `make label` |
 | Banks for thin-responder / tries-to-rush | **not built** |
-| Held-out set never used for tuning | **not built** |
+| Held-out set never used for tuning | built (65 items); **awaiting your labels** — `make label-heldout` |
 
 ## Benchmark results, honestly
 
-Full detail in `bench-results/`. Two headline findings:
+Every recorded run is indexed in `bench-results/HISTORY.md`; the latest
+summary is `bench-results/2026-10-16-model-refresh.md`. Numbers below are from
+`assessors-2026-10-17T004102Z.md` (23 seed turns, k=4 transcripts, assessor at
+effort=low; 95% cluster-bootstrap CIs).
 
-**The hybrid assessor beats every model alone**, on all five models tested.
+**The hybrid assessor beats the model alone on every model tested.**
 Specificity goes to the model, ownership to the rules:
 
 | assessor | specificity | ownership | both |
 |---|---|---|---|
-| deterministic | 74% | **96%** | 70% |
-| llm / haiku-4-5 | **91%** | 65% | 65% |
-| **hybrid / haiku-4-5** | **91%** | **96%** | **87%** |
-| hybrid / opus-5 | 83% | 96% | 78% |
-| hybrid / gpt-4.1 | 78% | 96% | 78% |
+| deterministic | 74% [53–90] | 96% [81–100] | 70% [50–81] |
+| llm / haiku-4-5 | 91% [79–100] | 65% [42–92] | 65% [42–92] |
+| hybrid / haiku-4-5 | 91% [79–100] | 96% [81–100] | 87% [62–100] |
+| hybrid / haiku-5-5 | 87% [67–96] | 96% [81–100] | 83% [50–96] |
+| hybrid / sonnet-5-5 | 96% [81–100] | 96% [81–100] | 91% [67–100] |
+| hybrid / opus-5-5 | 91% [75–100] | 96% [81–100] | 87% [67–97] |
+| hybrid / gpt-4.1 | 78% [50–100] | 96% [81–100] | 78% [50–100] |
 
-**Specificity scales inversely with model capability** — haiku 91% > sonnet 87%
-> opus 83%, monotonic across three tiers. Stronger models interpret more
-generously and inflate S2 into S3, where the rubric asks for conservatism. So
-the recommended configuration is `hybrid/haiku-4-5`: 5× cheaper than Opus and
-more accurate on this task. Not the expected result, which is why it was worth
-measuring.
+**No assessor is statistically separable from another.** Every pair of "both"
+intervals overlaps across all 17 assessor rows. The Sept 3 finding that
+specificity falls with model capability (haiku-4-5 91% > sonnet-5 87% > opus-5
+83%) does not carry to the 5.5 tier (haiku-5-5 87%, opus-5-5 91%, sonnet-5-5
+96%). `hybrid/haiku-4-5` remains a cheap configuration within the noise of the
+best; all assessors ran at effort=low, so this is not a verdict on the larger
+models at higher depth.
+
+**End to end on synth** (gate fed by a live assessor instead of the authored
+labels), hybrid/haiku-4-5, hybrid/sonnet-5-5 and hybrid/opus-5-5 all score
+92% [86–100] accuracy with 0% premature advance, against 100% with oracle
+inputs.
 
 **The gate evaluation is not yet conclusive**, and says so: `always_follow_up`
-beats the gate on strict accuracy (78% vs 60%) because 72 of 92 labels are
+matches the gate on strict accuracy (78% [69–85] vs 77% [73–81]) because 72 of 92 labels are
 `follow_up` — every golden transcript was written to punish premature advance
 and none to punish stalling. The metric pair still does its job (that policy
 scores 0% premature advance and 100% stall), but the corpus needs fixtures
 where advancing is correct before it can rank real policies.
 
 Caveats bounding all of it: 23 sufficiency labels and 92 **weak** gate labels,
-one labeller, tuned against the same set, no confidence intervals, and an
-effective n nearer 11 than 92 given correlated transcripts. Directional only.
+one labeller, tuned against the same set, and only 4–11 clusters behind each
+interval (corpus stall rests on n=2), so the percentile intervals are if
+anything too narrow. Directional only.
 
 ## Testing
 

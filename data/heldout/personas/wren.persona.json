@@ -1,0 +1,71 @@
+{
+  "persona_id": "wren",
+  "display_name": "Wren",
+  "one_line": "Thin responder: county water-quality lab technician; short, hedged, low-ownership answers that occasionally carry one concrete detail.",
+  "synthetic": true,
+  "topics": [
+    {
+      "topic_id": "opening.why_here",
+      "stage": "opening",
+      "intents": [
+        "ask_opening"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "career.the_work",
+      "stage": "career",
+      "intents": [
+        "ask_career"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "career.proud_moment",
+      "stage": "career",
+      "intents": [
+        "ask_proudest_moment"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "early_life.childhood",
+      "stage": "early_life",
+      "intents": [
+        "ask_childhood"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "outside.free_time",
+      "stage": "outside_work",
+      "intents": [
+        "ask_outside_work"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "thrives.conditions",
+      "stage": "thrives",
+      "intents": [
+        "ask_where_you_thrive"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "reflection.frame",
+      "stage": "reflection",
+      "intents": [
+        "offer_framing"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    }
+  ]
+}

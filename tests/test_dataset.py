@@ -95,3 +95,106 @@ def test_denominators_are_reported_so_small_n_is_visible():
     result = gate_eval.run("corpus")["gate"]
     assert result["premature_advance_n"] > 0
     assert result["stall_n"] > 0
+
+
+# --- confidence intervals and end-to-end mode ------------------------------
+
+def test_oracle_synth_numbers_are_unchanged():
+    """Pinned to the pre-CI values: adding intervals must not move a rate."""
+    result = gate_eval.run("synth")
+    assert result["gate"]["accuracy_strict"] == 1.0
+    assert result["gate"]["minimal_pair_accuracy"] == 1.0
+    assert result["budget_only"]["accuracy_strict"] == pytest.approx(46 / 52)
+    assert result["budget_only"]["stall_rate"] == pytest.approx(6 / 19)
+    assert result["budget_only"]["minimal_pair_accuracy"] == 0.0
+    assert result["length_threshold"]["premature_advance_rate"] == pytest.approx(10 / 33)
+    assert result["gate"]["premature_advance_n"] == 33
+    assert result["gate"]["stall_n"] == 19
+    assert result["gate"]["minimal_pair_n"] == 12
+
+
+def test_every_rate_carries_a_ci_a_denominator_and_a_cluster_count():
+    for split in ("synth", "corpus"):
+        for name, m in gate_eval.run(split).items():
+            for metric in ("accuracy_strict", "accuracy_acceptable",
+                           "premature_advance_rate", "stall_rate", "minimal_pair_accuracy"):
+                assert f"{metric}_n" in m and f"{metric}_k" in m, (split, name, metric)
+                ci = m[f"{metric}_ci"]
+                if m[metric] is None:
+                    assert ci is None
+                elif ci is not None:
+                    assert ci[0] <= m[metric] <= ci[1], (split, name, metric)
+
+
+def test_cluster_keys_keep_minimal_pairs_together_and_corpus_by_transcript():
+    from convint.dataset.synth import build_from_banks, minimal_pairs
+
+    items, labels = build_from_banks()
+    by_id = {i.item_id: i for i in items}
+    for a, b in minimal_pairs(items, labels):
+        assert gate_eval.cluster_key(by_id[a]) == gate_eval.cluster_key(by_id[b])
+    assert len({gate_eval.cluster_key(i) for i in items}) > 1
+
+    corpus_items, _ = build()
+    assert {gate_eval.cluster_key(i) for i in corpus_items} == {i.transcript for i in corpus_items}
+    assert gate_eval.run("corpus")["gate"]["clusters"] == len({i.transcript for i in corpus_items})
+
+
+def test_e2e_mode_adds_a_row_beside_the_oracle_and_leaves_the_rest_alone():
+    from convint.adapters.assessor_deterministic import DeterministicAssessor
+
+    oracle = gate_eval.run("synth")
+    both = gate_eval.run("synth", e2e_assessor=DeterministicAssessor())
+    e2e = gate_eval.e2e_key("deterministic")
+    assert e2e in both and "gate" in both
+    assert set(both) == set(oracle) | {e2e}
+    for name in oracle:
+        assert both[name] == oracle[name], name
+    row = both[e2e]
+    assert row["n"] == oracle["gate"]["n"]
+    assert 0.0 <= row["accuracy_strict"] <= 1.0
+    assert 0.0 <= row["assessor_specificity_agreement"] <= 1.0
+
+
+def test_e2e_policy_uses_the_assessor_not_the_authored_inputs():
+    """An assessor that always says 'rich, owned episode' must make the gate
+    advance once the floor is met, whatever the item was authored as."""
+    from convint.domain.enums import Ownership, Specificity
+    from convint.domain.sufficiency import Assessment
+
+    class Generous:
+        name = "generous"
+
+        def assess(self, text, prior):
+            return Assessment(specificity=Specificity.S3, ownership=Ownership.O2)
+
+    item = Item(item_id="x", transcript="bank:t", turn_index=0, text="meh",
+                followups_used=1, specificity=Specificity.S0, ownership=Ownership.O0)
+    assert gate_eval.gate_policy(item) is Action.FOLLOW_UP
+    assert gate_eval.E2EGatePolicy(Generous())(item) is Action.ADVANCE
+
+
+def test_e2e_is_refused_off_the_synth_split():
+    from convint.adapters.assessor_deterministic import DeterministicAssessor
+
+    with pytest.raises(ValueError):
+        gate_eval.run("corpus", e2e_assessor=DeterministicAssessor())
+
+
+def test_make_assessor_parses_specs_without_calling_anything():
+    assert gate_eval.make_assessor("deterministic").name == "deterministic"
+    for bad in ("", "llm", "llm:", "gpt:haiku-4-5"):
+        with pytest.raises(ValueError):
+            gate_eval.make_assessor(bad)
+
+
+def test_bench_gate_e2e_cli_prints_both_rows(capsys):
+    from convint.api.cli import main as cli_main
+
+    assert cli_main(["bench", "--gate", "--split", "synth", "--e2e"]) == 0
+    out = capsys.readouterr().out
+    assert "gate (oracle inputs)" in out
+    assert "gate (e2e: deterministic)" in out
+    assert "k=4 topics" in out
+    with pytest.raises(SystemExit):
+        cli_main(["bench", "--gate", "--split", "corpus", "--e2e"])

@@ -1,0 +1,1398 @@
+{
+  "kind": "testbed",
+  "note": "Full live testbed after model refresh (5.5 registry), CIs, e2e gate, truncation fix, run recorder",
+  "command": "scripts/testbed.py --live --note 'Full live testbed after model refresh (5.5 registry), CIs, e2e gate, truncation fix, run recorder'",
+  "models": [
+    "haiku-4-5 (claude-haiku-4-5, effort n/a)",
+    "haiku-5-5 (claude-haiku-5-5, effort low)",
+    "sonnet-5 (claude-sonnet-5, effort low)",
+    "sonnet-5-5 (claude-sonnet-5-5, effort low)",
+    "opus-5 (claude-opus-5, effort low)",
+    "opus-5-5 (claude-opus-5-5, effort low)",
+    "gpt-4.1-mini (gpt-4.1-mini, effort n/a)",
+    "gpt-4.1 (gpt-4.1, effort n/a)",
+    "invariants: haiku-4-5 (generator, effort n/a)"
+  ],
+  "headline": {
+    "suites": "offline PASS (287 passed), e2e PASS (1 passed), live PASS (5 passed)",
+    "synth gate": "acc 100% [100\u2013100], premature 0% [0\u20130], stall 0% [0\u20130]",
+    "synth gate (e2e: deterministic)": "acc 88% [80\u201397], premature 0% [0\u20130], stall 32% [12\u201344]",
+    "corpus gate": "acc 77% [73\u201381], premature 10% [0\u201338], stall 50% [0\u2013100]",
+    "human gate": "acc 80% [57\u2013100], premature 0% [0\u20130], stall 50% [0\u2013100]",
+    "invariants": "single-question 100%, grounded 100% of 6 samples",
+    "best assessor (both)": "hybrid/sonnet-5-5 91% [67\u2013100]"
+  },
+  "est_cost": null,
+  "provenance": {
+    "run_at": "2026-10-17T00:42:00+00:00",
+    "git": {
+      "commit": "a7c4c57c27553f539ae6cca163fb5ffe82dcbc28",
+      "branch": "main",
+      "dirty": true,
+      "dirty_files": [
+        "CLAUDE.md",
+        "Makefile",
+        "bench-results/LATEST.md",
+        "scripts/compare_assessors.py",
+        "scripts/testbed.py",
+        "src/convint/adapters/cache.py",
+        "src/convint/adapters/llm_anthropic.py",
+        "src/convint/adapters/llm_openai.py",
+        "src/convint/adapters/models.py",
+        "src/convint/api/cli.py",
+        "src/convint/bench/evaluate.py",
+        "src/convint/bench/gate_eval.py",
+        "src/convint/ports/llm.py",
+        "tests/conftest.py",
+        "tests/test_adapters.py",
+        "tests/test_cache.py",
+        "tests/test_dataset.py",
+        "tests/test_live_adapter.py",
+        ".vscode/",
+        "bench-results/HISTORY.md"
+      ]
+    },
+    "platform": {
+      "python": "3.13.4",
+      "os": "macOS-27.0.1-arm64-arm-64bit-Mach-O"
+    },
+    "packages": {
+      "pydantic": "2.13.5",
+      "anthropic": "1.3.0",
+      "openai": "3.8.0",
+      "fastapi": "0.141.1",
+      "pytest": "9.1.1",
+      "convint": "0.1.0"
+    },
+    "dataset_hashes": {
+      "labels/sufficiency.seed.jsonl": "0b107d7f45957839",
+      "turn_decisions/human_labels.jsonl": "7552f88cc312407b",
+      "turn_decisions/items.jsonl": "c566dfeba26bfa80",
+      "turn_decisions/labels.jsonl": "b4280d53fb978da4",
+      "turn_decisions/synth_items.jsonl": "96d1a029ef2d30a4",
+      "turn_decisions/synth_labels.jsonl": "c5eae593b800fa25"
+    }
+  },
+  "results": {
+    "tag": "",
+    "live": true,
+    "suites": [
+      {
+        "suite": "offline",
+        "exit_code": 0,
+        "ok": true,
+        "summary": "287 passed, 0 failed, 0 errored, 0 skipped in 2.43s",
+        "tests": 287,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time": 2.433,
+        "passed": 287
+      },
+      {
+        "suite": "e2e",
+        "exit_code": 0,
+        "ok": true,
+        "summary": "1 passed, 0 failed, 0 errored, 0 skipped in 0.54s",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time": 0.538,
+        "passed": 1
+      },
+      {
+        "suite": "live",
+        "exit_code": 0,
+        "ok": true,
+        "summary": "5 passed, 0 failed, 0 errored, 0 skipped in 1.18s",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "time": 1.184,
+        "passed": 5
+      }
+    ],
+    "coverage": {
+      "exit_code": 0,
+      "total": "86%",
+      "ok": true
+    },
+    "dataset": {
+      "corpus_items": 92,
+      "synth_items": 52,
+      "minimal_pairs": 12,
+      "human_labels": 5,
+      "corpus_label_actions": {
+        "follow_up": 72,
+        "synthesize": 11,
+        "advance": 5,
+        "refuse_and_continue": 4
+      },
+      "synth_label_actions": {
+        "follow_up": 33,
+        "advance": 19
+      }
+    },
+    "gate": {
+      "synth": {
+        "gate": {
+          "n": 52,
+          "clusters": 4,
+          "cluster_unit": "topics",
+          "minimal_pair_accuracy": 1.0,
+          "minimal_pair_n": 12,
+          "accuracy_strict": 1.0,
+          "accuracy_acceptable": 1.0,
+          "premature_advance_rate": 0.0,
+          "premature_advance_n": 33,
+          "stall_rate": 0.0,
+          "stall_n": 19,
+          "accuracy_strict_ci": [
+            1.0,
+            1.0
+          ],
+          "accuracy_strict_n": 52,
+          "accuracy_strict_k": 4,
+          "accuracy_acceptable_ci": [
+            1.0,
+            1.0
+          ],
+          "accuracy_acceptable_n": 52,
+          "accuracy_acceptable_k": 4,
+          "premature_advance_rate_ci": [
+            0.0,
+            0.0
+          ],
+          "premature_advance_rate_n": 33,
+          "premature_advance_rate_k": 4,
+          "stall_rate_ci": [
+            0.0,
+            0.0
+          ],
+          "stall_rate_n": 19,
+          "stall_rate_k": 4,
+          "minimal_pair_accuracy_ci": [
+            1.0,
+            1.0
+          ],
+          "minimal_pair_accuracy_n": 12,
+          "minimal_pair_accuracy_k": 3
+        },
+        "gate (e2e: deterministic)": {
+          "n": 52,
+          "clusters": 4,
+          "cluster_unit": "topics",
+          "minimal_pair_accuracy": 0.0,
+          "minimal_pair_n": 12,
+          "accuracy_strict": 0.8846153846153846,
+          "accuracy_acceptable": 0.8846153846153846,
+          "premature_advance_rate": 0.0,
+          "premature_advance_n": 33,
+          "stall_rate": 0.3157894736842105,
+          "stall_n": 19,
+          "accuracy_strict_ci": [
+            0.8,
+            0.9666666666666667
+          ],
+          "accuracy_strict_n": 52,
+          "accuracy_strict_k": 4,
+          "accuracy_acceptable_ci": [
+            0.8,
+            0.9666666666666667
+          ],
+          "accuracy_acceptable_n": 52,
+          "accuracy_acceptable_k": 4,
+          "premature_advance_rate_ci": [
+            0.0,
+            0.0
+          ],
+          "premature_advance_rate_n": 33,
+          "premature_advance_rate_k": 4,
+          "stall_rate_ci": [
+            0.11764705882352941,
+            0.4444444444444444
+          ],
+          "stall_rate_n": 19,
+          "stall_rate_k": 4,
+          "minimal_pair_accuracy_ci": [
+            0.0,
+            0.0
+          ],
+          "minimal_pair_accuracy_n": 12,
+          "minimal_pair_accuracy_k": 3,
+          "assessor_specificity_agreement": 0.38461538461538464,
+          "assessor_ownership_agreement": 0.9230769230769231
+        },
+        "always_follow_up": {
+          "n": 52,
+          "clusters": 4,
+          "cluster_unit": "topics",
+          "minimal_pair_accuracy": 0.0,
+          "minimal_pair_n": 12,
+          "accuracy_strict": 0.6346153846153846,
+          "accuracy_acceptable": 0.6346153846153846,
+          "premature_advance_rate": 0.0,
+          "premature_advance_n": 33,
+          "stall_rate": 1.0,
+          "stall_n": 19,
+          "accuracy_strict_ci": [
+            0.55,
+            0.7166666666666667
+          ],
+          "accuracy_strict_n": 52,
+          "accuracy_strict_k": 4,
+          "accuracy_acceptable_ci": [
+            0.55,
+            0.7166666666666667
+          ],
+          "accuracy_acceptable_n": 52,
+          "accuracy_acceptable_k": 4,
+          "premature_advance_rate_ci": [
+            0.0,
+            0.0
+          ],
+          "premature_advance_rate_n": 33,
+          "premature_advance_rate_k": 4,
+          "stall_rate_ci": [
+            1.0,
+            1.0
+          ],
+          "stall_rate_n": 19,
+          "stall_rate_k": 4,
+          "minimal_pair_accuracy_ci": [
+            0.0,
+            0.0
+          ],
+          "minimal_pair_accuracy_n": 12,
+          "minimal_pair_accuracy_k": 3
+        },
+        "always_advance": {
+          "n": 52,
+          "clusters": 4,
+          "cluster_unit": "topics",
+          "minimal_pair_accuracy": 0.0,
+          "minimal_pair_n": 12,
+          "accuracy_strict": 0.36538461538461536,
+          "accuracy_acceptable": 0.36538461538461536,
+          "premature_advance_rate": 1.0,
+          "premature_advance_n": 33,
+          "stall_rate": 0.0,
+          "stall_n": 19,
+          "accuracy_strict_ci": [
+            0.2833333333333333,
+            0.45
+          ],
+          "accuracy_strict_n": 52,
+          "accuracy_strict_k": 4,
+          "accuracy_acceptable_ci": [
+            0.2833333333333333,
+            0.45
+          ],
+          "accuracy_acceptable_n": 52,
+          "accuracy_acceptable_k": 4,
+          "premature_advance_rate_ci": [
+            1.0,
+            1.0
+          ],
+          "premature_advance_rate_n": 33,
+          "premature_advance_rate_k": 4,
+          "stall_rate_ci": [
+            0.0,
+            0.0
+          ],
+          "stall_rate_n": 19,
+          "stall_rate_k": 4,
+          "minimal_pair_accuracy_ci": [
+            0.0,
+            0.0
+          ],
+          "minimal_pair_accuracy_n": 12,
+          "minimal_pair_accuracy_k": 3
+        },
+        "budget_only": {
+          "n": 52,
+          "clusters": 4,
+          "cluster_unit": "topics",
+          "minimal_pair_accuracy": 0.0,
+          "minimal_pair_n": 12,
+          "accuracy_strict": 0.8846153846153846,
+          "accuracy_acceptable": 0.8846153846153846,
+          "premature_advance_rate": 0.0,
+          "premature_advance_n": 33,
+          "stall_rate": 0.3157894736842105,
+          "stall_n": 19,
+          "accuracy_strict_ci": [
+            0.8,
+            0.9666666666666667
+          ],
+          "accuracy_strict_n": 52,
+          "accuracy_strict_k": 4,
+          "accuracy_acceptable_ci": [
+            0.8,
+            0.9666666666666667
+          ],
+          "accuracy_acceptable_n": 52,
+          "accuracy_acceptable_k": 4,
+          "premature_advance_rate_ci": [
+            0.0,
+            0.0
+          ],
+          "premature_advance_rate_n": 33,
+          "premature_advance_rate_k": 4,
+          "stall_rate_ci": [
+            0.11764705882352941,
+            0.4444444444444444
+          ],
+          "stall_rate_n": 19,
+          "stall_rate_k": 4,
+          "minimal_pair_accuracy_ci": [
+            0.0,
+            0.0
+          ],
+          "minimal_pair_accuracy_n": 12,
+          "minimal_pair_accuracy_k": 3
+        },
+        "length_threshold": {
+          "n": 52,
+          "clusters": 4,
+          "cluster_unit": "topics",
+          "minimal_pair_accuracy": 0.3333333333333333,
+          "minimal_pair_n": 12,
+          "accuracy_strict": 0.5576923076923077,
+          "accuracy_acceptable": 0.5576923076923077,
+          "premature_advance_rate": 0.30303030303030304,
+          "premature_advance_n": 33,
+          "stall_rate": 0.6842105263157895,
+          "stall_n": 19,
+          "accuracy_strict_ci": [
+            0.5,
+            0.6730769230769231
+          ],
+          "accuracy_strict_n": 52,
+          "accuracy_strict_k": 4,
+          "accuracy_acceptable_ci": [
+            0.5,
+            0.6730769230769231
+          ],
+          "accuracy_acceptable_n": 52,
+          "accuracy_acceptable_k": 4,
+          "premature_advance_rate_ci": [
+            0.09090909090909091,
+            0.45
+          ],
+          "premature_advance_rate_n": 33,
+          "premature_advance_rate_k": 4,
+          "stall_rate_ci": [
+            0.4444444444444444,
+            0.9
+          ],
+          "stall_rate_n": 19,
+          "stall_rate_k": 4,
+          "minimal_pair_accuracy_ci": [
+            0.0,
+            1.0
+          ],
+          "minimal_pair_accuracy_n": 12,
+          "minimal_pair_accuracy_k": 3
+        }
+      },
+      "corpus": {
+        "gate": {
+          "n": 92,
+          "clusters": 11,
+          "cluster_unit": "transcripts",
+          "minimal_pair_accuracy": null,
+          "minimal_pair_n": 0,
+          "accuracy_strict": 0.7717391304347826,
+          "accuracy_acceptable": 0.967391304347826,
+          "premature_advance_rate": 0.1,
+          "premature_advance_n": 10,
+          "stall_rate": 0.5,
+          "stall_n": 2,
+          "accuracy_strict_ci": [
+            0.731939363706906,
+            0.8144425353188239
+          ],
+          "accuracy_strict_n": 92,
+          "accuracy_strict_k": 11,
+          "accuracy_acceptable_ci": [
+            0.9285499139414802,
+            1.0
+          ],
+          "accuracy_acceptable_n": 92,
+          "accuracy_acceptable_k": 11,
+          "premature_advance_rate_ci": [
+            0.0,
+            0.375
+          ],
+          "premature_advance_rate_n": 10,
+          "premature_advance_rate_k": 4,
+          "stall_rate_ci": [
+            0.0,
+            1.0
+          ],
+          "stall_rate_n": 2,
+          "stall_rate_k": 2,
+          "minimal_pair_accuracy_ci": null,
+          "minimal_pair_accuracy_n": 0,
+          "minimal_pair_accuracy_k": 0
+        },
+        "always_follow_up": {
+          "n": 92,
+          "clusters": 11,
+          "cluster_unit": "transcripts",
+          "minimal_pair_accuracy": null,
+          "minimal_pair_n": 0,
+          "accuracy_strict": 0.782608695652174,
+          "accuracy_acceptable": 0.8152173913043478,
+          "premature_advance_rate": 0.0,
+          "premature_advance_n": 10,
+          "stall_rate": 1.0,
+          "stall_n": 2,
+          "accuracy_strict_ci": [
+            0.6875,
+            0.8534535323801513
+          ],
+          "accuracy_strict_n": 92,
+          "accuracy_strict_k": 11,
+          "accuracy_acceptable_ci": [
+            0.72,
+            0.8771929824561403
+          ],
+          "accuracy_acceptable_n": 92,
+          "accuracy_acceptable_k": 11,
+          "premature_advance_rate_ci": [
+            0.0,
+            0.0
+          ],
+          "premature_advance_rate_n": 10,
+          "premature_advance_rate_k": 4,
+          "stall_rate_ci": [
+            1.0,
+            1.0
+          ],
+          "stall_rate_n": 2,
+          "stall_rate_k": 2,
+          "minimal_pair_accuracy_ci": null,
+          "minimal_pair_accuracy_n": 0,
+          "minimal_pair_accuracy_k": 0
+        },
+        "always_advance": {
+          "n": 92,
+          "clusters": 11,
+          "cluster_unit": "transcripts",
+          "minimal_pair_accuracy": null,
+          "minimal_pair_n": 0,
+          "accuracy_strict": 0.05434782608695652,
+          "accuracy_acceptable": 0.8478260869565217,
+          "premature_advance_rate": 1.0,
+          "premature_advance_n": 10,
+          "stall_rate": 0.0,
+          "stall_n": 2,
+          "accuracy_strict_ci": [
+            0.0,
+            0.10680478502080439
+          ],
+          "accuracy_strict_n": 92,
+          "accuracy_strict_k": 11,
+          "accuracy_acceptable_ci": [
+            0.7525773195876289,
+            0.9294117647058824
+          ],
+          "accuracy_acceptable_n": 92,
+          "accuracy_acceptable_k": 11,
+          "premature_advance_rate_ci": [
+            1.0,
+            1.0
+          ],
+          "premature_advance_rate_n": 10,
+          "premature_advance_rate_k": 4,
+          "stall_rate_ci": [
+            0.0,
+            0.0
+          ],
+          "stall_rate_n": 2,
+          "stall_rate_k": 2,
+          "minimal_pair_accuracy_ci": null,
+          "minimal_pair_accuracy_n": 0,
+          "minimal_pair_accuracy_k": 0
+        },
+        "budget_only": {
+          "n": 92,
+          "clusters": 11,
+          "cluster_unit": "transcripts",
+          "minimal_pair_accuracy": null,
+          "minimal_pair_n": 0,
+          "accuracy_strict": 0.6630434782608695,
+          "accuracy_acceptable": 0.9021739130434783,
+          "premature_advance_rate": 0.1,
+          "premature_advance_n": 10,
+          "stall_rate": 0.5,
+          "stall_n": 2,
+          "accuracy_strict_ci": [
+            0.5975570161545771,
+            0.717391304347826
+          ],
+          "accuracy_strict_n": 92,
+          "accuracy_strict_k": 11,
+          "accuracy_acceptable_ci": [
+            0.8022674418604652,
+            0.9714353099730457
+          ],
+          "accuracy_acceptable_n": 92,
+          "accuracy_acceptable_k": 11,
+          "premature_advance_rate_ci": [
+            0.0,
+            0.375
+          ],
+          "premature_advance_rate_n": 10,
+          "premature_advance_rate_k": 4,
+          "stall_rate_ci": [
+            0.0,
+            1.0
+          ],
+          "stall_rate_n": 2,
+          "stall_rate_k": 2,
+          "minimal_pair_accuracy_ci": null,
+          "minimal_pair_accuracy_n": 0,
+          "minimal_pair_accuracy_k": 0
+        },
+        "length_threshold": {
+          "n": 92,
+          "clusters": 11,
+          "cluster_unit": "transcripts",
+          "minimal_pair_accuracy": null,
+          "minimal_pair_n": 0,
+          "accuracy_strict": 0.4673913043478261,
+          "accuracy_acceptable": 0.717391304347826,
+          "premature_advance_rate": 1.0,
+          "premature_advance_n": 10,
+          "stall_rate": 0.5,
+          "stall_n": 2,
+          "accuracy_strict_ci": [
+            0.3669565809791988,
+            0.5813953488372093
+          ],
+          "accuracy_strict_n": 92,
+          "accuracy_strict_k": 11,
+          "accuracy_acceptable_ci": [
+            0.6222072072072072,
+            0.7964891487568477
+          ],
+          "accuracy_acceptable_n": 92,
+          "accuracy_acceptable_k": 11,
+          "premature_advance_rate_ci": [
+            1.0,
+            1.0
+          ],
+          "premature_advance_rate_n": 10,
+          "premature_advance_rate_k": 4,
+          "stall_rate_ci": [
+            0.0,
+            1.0
+          ],
+          "stall_rate_n": 2,
+          "stall_rate_k": 2,
+          "minimal_pair_accuracy_ci": null,
+          "minimal_pair_accuracy_n": 0,
+          "minimal_pair_accuracy_k": 0
+        }
+      },
+      "human": {
+        "gate": {
+          "n": 5,
+          "clusters": 4,
+          "cluster_unit": "transcripts",
+          "minimal_pair_accuracy": null,
+          "minimal_pair_n": 0,
+          "accuracy_strict": 0.8,
+          "accuracy_acceptable": 0.8,
+          "premature_advance_rate": 0.0,
+          "premature_advance_n": 3,
+          "stall_rate": 0.5,
+          "stall_n": 2,
+          "accuracy_strict_ci": [
+            0.5714285714285714,
+            1.0
+          ],
+          "accuracy_strict_n": 5,
+          "accuracy_strict_k": 4,
+          "accuracy_acceptable_ci": [
+            0.5714285714285714,
+            1.0
+          ],
+          "accuracy_acceptable_n": 5,
+          "accuracy_acceptable_k": 4,
+          "premature_advance_rate_ci": [
+            0.0,
+            0.0
+          ],
+          "premature_advance_rate_n": 3,
+          "premature_advance_rate_k": 3,
+          "stall_rate_ci": [
+            0.0,
+            1.0
+          ],
+          "stall_rate_n": 2,
+          "stall_rate_k": 2,
+          "minimal_pair_accuracy_ci": null,
+          "minimal_pair_accuracy_n": 0,
+          "minimal_pair_accuracy_k": 0
+        },
+        "always_follow_up": {
+          "n": 5,
+          "clusters": 4,
+          "cluster_unit": "transcripts",
+          "minimal_pair_accuracy": null,
+          "minimal_pair_n": 0,
+          "accuracy_strict": 0.6,
+          "accuracy_acceptable": 0.6,
+          "premature_advance_rate": 0.0,
+          "premature_advance_n": 3,
+          "stall_rate": 1.0,
+          "stall_n": 2,
+          "accuracy_strict_ci": [
+            0.25,
+            1.0
+          ],
+          "accuracy_strict_n": 5,
+          "accuracy_strict_k": 4,
+          "accuracy_acceptable_ci": [
+            0.25,
+            1.0
+          ],
+          "accuracy_acceptable_n": 5,
+          "accuracy_acceptable_k": 4,
+          "premature_advance_rate_ci": [
+            0.0,
+            0.0
+          ],
+          "premature_advance_rate_n": 3,
+          "premature_advance_rate_k": 3,
+          "stall_rate_ci": [
+            1.0,
+            1.0
+          ],
+          "stall_rate_n": 2,
+          "stall_rate_k": 2,
+          "minimal_pair_accuracy_ci": null,
+          "minimal_pair_accuracy_n": 0,
+          "minimal_pair_accuracy_k": 0
+        },
+        "always_advance": {
+          "n": 5,
+          "clusters": 4,
+          "cluster_unit": "transcripts",
+          "minimal_pair_accuracy": null,
+          "minimal_pair_n": 0,
+          "accuracy_strict": 0.4,
+          "accuracy_acceptable": 0.4,
+          "premature_advance_rate": 1.0,
+          "premature_advance_n": 3,
+          "stall_rate": 0.0,
+          "stall_n": 2,
+          "accuracy_strict_ci": [
+            0.0,
+            0.75
+          ],
+          "accuracy_strict_n": 5,
+          "accuracy_strict_k": 4,
+          "accuracy_acceptable_ci": [
+            0.0,
+            0.75
+          ],
+          "accuracy_acceptable_n": 5,
+          "accuracy_acceptable_k": 4,
+          "premature_advance_rate_ci": [
+            1.0,
+            1.0
+          ],
+          "premature_advance_rate_n": 3,
+          "premature_advance_rate_k": 3,
+          "stall_rate_ci": [
+            0.0,
+            0.0
+          ],
+          "stall_rate_n": 2,
+          "stall_rate_k": 2,
+          "minimal_pair_accuracy_ci": null,
+          "minimal_pair_accuracy_n": 0,
+          "minimal_pair_accuracy_k": 0
+        },
+        "budget_only": {
+          "n": 5,
+          "clusters": 4,
+          "cluster_unit": "transcripts",
+          "minimal_pair_accuracy": null,
+          "minimal_pair_n": 0,
+          "accuracy_strict": 0.8,
+          "accuracy_acceptable": 0.8,
+          "premature_advance_rate": 0.0,
+          "premature_advance_n": 3,
+          "stall_rate": 0.5,
+          "stall_n": 2,
+          "accuracy_strict_ci": [
+            0.5714285714285714,
+            1.0
+          ],
+          "accuracy_strict_n": 5,
+          "accuracy_strict_k": 4,
+          "accuracy_acceptable_ci": [
+            0.5714285714285714,
+            1.0
+          ],
+          "accuracy_acceptable_n": 5,
+          "accuracy_acceptable_k": 4,
+          "premature_advance_rate_ci": [
+            0.0,
+            0.0
+          ],
+          "premature_advance_rate_n": 3,
+          "premature_advance_rate_k": 3,
+          "stall_rate_ci": [
+            0.0,
+            1.0
+          ],
+          "stall_rate_n": 2,
+          "stall_rate_k": 2,
+          "minimal_pair_accuracy_ci": null,
+          "minimal_pair_accuracy_n": 0,
+          "minimal_pair_accuracy_k": 0
+        },
+        "length_threshold": {
+          "n": 5,
+          "clusters": 4,
+          "cluster_unit": "transcripts",
+          "minimal_pair_accuracy": null,
+          "minimal_pair_n": 0,
+          "accuracy_strict": 0.6,
+          "accuracy_acceptable": 0.6,
+          "premature_advance_rate": 0.6666666666666666,
+          "premature_advance_n": 3,
+          "stall_rate": 0.0,
+          "stall_n": 2,
+          "accuracy_strict_ci": [
+            0.25,
+            1.0
+          ],
+          "accuracy_strict_n": 5,
+          "accuracy_strict_k": 4,
+          "accuracy_acceptable_ci": [
+            0.25,
+            1.0
+          ],
+          "accuracy_acceptable_n": 5,
+          "accuracy_acceptable_k": 4,
+          "premature_advance_rate_ci": [
+            0.0,
+            1.0
+          ],
+          "premature_advance_rate_n": 3,
+          "premature_advance_rate_k": 3,
+          "stall_rate_ci": [
+            0.0,
+            0.0
+          ],
+          "stall_rate_n": 2,
+          "stall_rate_k": 2,
+          "minimal_pair_accuracy_ci": null,
+          "minimal_pair_accuracy_n": 0,
+          "minimal_pair_accuracy_k": 0
+        }
+      }
+    },
+    "corpus_replay": {
+      "transcripts": 11,
+      "turns": 92,
+      "actions": {
+        "follow_up": 63,
+        "advance": 19,
+        "synthesize": 6,
+        "refuse_and_continue": 4
+      },
+      "rules": {
+        "default_deepen": 33,
+        "floor_not_met": 25,
+        "ceiling_reached": 14,
+        "closing_honest_shortfall": 6,
+        "no_content_redirect": 5,
+        "adversarial_input": 4,
+        "gate_met": 4,
+        "acknowledgment_signpost": 1
+      }
+    },
+    "assessors": {
+      "deterministic": {
+        "n": 23,
+        "clusters": 4,
+        "cluster_unit": "transcripts",
+        "specificity_exact": 0.7391304347826086,
+        "specificity_within_1": 1.0,
+        "ownership_exact": 0.9565217391304348,
+        "both_exact": 0.6956521739130435,
+        "specificity_exact_ci": [
+          0.5263157894736842,
+          0.9
+        ],
+        "specificity_exact_n": 23,
+        "specificity_exact_k": 4,
+        "specificity_within_1_ci": [
+          1.0,
+          1.0
+        ],
+        "specificity_within_1_n": 23,
+        "specificity_within_1_k": 4,
+        "ownership_exact_ci": [
+          0.8125,
+          1.0
+        ],
+        "ownership_exact_n": 23,
+        "ownership_exact_k": 4,
+        "both_exact_ci": [
+          0.5,
+          0.8064516129032258
+        ],
+        "both_exact_n": 23,
+        "both_exact_k": 4
+      },
+      "llm/haiku-4-5": {
+        "n": 23,
+        "clusters": 4,
+        "cluster_unit": "transcripts",
+        "specificity_exact": 0.9130434782608695,
+        "specificity_within_1": 1.0,
+        "ownership_exact": 0.6521739130434783,
+        "both_exact": 0.6521739130434783,
+        "specificity_exact_ci": [
+          0.7894736842105263,
+          1.0
+        ],
+        "specificity_exact_n": 23,
+        "specificity_exact_k": 4,
+        "specificity_within_1_ci": [
+          1.0,
+          1.0
+        ],
+        "specificity_within_1_n": 23,
+        "specificity_within_1_k": 4,
+        "ownership_exact_ci": [
+          0.42105263157894735,
+          0.9166666666666666
+        ],
+        "ownership_exact_n": 23,
+        "ownership_exact_k": 4,
+        "both_exact_ci": [
+          0.42105263157894735,
+          0.9166666666666666
+        ],
+        "both_exact_n": 23,
+        "both_exact_k": 4
+      },
+      "hybrid/haiku-4-5": {
+        "n": 23,
+        "clusters": 4,
+        "cluster_unit": "transcripts",
+        "specificity_exact": 0.9130434782608695,
+        "specificity_within_1": 1.0,
+        "ownership_exact": 0.9565217391304348,
+        "both_exact": 0.8695652173913043,
+        "specificity_exact_ci": [
+          0.7894736842105263,
+          1.0
+        ],
+        "specificity_exact_n": 23,
+        "specificity_exact_k": 4,
+        "specificity_within_1_ci": [
+          1.0,
+          1.0
+        ],
+        "specificity_within_1_n": 23,
+        "specificity_within_1_k": 4,
+        "ownership_exact_ci": [
+          0.8125,
+          1.0
+        ],
+        "ownership_exact_n": 23,
+        "ownership_exact_k": 4,
+        "both_exact_ci": [
+          0.625,
+          1.0
+        ],
+        "both_exact_n": 23,
+        "both_exact_k": 4
+      },
+      "llm/haiku-5-5": {
+        "n": 23,
+        "clusters": 4,
+        "cluster_unit": "transcripts",
+        "specificity_exact": 0.8695652173913043,
+        "specificity_within_1": 0.9565217391304348,
+        "ownership_exact": 0.6521739130434783,
+        "both_exact": 0.6086956521739131,
+        "specificity_exact_ci": [
+          0.6666666666666666,
+          0.9583333333333334
+        ],
+        "specificity_exact_n": 23,
+        "specificity_exact_k": 4,
+        "specificity_within_1_ci": [
+          0.8125,
+          1.0
+        ],
+        "specificity_within_1_n": 23,
+        "specificity_within_1_k": 4,
+        "ownership_exact_ci": [
+          0.46153846153846156,
+          0.9
+        ],
+        "ownership_exact_n": 23,
+        "ownership_exact_k": 4,
+        "both_exact_ci": [
+          0.42105263157894735,
+          0.8
+        ],
+        "both_exact_n": 23,
+        "both_exact_k": 4
+      },
+      "hybrid/haiku-5-5": {
+        "n": 23,
+        "clusters": 4,
+        "cluster_unit": "transcripts",
+        "specificity_exact": 0.8695652173913043,
+        "specificity_within_1": 0.9565217391304348,
+        "ownership_exact": 0.9565217391304348,
+        "both_exact": 0.8260869565217391,
+        "specificity_exact_ci": [
+          0.6666666666666666,
+          0.9583333333333334
+        ],
+        "specificity_exact_n": 23,
+        "specificity_exact_k": 4,
+        "specificity_within_1_ci": [
+          0.8125,
+          1.0
+        ],
+        "specificity_within_1_n": 23,
+        "specificity_within_1_k": 4,
+        "ownership_exact_ci": [
+          0.8125,
+          1.0
+        ],
+        "ownership_exact_n": 23,
+        "ownership_exact_k": 4,
+        "both_exact_ci": [
+          0.5,
+          0.9583333333333334
+        ],
+        "both_exact_n": 23,
+        "both_exact_k": 4
+      },
+      "llm/sonnet-5": {
+        "n": 23,
+        "clusters": 4,
+        "cluster_unit": "transcripts",
+        "specificity_exact": 0.8695652173913043,
+        "specificity_within_1": 1.0,
+        "ownership_exact": 0.8260869565217391,
+        "both_exact": 0.6956521739130435,
+        "specificity_exact_ci": [
+          0.75,
+          0.9375
+        ],
+        "specificity_exact_n": 23,
+        "specificity_exact_k": 4,
+        "specificity_within_1_ci": [
+          1.0,
+          1.0
+        ],
+        "specificity_within_1_n": 23,
+        "specificity_within_1_k": 4,
+        "ownership_exact_ci": [
+          0.6923076923076923,
+          1.0
+        ],
+        "ownership_exact_n": 23,
+        "ownership_exact_k": 4,
+        "both_exact_ci": [
+          0.6060606060606061,
+          0.8333333333333334
+        ],
+        "both_exact_n": 23,
+        "both_exact_k": 4
+      },
+      "hybrid/sonnet-5": {
+        "n": 23,
+        "clusters": 4,
+        "cluster_unit": "transcripts",
+        "specificity_exact": 0.8695652173913043,
+        "specificity_within_1": 1.0,
+        "ownership_exact": 0.9565217391304348,
+        "both_exact": 0.8260869565217391,
+        "specificity_exact_ci": [
+          0.75,
+          0.9375
+        ],
+        "specificity_exact_n": 23,
+        "specificity_exact_k": 4,
+        "specificity_within_1_ci": [
+          1.0,
+          1.0
+        ],
+        "specificity_within_1_n": 23,
+        "specificity_within_1_k": 4,
+        "ownership_exact_ci": [
+          0.8125,
+          1.0
+        ],
+        "ownership_exact_n": 23,
+        "ownership_exact_k": 4,
+        "both_exact_ci": [
+          0.6666666666666666,
+          0.8823529411764706
+        ],
+        "both_exact_n": 23,
+        "both_exact_k": 4
+      },
+      "llm/sonnet-5-5": {
+        "n": 23,
+        "clusters": 4,
+        "cluster_unit": "transcripts",
+        "specificity_exact": 0.9565217391304348,
+        "specificity_within_1": 1.0,
+        "ownership_exact": 0.782608695652174,
+        "both_exact": 0.7391304347826086,
+        "specificity_exact_ci": [
+          0.8125,
+          1.0
+        ],
+        "specificity_exact_n": 23,
+        "specificity_exact_k": 4,
+        "specificity_within_1_ci": [
+          1.0,
+          1.0
+        ],
+        "specificity_within_1_n": 23,
+        "specificity_within_1_k": 4,
+        "ownership_exact_ci": [
+          0.5263157894736842,
+          1.0
+        ],
+        "ownership_exact_n": 23,
+        "ownership_exact_k": 4,
+        "both_exact_ci": [
+          0.5,
+          0.9166666666666666
+        ],
+        "both_exact_n": 23,
+        "both_exact_k": 4
+      },
+      "hybrid/sonnet-5-5": {
+        "n": 23,
+        "clusters": 4,
+        "cluster_unit": "transcripts",
+        "specificity_exact": 0.9565217391304348,
+        "specificity_within_1": 1.0,
+        "ownership_exact": 0.9565217391304348,
+        "both_exact": 0.9130434782608695,
+        "specificity_exact_ci": [
+          0.8125,
+          1.0
+        ],
+        "specificity_exact_n": 23,
+        "specificity_exact_k": 4,
+        "specificity_within_1_ci": [
+          1.0,
+          1.0
+        ],
+        "specificity_within_1_n": 23,
+        "specificity_within_1_k": 4,
+        "ownership_exact_ci": [
+          0.8125,
+          1.0
+        ],
+        "ownership_exact_n": 23,
+        "ownership_exact_k": 4,
+        "both_exact_ci": [
+          0.6666666666666666,
+          1.0
+        ],
+        "both_exact_n": 23,
+        "both_exact_k": 4
+      },
+      "llm/opus-5": {
+        "n": 23,
+        "clusters": 4,
+        "cluster_unit": "transcripts",
+        "specificity_exact": 0.8260869565217391,
+        "specificity_within_1": 1.0,
+        "ownership_exact": 0.782608695652174,
+        "both_exact": 0.6521739130434783,
+        "specificity_exact_ci": [
+          0.6666666666666666,
+          0.8823529411764706
+        ],
+        "specificity_exact_n": 23,
+        "specificity_exact_k": 4,
+        "specificity_within_1_ci": [
+          1.0,
+          1.0
+        ],
+        "specificity_within_1_n": 23,
+        "specificity_within_1_k": 4,
+        "ownership_exact_ci": [
+          0.6666666666666666,
+          0.9583333333333334
+        ],
+        "ownership_exact_n": 23,
+        "ownership_exact_k": 4,
+        "both_exact_ci": [
+          0.47368421052631576,
+          0.8
+        ],
+        "both_exact_n": 23,
+        "both_exact_k": 4
+      },
+      "hybrid/opus-5": {
+        "n": 23,
+        "clusters": 4,
+        "cluster_unit": "transcripts",
+        "specificity_exact": 0.8260869565217391,
+        "specificity_within_1": 1.0,
+        "ownership_exact": 0.9565217391304348,
+        "both_exact": 0.782608695652174,
+        "specificity_exact_ci": [
+          0.6666666666666666,
+          0.8823529411764706
+        ],
+        "specificity_exact_n": 23,
+        "specificity_exact_k": 4,
+        "specificity_within_1_ci": [
+          1.0,
+          1.0
+        ],
+        "specificity_within_1_n": 23,
+        "specificity_within_1_k": 4,
+        "ownership_exact_ci": [
+          0.8125,
+          1.0
+        ],
+        "ownership_exact_n": 23,
+        "ownership_exact_k": 4,
+        "both_exact_ci": [
+          0.5,
+          0.8823529411764706
+        ],
+        "both_exact_n": 23,
+        "both_exact_k": 4
+      },
+      "llm/opus-5-5": {
+        "n": 23,
+        "clusters": 4,
+        "cluster_unit": "transcripts",
+        "specificity_exact": 0.9130434782608695,
+        "specificity_within_1": 1.0,
+        "ownership_exact": 0.782608695652174,
+        "both_exact": 0.6956521739130435,
+        "specificity_exact_ci": [
+          0.75,
+          1.0
+        ],
+        "specificity_exact_n": 23,
+        "specificity_exact_k": 4,
+        "specificity_within_1_ci": [
+          1.0,
+          1.0
+        ],
+        "specificity_within_1_n": 23,
+        "specificity_within_1_k": 4,
+        "ownership_exact_ci": [
+          0.5263157894736842,
+          1.0
+        ],
+        "ownership_exact_n": 23,
+        "ownership_exact_k": 4,
+        "both_exact_ci": [
+          0.5,
+          0.8064516129032258
+        ],
+        "both_exact_n": 23,
+        "both_exact_k": 4
+      },
+      "hybrid/opus-5-5": {
+        "n": 23,
+        "clusters": 4,
+        "cluster_unit": "transcripts",
+        "specificity_exact": 0.9130434782608695,
+        "specificity_within_1": 1.0,
+        "ownership_exact": 0.9565217391304348,
+        "both_exact": 0.8695652173913043,
+        "specificity_exact_ci": [
+          0.75,
+          1.0
+        ],
+        "specificity_exact_n": 23,
+        "specificity_exact_k": 4,
+        "specificity_within_1_ci": [
+          1.0,
+          1.0
+        ],
+        "specificity_within_1_n": 23,
+        "specificity_within_1_k": 4,
+        "ownership_exact_ci": [
+          0.8125,
+          1.0
+        ],
+        "ownership_exact_n": 23,
+        "ownership_exact_k": 4,
+        "both_exact_ci": [
+          0.6666666666666666,
+          0.9696969696969697
+        ],
+        "both_exact_n": 23,
+        "both_exact_k": 4
+      },
+      "llm/gpt-4.1-mini": {
+        "n": 23,
+        "clusters": 4,
+        "cluster_unit": "transcripts",
+        "specificity_exact": 0.7391304347826086,
+        "specificity_within_1": 1.0,
+        "ownership_exact": 0.8260869565217391,
+        "both_exact": 0.6086956521739131,
+        "specificity_exact_ci": [
+          0.6666666666666666,
+          0.7878787878787878
+        ],
+        "specificity_exact_n": 23,
+        "specificity_exact_k": 4,
+        "specificity_within_1_ci": [
+          1.0,
+          1.0
+        ],
+        "specificity_within_1_n": 23,
+        "specificity_within_1_k": 4,
+        "ownership_exact_ci": [
+          0.5625,
+          0.9375
+        ],
+        "ownership_exact_n": 23,
+        "ownership_exact_k": 4,
+        "both_exact_ci": [
+          0.4375,
+          0.6923076923076923
+        ],
+        "both_exact_n": 23,
+        "both_exact_k": 4
+      },
+      "hybrid/gpt-4.1-mini": {
+        "n": 23,
+        "clusters": 4,
+        "cluster_unit": "transcripts",
+        "specificity_exact": 0.7391304347826086,
+        "specificity_within_1": 1.0,
+        "ownership_exact": 0.9565217391304348,
+        "both_exact": 0.6956521739130435,
+        "specificity_exact_ci": [
+          0.6666666666666666,
+          0.7878787878787878
+        ],
+        "specificity_exact_n": 23,
+        "specificity_exact_k": 4,
+        "specificity_within_1_ci": [
+          1.0,
+          1.0
+        ],
+        "specificity_within_1_n": 23,
+        "specificity_within_1_k": 4,
+        "ownership_exact_ci": [
+          0.8125,
+          1.0
+        ],
+        "ownership_exact_n": 23,
+        "ownership_exact_k": 4,
+        "both_exact_ci": [
+          0.5,
+          0.7837837837837838
+        ],
+        "both_exact_n": 23,
+        "both_exact_k": 4
+      },
+      "llm/gpt-4.1": {
+        "n": 23,
+        "clusters": 4,
+        "cluster_unit": "transcripts",
+        "specificity_exact": 0.782608695652174,
+        "specificity_within_1": 1.0,
+        "ownership_exact": 0.8695652173913043,
+        "both_exact": 0.6521739130434783,
+        "specificity_exact_ci": [
+          0.5,
+          1.0
+        ],
+        "specificity_exact_n": 23,
+        "specificity_exact_k": 4,
+        "specificity_within_1_ci": [
+          1.0,
+          1.0
+        ],
+        "specificity_within_1_n": 23,
+        "specificity_within_1_k": 4,
+        "ownership_exact_ci": [
+          0.75,
+          1.0
+        ],
+        "ownership_exact_n": 23,
+        "ownership_exact_k": 4,
+        "both_exact_ci": [
+          0.25,
+          0.8461538461538461
+        ],
+        "both_exact_n": 23,
+        "both_exact_k": 4
+      },
+      "hybrid/gpt-4.1": {
+        "n": 23,
+        "clusters": 4,
+        "cluster_unit": "transcripts",
+        "specificity_exact": 0.782608695652174,
+        "specificity_within_1": 1.0,
+        "ownership_exact": 0.9565217391304348,
+        "both_exact": 0.782608695652174,
+        "specificity_exact_ci": [
+          0.5,
+          1.0
+        ],
+        "specificity_exact_n": 23,
+        "specificity_exact_k": 4,
+        "specificity_within_1_ci": [
+          1.0,
+          1.0
+        ],
+        "specificity_within_1_n": 23,
+        "specificity_within_1_k": 4,
+        "ownership_exact_ci": [
+          0.8125,
+          1.0
+        ],
+        "ownership_exact_n": 23,
+        "ownership_exact_k": 4,
+        "both_exact_ci": [
+          0.5,
+          1.0
+        ],
+        "both_exact_n": 23,
+        "both_exact_k": 4
+      }
+    },
+    "invariants": {
+      "samples": 6,
+      "single_question_rate": 1.0,
+      "ends_with_question_rate": 1.0,
+      "grounded_rate": 1.0,
+      "mean_words": 12.666666666666666,
+      "errors": []
+    }
+  }
+}

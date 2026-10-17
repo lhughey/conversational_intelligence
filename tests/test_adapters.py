@@ -13,7 +13,10 @@ from convint.ports.llm import LLMMessage, LLMPort, LLMRequest
 
 # --- capability validation -------------------------------------------------
 
-@pytest.mark.parametrize("key", ["opus-5", "opus-4-8", "sonnet-5"])
+@pytest.mark.parametrize(
+    "key", ["opus-5", "opus-4-8", "sonnet-5", "opus-5-5", "sonnet-5-5", "fable-5-1",
+            "haiku-5-5"]
+)
 @pytest.mark.parametrize("temp", [0, 0.3, 0.7, 1.0])
 def test_sampling_is_rejected_at_config_load_not_request_time(key, temp):
     """Measured: these models 400 on any non-default temperature. Catching it
@@ -39,7 +42,14 @@ def test_model_ids_are_never_date_suffixed():
 
 def test_cost_is_computed_from_usage():
     assert cost_usd(spec("opus-5"), {"input": 1_000_000, "output": 0}) == pytest.approx(5.0)
-    assert cost_usd(spec("sonnet-5"), {"input": 0, "output": 1_000_000}) == pytest.approx(15.0)
+    assert cost_usd(spec("sonnet-5"), {"input": 0, "output": 1_000_000}) == pytest.approx(10.0)
+    assert cost_usd(spec("opus-5-5"), {"input": 1_000_000, "output": 1_000_000}) == pytest.approx(
+        24.0
+    )
+    # <=100k-token prompt tier; the >100k tier is not modelled.
+    assert cost_usd(spec("haiku-5-5"), {"input": 1_000_000, "output": 1_000_000}) == pytest.approx(
+        0.60
+    )
 
 
 def test_adapters_satisfy_the_port():
@@ -94,6 +104,37 @@ def test_anthropic_sends_effort_as_output_config():
     fake = _FakeAnthropic()
     AnthropicLLM("opus-5", client=fake).complete(_request())
     assert fake.kwargs["output_config"] == {"effort": "low"}
+
+
+def test_opus_5_5_defaults_to_high_effort_not_its_api_default():
+    """opus-5-5's API default effort is `medium`; opus-5 ran at its default
+    `high`. The spec pins `high` so the two are benchmarked at the same depth
+    when the caller does not set effort itself (the generator path)."""
+    fake = _FakeAnthropic()
+    req = LLMRequest(system="sys", messages=[LLMMessage(role="user", content="hi")])
+    AnthropicLLM("opus-5-5", client=fake).complete(req)
+    assert fake.kwargs["output_config"] == {"effort": "high"}
+    assert fake.kwargs["model"] == "claude-opus-5-5"
+
+
+def test_request_effort_still_overrides_the_opus_5_5_spec_default():
+    fake = _FakeAnthropic()
+    AnthropicLLM("opus-5-5", client=fake).complete(_request())
+    assert fake.kwargs["output_config"] == {"effort": "low"}
+
+
+def test_haiku_5_5_sends_effort_unlike_haiku_4_5():
+    """haiku-4-5 400s on effort, so the adapter drops it; haiku-5-5 supports
+    it, so the same request must carry it."""
+    fake = _FakeAnthropic()
+    AnthropicLLM("haiku-5-5", client=fake).complete(_request())
+    assert fake.kwargs["output_config"] == {"effort": "low"}
+    assert fake.kwargs["model"] == "claude-haiku-5-5"
+    assert "extra_body" not in fake.kwargs
+
+    fake = _FakeAnthropic()
+    AnthropicLLM("haiku-4-5", client=fake).complete(_request())
+    assert "output_config" not in fake.kwargs
 
 
 def test_anthropic_sends_sampling_through_extra_body_when_supported():
@@ -162,3 +203,125 @@ def test_openai_parses_text_and_usage():
     resp = OpenAILLM(client=_FakeOpenAI()).complete(_request())
     assert resp.text == "ok?"
     assert resp.usage == {"input": 7, "output": 2}
+
+
+# --- unusable responses and thinking headroom -------------------------------
+
+from convint.adapters.llm_anthropic import (  # noqa: E402
+    NONSTREAMING_MAX_TOKENS, THINKING_HEADROOM, effective_max_tokens,
+)
+from convint.ports.llm import (  # noqa: E402
+    IncompleteResponse, RefusedResponse, TruncatedResponse,
+)
+
+
+class _ScriptedAnthropic(_FakeAnthropic):
+    """Returns a chosen text and stop_reason, as the 5.x models can."""
+
+    def __init__(self, text="ok", stop_reason="end_turn", output_tokens=4):
+        super().__init__()
+        self.text, self.stop_reason, self.output_tokens = text, stop_reason, output_tokens
+
+    def _create(self, **kwargs):
+        self.kwargs = kwargs
+        content = [types.SimpleNamespace(type="thinking", thinking="")]
+        if self.text is not None:
+            content.append(types.SimpleNamespace(type="text", text=self.text))
+        return types.SimpleNamespace(
+            model=kwargs["model"], content=content, stop_reason=self.stop_reason,
+            stop_details=None,
+            usage=types.SimpleNamespace(input_tokens=1364, output_tokens=self.output_tokens),
+        )
+
+
+def test_max_tokens_stop_raises_truncated_with_details():
+    """The live haiku-5-5 failure: thinking consumed the whole budget."""
+    fake = _ScriptedAnthropic(text='{"scene": tr', stop_reason="max_tokens", output_tokens=400)
+    with pytest.raises(TruncatedResponse) as exc:
+        AnthropicLLM("haiku-5-5", client=fake).complete(_request())
+    err = exc.value
+    assert err.model == "claude-haiku-5-5"
+    assert err.max_tokens == fake.kwargs["max_tokens"]
+    assert err.usage == {"input": 1364, "output": 400}
+    assert err.stop_reason == "max_tokens"
+    assert "max_tokens" in str(err)
+
+
+def test_context_window_stop_also_raises_truncated():
+    fake = _ScriptedAnthropic(stop_reason="model_context_window_exceeded")
+    with pytest.raises(TruncatedResponse):
+        AnthropicLLM("opus-5", client=fake).complete(_request())
+
+
+@pytest.mark.parametrize("text", ["", "   \n", None])
+def test_empty_text_raises_even_on_end_turn(text):
+    fake = _ScriptedAnthropic(text=text, stop_reason="end_turn")
+    with pytest.raises(TruncatedResponse, match="no text"):
+        AnthropicLLM("haiku-5-5", client=fake).complete(_request())
+
+
+def test_refusal_raises_its_own_type():
+    fake = _ScriptedAnthropic(text="", stop_reason="refusal")
+    with pytest.raises(RefusedResponse) as exc:
+        AnthropicLLM("opus-5-5", client=fake).complete(_request())
+    assert not isinstance(exc.value, TruncatedResponse)
+    assert isinstance(exc.value, IncompleteResponse)
+
+
+def test_complete_response_carries_stop_reason():
+    resp = AnthropicLLM("opus-5", client=_ScriptedAnthropic()).complete(_request())
+    assert resp.text == "ok"
+    assert resp.stop_reason == "end_turn"
+
+
+def test_thinking_model_gets_headroom_scaled_by_effort():
+    """LLMRequest.max_tokens is the visible-answer budget; thinking is extra."""
+    fake = _FakeAnthropic()
+    AnthropicLLM("haiku-5-5", client=fake).complete(_request())  # effort=low
+    assert fake.kwargs["max_tokens"] == 50 + THINKING_HEADROOM["low"]
+
+    fake = _FakeAnthropic()
+    req = LLMRequest(messages=[LLMMessage(role="user", content="hi")], max_tokens=900)
+    AnthropicLLM("opus-5-5", client=fake).complete(req)  # spec pins effort=high
+    assert fake.kwargs["max_tokens"] == 900 + THINKING_HEADROOM["high"]
+
+
+@pytest.mark.parametrize("key", ["opus-5", "sonnet-5", "opus-5-5", "sonnet-5-5",
+                                 "haiku-5-5", "fable-5-1"])
+def test_5x_models_are_marked_as_thinking(key):
+    assert REGISTRY[key].thinks
+
+
+@pytest.mark.parametrize("key", ["haiku-4-5", "opus-4-8", "gpt-4.1", "gpt-4.1-mini"])
+def test_non_thinking_models_get_no_headroom(key):
+    assert not REGISTRY[key].thinks
+    assert effective_max_tokens(REGISTRY[key], 400, "low") == 400
+
+
+def test_haiku_4_5_request_budget_is_sent_unchanged():
+    fake = _FakeAnthropic()
+    AnthropicLLM("haiku-4-5", client=fake).complete(_request())
+    assert fake.kwargs["max_tokens"] == 50
+
+
+def test_headroom_never_exceeds_the_nonstreaming_ceiling():
+    s = REGISTRY["opus-5"]
+    assert effective_max_tokens(s, 900, "max") <= NONSTREAMING_MAX_TOKENS
+    # ...but never shrinks a budget the caller asked for explicitly.
+    assert effective_max_tokens(s, 30_000, "max") == 30_000
+
+
+def test_openai_maps_finish_reason_and_does_not_raise():
+    """OpenAI path unaffected: same text, now with a normalised stop_reason."""
+    class _Truncating(_FakeOpenAI):
+        def _create(self, **kwargs):
+            resp = super()._create(**kwargs)
+            resp.choices[0].finish_reason = "length"
+            return resp
+
+    fake = _Truncating()
+    resp = OpenAILLM(client=fake).complete(_request())
+    assert resp.text == "ok?"
+    assert resp.stop_reason == "max_tokens"
+    assert fake.kwargs["max_completion_tokens"] == 50
+    assert OpenAILLM(client=_FakeOpenAI()).complete(_request()).stop_reason is None
