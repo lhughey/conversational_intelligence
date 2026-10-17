@@ -28,5 +28,10 @@ make test-e2e
   `state_delta` after each call and pass the whole state back next time.
 - **`generate_text: false`** returns `message: null` and lets you write the
   words yourself — the escape hatch that keeps brand voice on your side.
+- **`assess`** is `"server"` by default (the operator's configured assessor);
+  `"deterministic"` forces the free regex assessor for that call, which is what
+  this example sends. The client never names a model.
+- **Check `diagnostics.degraded`.** A failed model call does not fail the turn:
+  `message` / `artifact` come back null and `diagnostics.warnings` says why.
 - MCP instead of HTTP: run `convint mcp` and call the `decide_turn` tool with
   the identical payload.

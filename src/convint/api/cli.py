@@ -4,6 +4,10 @@
     convint serve --port 8000
     convint mcp
     convint contract
+
+`turn`, `serve` and `mcp` build the server-configured engine
+(CONVINT_ASSESSOR / CONVINT_MODEL, see app/engine_factory.py); `--assessor`
+and `--model` override those for one process.
 """
 
 from __future__ import annotations
@@ -26,7 +30,15 @@ def main(argv: list[str] | None = None) -> int:
     p_serve.add_argument("--host", default="127.0.0.1")
     p_serve.add_argument("--port", type=int, default=8000)
 
-    sub.add_parser("mcp", help="run the MCP server on stdio")
+    p_mcp = sub.add_parser("mcp", help="run the MCP server on stdio")
+
+    for p in (p_turn, p_serve, p_mcp):
+        p.add_argument("--assessor", default=None,
+                       help="deterministic, llm:<key> or hybrid:<key> "
+                            "(default: $CONVINT_ASSESSOR, else hybrid:haiku-4-5)")
+        p.add_argument("--model", default=None,
+                       help="model registry key for the question and the Read, or 'none' "
+                            "(default: $CONVINT_MODEL, else haiku-4-5)")
 
     p_bench = sub.add_parser("bench", help="assessor agreement + corpus replay")
     p_bench.add_argument("--json", action="store_true", help="machine-readable output")
@@ -196,24 +208,30 @@ def main(argv: list[str] | None = None) -> int:
             print(corpus.format_report(replay))
         return 0
 
-    if args.command == "turn":
-        from ..app.turn_engine import TurnEngine
+    if args.command in ("turn", "serve", "mcp"):
+        from ..app.engine_factory import build_engine
 
+        try:
+            engine = build_engine(assessor=args.assessor, model=args.model)
+        except ValueError as exc:
+            parser.error(str(exc))
+
+    if args.command == "turn":
         raw = open(args.file, encoding="utf-8").read() if args.file else sys.stdin.read()
-        response: TurnResponse = TurnEngine().run(TurnRequest.model_validate_json(raw))
+        response: TurnResponse = engine.run(TurnRequest.model_validate_json(raw))
         print(response.model_dump_json(indent=2))
         return 0
 
     if args.command == "serve":  # pragma: no cover
         from .http import serve
 
-        serve(args.host, args.port)
+        serve(args.host, args.port, engine)
         return 0
 
     if args.command == "mcp":  # pragma: no cover
         from .mcp import serve
 
-        serve()
+        serve(engine)
         return 0
 
     return 1

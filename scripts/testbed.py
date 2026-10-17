@@ -169,6 +169,8 @@ def run_invariant_sampling(samples: int = 6) -> dict:
             engine = TurnEngine(llm=build_llm("haiku-4-5"))
             resp = engine.run(TurnRequest(plan=plan, state=state,
                                           options=Options(generate_text=True)))
+            if resp.message is None:  # generation failures degrade, not raise
+                raise RuntimeError("; ".join(resp.diagnostics.warnings) or "no message")
             text = resp.message.text
             single += question_count(text) == 1
             ends_q += ends_with_question(text)

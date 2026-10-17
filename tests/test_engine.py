@@ -10,6 +10,7 @@ from convint.domain import (
     StageSpec, TopicRecord, TopicSpec, Turn, UserSignal,
 )
 from convint.domain.sufficiency import Assessment, SufficiencyComponents
+from convint.ports.llm import LLMRequest
 
 PLAN = InterviewPlan(
     plan_id="demo",
@@ -132,9 +133,15 @@ def test_stacked_questions_are_truncated_to_one():
 
 
 def test_fake_llm_refuses_to_invent_a_response():
-    """A test can never silently pass on text nobody wrote."""
+    """A test can never silently pass on text nobody wrote. The fake's miss is
+    a model failure, so the turn degrades rather than raising - but no message
+    is invented and the miss is named."""
     with pytest.raises(KeyError):
-        TurnEngine(llm=FakeLLM()).run(_req(_state(), generate=True))
+        FakeLLM().complete(LLMRequest())
+    resp = TurnEngine(llm=FakeLLM()).run(_req(_state(), generate=True))
+    assert resp.message is None
+    assert resp.diagnostics.degraded
+    assert resp.diagnostics.warnings[0].startswith("generation_failed: KeyError")
 
 
 def test_conversation_converges_within_the_ceiling():

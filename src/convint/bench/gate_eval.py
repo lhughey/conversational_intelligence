@@ -111,28 +111,13 @@ def make_assessor(spec: str = "deterministic"):
     Model-backed assessors follow scripts/compare_assessors.py: a registry key
     through `build_llm`, wrapped in a read-write `CachingLLM`. Constructing one
     makes no call; evaluating it does (and costs money on a cache miss).
+    Spec parsing is shared with the serving path (`app/engine_factory.py`),
+    which does NOT cache - the response cache is a bench tool.
     """
-    from ..adapters.assessor_deterministic import DeterministicAssessor
-
-    if spec == "deterministic":
-        return DeterministicAssessor()
-    kind, _, key = spec.partition(":")
-    if kind not in {"llm", "hybrid"} or not key:
-        raise ValueError(
-            f"unknown assessor {spec!r}; use deterministic, llm:<key> or hybrid:<key>"
-        )
-    from ..adapters.assessor_hybrid import HybridAssessor
-    from ..adapters.assessor_llm import LLMAssessor
     from ..adapters.cache import CachingLLM
-    from ..adapters.models import build_llm
+    from ..app.engine_factory import assessor_from_spec
 
-    llm = LLMAssessor(CachingLLM(build_llm(key), mode="rw"))
-    if kind == "llm":
-        llm.name = f"llm/{key}"
-        return llm
-    hybrid = HybridAssessor(llm)
-    hybrid.name = f"hybrid/{key}"
-    return hybrid
+    return assessor_from_spec(spec, wrap=lambda llm: CachingLLM(llm, mode="rw"))
 
 
 def e2e_key(assessor_name: str) -> str:

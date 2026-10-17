@@ -24,6 +24,7 @@ Read first: `README.md`, `docs/ARCHITECTURE.md`, `docs/DATA.md`, `bench-results/
 
 - Credentials come only from this repo's `.env` (or an exported env var) via `src/convint/config.py`. Never source a sibling project's `.env`.
 - Tests block sockets. Anything that calls a model must carry the `live` marker (`live`/`e2e` are excluded by default in addopts).
+- Served engines come from `app/engine_factory.build_engine` (`CONVINT_ASSESSOR`/`CONVINT_MODEL`) and bill by default; conftest pins both model-free, and any server a test spawns must too. Model failures degrade to `diagnostics.warnings`, they do not raise.
 - `contracts/v1` drift from the models fails the suite; run `make contracts` after changing contract models.
 - Every gate decision carries `rule_fired` (`src/convint/domain/gate.py`); keep it on new rules.
 - `data/heldout/` is the never-tuned test split: never use it for prompt edits, few-shot examples, optimizer train/dev data or reading misses; only the `READERS` in `tests/test_heldout_leak.py` may touch it, and you author items but never labels (`data/heldout/README.md`).

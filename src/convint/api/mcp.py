@@ -22,8 +22,11 @@ def tool_definitions() -> list[dict[str, Any]]:
             "description": (
                 "Decide how an interview should proceed: follow up, advance, or "
                 "synthesize. Takes the full conversation state and an interview plan; "
-                "returns the decision, the sufficiency assessment, and the state to "
-                "persist. Stateless - pass the whole state every call."
+                "returns the decision, the sufficiency assessment, the state to "
+                "persist, and - when the server has a model configured - the next "
+                "question to ask (`message`) and, on a supported synthesize, the "
+                "Read (`artifact`). Set options.generate_text=false to write the "
+                "words yourself. Stateless - pass the whole state every call."
             ),
             "inputSchema": TurnRequest.model_json_schema(),
         },
@@ -37,6 +40,18 @@ def tool_definitions() -> list[dict[str, Any]]:
 
 TOOLS = tool_definitions()
 
+#: Built once per server process on first use (or by `serve`), never per call.
+_engine = None
+
+
+def default_engine():
+    global _engine
+    if _engine is None:
+        from ..app.engine_factory import build_engine
+
+        _engine = build_engine()
+    return _engine
+
 
 def handle_tool_call(name: str, arguments: dict[str, Any], engine=None) -> dict[str, Any]:
     """Pure dispatch. Raises ValueError on an unknown tool."""
@@ -48,16 +63,20 @@ def handle_tool_call(name: str, arguments: dict[str, Any], engine=None) -> dict[
         }
 
     if name == TOOL_DECIDE_TURN:
-        from ..app.turn_engine import TurnEngine
-
-        engine = engine or TurnEngine()
+        engine = engine or default_engine()
         return engine.run(TurnRequest.model_validate(arguments)).model_dump(mode="json")
 
     raise ValueError(f"unknown tool {name!r}; known: {[t['name'] for t in TOOLS]}")
 
 
-def serve() -> None:  # pragma: no cover - requires an MCP client to exercise
+def serve(engine=None, *, assessor: str | None = None,
+          model: str | None = None) -> None:  # pragma: no cover - needs an MCP client
     import asyncio
+
+    from ..app.engine_factory import build_engine
+
+    global _engine
+    _engine = engine or build_engine(assessor=assessor, model=model)
 
     import mcp.types as types
     from mcp.server import Server

@@ -10,6 +10,7 @@ Deselected by default (marker `e2e`) because it binds a port and shells out.
 
 from __future__ import annotations
 
+import os
 import pathlib
 import shutil
 import socket
@@ -18,6 +19,8 @@ import sys
 import time
 
 import pytest
+
+from convint.api.contract import CONTRACT_VERSION
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
 CLIENT = REPO / "examples" / "typescript-client" / "client.mjs"
@@ -38,6 +41,10 @@ def server() -> str:
         [sys.executable, "-m", "uvicorn", "--factory", "convint.api.http:build_app",
          "--host", "127.0.0.1", "--port", str(port), "--log-level", "warning"],
         cwd=REPO, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        # No-cost by construction: this repo's .env may hold a real key, and
+        # the server-configured default is model-backed. Exported vars win
+        # over .env (convint.config), so these pin a model-free server.
+        env={**os.environ, "CONVINT_ASSESSOR": "deterministic", "CONVINT_MODEL": "none"},
     )
     base = f"http://127.0.0.1:{port}"
     try:
@@ -65,7 +72,7 @@ def test_node_consumer_can_drive_the_component(server):
     )
     assert result.returncode == 0, result.stdout + result.stderr
     out = result.stdout
-    assert "contract 1.0 OK" in out
+    assert f"contract {CONTRACT_VERSION} OK" in out
     assert "decision   : follow_up / deepen" in out
     assert "rule_fired : floor_not_met" in out
     assert "followups  : 1" in out

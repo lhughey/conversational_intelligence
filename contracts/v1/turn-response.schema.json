@@ -128,6 +128,35 @@
           "title": "Assessor",
           "type": "string"
         },
+        "assessor_model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Assessor Model"
+        },
+        "cost_usd": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cost Usd"
+        },
+        "degraded": {
+          "default": false,
+          "title": "Degraded",
+          "type": "boolean"
+        },
         "latency_ms": {
           "default": 0,
           "title": "Latency Ms",
@@ -151,6 +180,13 @@
           },
           "title": "Usage",
           "type": "object"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
         }
       },
       "title": "Diagnostics",
@@ -377,7 +413,7 @@
       "$ref": "#/$defs/Assessment"
     },
     "contract_version": {
-      "default": "1.0",
+      "default": "1.1",
       "title": "Contract Version",
       "type": "string"
     },

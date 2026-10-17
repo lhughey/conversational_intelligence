@@ -38,6 +38,7 @@ src/convint/
     assessor_deterministic.py  assessor_llm.py
   app/
     turn_engine.py # orchestration: assess -> decide -> generate -> emit
+    engine_factory.py # builds the served engine from CONVINT_ASSESSOR / CONVINT_MODEL
   api/             # transports, all thin wrappers over turn_engine
     contract.py    # versioned request/response models
     mcp.py  http.py  cli.py
@@ -58,7 +59,7 @@ The transports are each ~100 lines. Adding a fourth seam later is cheap, which i
 
 ```jsonc
 {
-  "contract_version": "1.0",
+  "contract_version": "1.1",
   "plan":  { /* InterviewPlan */ },
   "state": {
     "turns":  [ { "role": "user" | "assistant", "content": "..." } ],
@@ -72,7 +73,7 @@ The transports are each ~100 lines. Adding a fourth seam later is cheap, which i
     "coverage": { "early_life": true, "career": false },
     "signals":  { "user_signal": "none" }
   },
-  "options": { "generate_text": true, "assess": "llm" | "deterministic" }
+  "options": { "generate_text": true, "assess": "server" | "deterministic" | "llm" }
 }
 ```
 
@@ -80,7 +81,7 @@ The transports are each ~100 lines. Adding a fourth seam later is cheap, which i
 
 ```jsonc
 {
-  "contract_version": "1.0",
+  "contract_version": "1.1",
   "decision": {
     "action": "follow_up" | "advance" | "synthesize" | "refuse_and_continue",
     "sub_action": "deepen" | "redirect" | "reflect_pattern" | "handoff" | "hold",
@@ -95,9 +96,14 @@ The transports are each ~100 lines. Adding a fourth seam later is cheap, which i
                 "grounded_on": [ "flashcards" ] } | null,
   "artifact": { /* the Read */ } | null,
   "state_delta": { /* what the caller should persist */ },
-  "diagnostics": { "model": "...", "latency_ms": 0, "usage": {}, "assessor": "llm" }
+  "diagnostics": { "assessor": "hybrid/haiku-4-5", "assessor_model": "claude-haiku-4-5",
+                   "model": "claude-haiku-4-5", "latency_ms": 0,
+                   "usage": { "input": 0, "output": 0 }, "cost_usd": 0.0,
+                   "warnings": [], "degraded": false }
 }
 ```
+
+`assess` defaults to `"server"` (whatever the operator configured). `"deterministic"` forces the regex assessor for one call (free, offline); `"llm"` asks for the server's model-backed assessor and falls back to deterministic, with a warning, when the server has none. The caller never names a model. 1.1 is an additive minor over 1.0: `assessor_model`, `cost_usd`, `warnings` and `degraded` are new, and `latency_ms` is now the whole turn's wall time.
 
 `rule_fired` is the generalization of the app's `positionInjection` idea: it makes every decision attributable to a named rule, so a bad turn is debuggable as "wrong rule fired" versus "right rule, bad generation." Do not let it be nullable — an unattributable decision is a bug.
 
@@ -141,9 +147,22 @@ Tier 5 is the one that proves componentization actually works. A small TS client
 | MCP server | `convint mcp` | App registers it as an MCP server; tools map 1:1 to the contract |
 | HTTP service | `convint serve` | FastAPI. Vercel supports Python functions, or run it as a sidecar |
 | Subprocess | `convint turn --json` | Node `child_process`; crude but zero infrastructure |
-| Python library | `from convint import TurnEngine` | For any Python consumer |
+| Python library | `from convint.app.engine_factory import build_engine` | For any Python consumer; or construct `TurnEngine` with your own adapters |
 
 All four call the same `turn_engine`. None of them is privileged, and choosing one later requires no core changes.
+
+### Server configuration: the operator picks the models
+
+`convint serve`, `convint mcp` and `convint turn` all build their engine with `app/engine_factory.py:build_engine`, which reads this repo's `.env` (or exported vars) through `convint.config`:
+
+| Variable | Values | Default |
+|---|---|---|
+| `CONVINT_ASSESSOR` | `deterministic` · `llm:<key>` · `hybrid:<key>` | `hybrid:haiku-4-5` |
+| `CONVINT_MODEL` | model registry key for the question and the Read, or `none` | `haiku-4-5` |
+
+`--assessor` / `--model` on those three commands override the env for one process. An invalid value fails at startup. Serving never goes through the bench response cache (`CachingLLM`); every call is metered into `diagnostics.usage` / `cost_usd`.
+
+**Degrade, never fail.** If the configured provider has no credential, that part of the engine starts degraded (deterministic assessor, or no generation) and the startup warning appears in every response's `diagnostics.warnings`. At turn time, a model failure falls back the same way: a failing assessor is re-run deterministically (`assessor_fallback: …`), a failing generator returns `message: null` (`generation_failed: …`; follow-up bookkeeping still advances), and a failing or truth-floor-violating Read returns `artifact: null` (`artifact_withheld: …`) while `readiness` is still reported. Any of these sets `diagnostics.degraded`.
 
 ---
 
