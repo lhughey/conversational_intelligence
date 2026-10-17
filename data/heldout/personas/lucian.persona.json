@@ -1,0 +1,89 @@
+{
+  "persona_id": "lucian",
+  "display_name": "Lucian",
+  "one_line": "Verbose but abstract: former secondary-school principal, now head of partnerships at an education nonprofit; long, confident self-description with few bounded instances.",
+  "synthetic": true,
+  "topics": [
+    {
+      "topic_id": "opening.why_here",
+      "stage": "opening",
+      "intents": [
+        "ask_opening"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "career.what_you_do",
+      "stage": "career",
+      "intents": [
+        "ask_career"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "career.proudest",
+      "stage": "career",
+      "intents": [
+        "ask_proudest_moment"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "early_life.growing_up",
+      "stage": "early_life",
+      "intents": [
+        "ask_childhood"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "outside.interests",
+      "stage": "outside_work",
+      "intents": [
+        "ask_outside_work"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "thrives.conditions",
+      "stage": "thrives",
+      "intents": [
+        "ask_where_you_thrive"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "reflection.frame",
+      "stage": "reflection",
+      "intents": [
+        "offer_framing"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "reflection.connect",
+      "stage": "reflection",
+      "intents": [
+        "ask_connection"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "closing.anything_else",
+      "stage": "closing",
+      "intents": [
+        "ask_anything_else"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    }
+  ]
+}

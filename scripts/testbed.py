@@ -10,51 +10,20 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
-import hashlib
 import json
 import pathlib
-import platform
 import subprocess
 import sys
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "src"))
-OUT = REPO / "bench-results"
+
+from convint.bench import record as recorder  # noqa: E402
 
 
 def sh(*cmd: str, cwd: pathlib.Path = REPO) -> tuple[int, str]:
     proc = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
     return proc.returncode, (proc.stdout + proc.stderr)
-
-
-def git_provenance() -> dict:
-    _, sha = sh("git", "rev-parse", "HEAD")
-    _, branch = sh("git", "rev-parse", "--abbrev-ref", "HEAD")
-    code, status = sh("git", "status", "--porcelain")
-    dirty = bool(status.strip())
-    return {
-        "commit": sha.strip(),
-        "branch": branch.strip(),
-        "dirty": dirty,
-        "dirty_files": [l[3:] for l in status.splitlines()][:20] if dirty else [],
-    }
-
-
-def file_hash(path: pathlib.Path) -> str | None:
-    if not path.exists():
-        return None
-    return hashlib.sha256(path.read_bytes()).hexdigest()[:16]
-
-
-def package_versions() -> dict:
-    out = {}
-    for name in ("pydantic", "anthropic", "openai", "fastapi", "pytest"):
-        try:
-            mod = __import__(name)
-            out[name] = getattr(mod, "__version__", getattr(mod, "VERSION", "?"))
-        except Exception:
-            out[name] = "not installed"
-    return out
 
 
 def run_pytest(marker: str | None, label: str) -> dict:
@@ -107,12 +76,17 @@ def run_coverage() -> dict:
 
 
 def run_gate_splits() -> dict:
+    """Synth also gets an end-to-end row (gate fed by the offline deterministic
+    assessor) beside the oracle row, so the cost of imperfect inputs shows."""
+    from convint.adapters.assessor_deterministic import DeterministicAssessor
     from convint.bench.gate_eval import run as gate_run
 
     results = {}
     for split in ("synth", "corpus", "human"):
         try:
-            results[split] = gate_run(split)
+            results[split] = gate_run(
+                split, e2e_assessor=DeterministicAssessor() if split == "synth" else None
+            )
         except Exception as exc:
             results[split] = {"error": str(exc)[:200]}
     return results
@@ -123,6 +97,10 @@ def run_corpus_replay() -> dict:
 
     result = corpus.run()
     return {k: result[k] for k in ("transcripts", "turns", "actions", "rules")}
+
+
+LIVE_ASSESSOR_MODELS = ("haiku-4-5", "haiku-5-5", "sonnet-5", "sonnet-5-5", "opus-5",
+                        "opus-5-5", "gpt-4.1-mini", "gpt-4.1")
 
 
 def run_assessors(live: bool) -> dict:
@@ -138,7 +116,7 @@ def run_assessors(live: bool) -> dict:
     from convint.adapters.cache import CachingLLM
     from convint.adapters.models import build_llm
 
-    for key in ("haiku-4-5", "sonnet-5", "opus-5", "gpt-4.1-mini", "gpt-4.1"):
+    for key in LIVE_ASSESSOR_MODELS:
         try:
             llm = LLMAssessor(CachingLLM(build_llm(key), mode="rw"))
             rows[f"llm/{key}"] = evaluate(llm)
@@ -151,8 +129,10 @@ def run_assessors(live: bool) -> dict:
 def _slim(result) -> dict:
     if "error" in result:
         return result
-    return {k: result[k] for k in
-            ("n", "specificity_exact", "specificity_within_1", "ownership_exact", "both_exact")}
+    metrics = ("specificity_exact", "specificity_within_1", "ownership_exact", "both_exact")
+    keys = ["n", "clusters", "cluster_unit", *metrics]
+    keys += [f"{m}_{suffix}" for m in metrics for suffix in ("ci", "n", "k")]
+    return {k: result[k] for k in keys if k in result}
 
 
 def run_invariant_sampling(samples: int = 6) -> dict:
@@ -236,26 +216,19 @@ def _count(values) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--live", action="store_true", help="include model-calling suites")
-    parser.add_argument("--tag", default="", help="label for this run")
+    parser.add_argument("--tag", default="", help="label for this run (filename suffix)")
+    parser.add_argument("--note", default=None,
+                        help="what this run is testing (else $NOTE, else '(no note)')")
     args = parser.parse_args()
 
-    started = dt.datetime.now().astimezone()
+    started = dt.datetime.now(dt.timezone.utc)
     print(f"testbed starting {started.isoformat(timespec='seconds')}"
           f"{' (live)' if args.live else ' (offline only)'}\n")
 
-    record: dict = {
-        "run_at": started.isoformat(timespec="seconds"),
-        "tag": args.tag,
-        "live": args.live,
-        "git": git_provenance(),
-        "platform": {"python": platform.python_version(), "os": platform.platform()},
-        "packages": package_versions(),
-        "dataset_hashes": {
-            p.name: file_hash(p)
-            for p in sorted((REPO / "data").rglob("*.jsonl"))
-        },
-        "suites": [],
-    }
+    # Provenance BEFORE anything runs, so the dirty flag describes the code
+    # that was measured rather than the files this run is about to write.
+    prov = recorder.provenance(started)
+    record: dict = {"tag": args.tag, "live": args.live, "suites": []}
 
     for marker, label in [(None, "offline"), ("e2e", "e2e")] + (
         [("live", "live")] if args.live else []
@@ -283,31 +256,53 @@ def main() -> int:
                   f"of {inv['samples']} samples, grounded {inv['grounded_rate']:.0%}")
     print(f"  {'benchmarks':<10} done")
 
-    stamp = started.strftime("%Y-%m-%dT%H%M%S")
-    suffix = f"-{args.tag}" if args.tag else ""
-    OUT.mkdir(parents=True, exist_ok=True)
-    json_path = OUT / f"testbed-{stamp}{suffix}.json"
-    json_path.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+    paths = recorder.record_run(
+        "testbed", args.note, record, render(record, prov),
+        models=testbed_models(args.live), headline=headline(record),
+        prov=prov, suffix=f"-{args.tag}" if args.tag else "",
+    )
+    (recorder.out_dir() / "LATEST.md").write_text(paths["markdown"], encoding="utf-8")
 
-    md_path = OUT / f"testbed-{stamp}{suffix}.md"
-    md_path.write_text(render(record), encoding="utf-8")
-
-    (OUT / "LATEST.md").write_text(render(record), encoding="utf-8")
-
-    print(f"\nrecorded -> {json_path.name} / {md_path.name} (and LATEST.md)")
+    print(f"\nrecorded -> {paths['json'].name} / {paths['md'].name} "
+          f"(and LATEST.md, HISTORY.md)")
     failed = [s for s in record["suites"] if not s["ok"]]
     return 1 if failed else 0
 
 
-def render(r: dict) -> str:
-    g = r["git"]
+def testbed_models(live: bool) -> list[str]:
+    if not live:
+        return []
+    keys = list(LIVE_ASSESSOR_MODELS)
+    labels = [recorder.assessor_model_label(k) for k in keys]
+    # The invariant sampler uses the generator at the spec's default effort.
+    return labels + ["invariants: haiku-4-5 (generator, effort n/a)"]
+
+
+def headline(r: dict) -> dict:
+    out = {"suites": ", ".join(f"{s['suite']} {'PASS' if s['ok'] else 'FAIL'} "
+                               f"({s.get('passed', 0)} passed)" for s in r["suites"])}
+    for split, res in r["gate"].items():
+        if "error" in res:
+            out[f"{split} gate"] = f"error: {res['error'][:60]}"
+        else:
+            out.update(recorder.gate_headline(res, split))
+    inv = r.get("invariants")
+    if inv and "error" not in inv:
+        out["invariants"] = (f"single-question {inv['single_question_rate']:.0%}, grounded "
+                             f"{inv['grounded_rate']:.0%} of {inv['samples']} samples")
+    best = recorder.best_assessor(r["assessors"])
+    if best:
+        out["best assessor (both)"] = f"{best[0]} {best[1]}"
+    return out
+
+
+def render(r: dict, prov: dict) -> str:
+    """The body; the recorder prepends the note/commit/models header."""
+    from convint.bench.stats import format_ci
+
     lines = [
-        f"# Testbed run — {r['run_at']}",
-        "",
-        f"**commit** `{g['commit'][:12]}` on `{g['branch']}`"
-        + ("  ⚠️ **DIRTY TREE — not reproducible**" if g["dirty"] else ""),
         f"**mode** {'live (model calls made)' if r['live'] else 'offline only'}"
-        f" · python {r['platform']['python']}",
+        f" · {prov['platform']['os']}",
         "",
         "## Suites",
         "",
@@ -332,35 +327,52 @@ def render(r: dict) -> str:
         "## Gate evaluation",
         "",
     ]
+    lines += [
+        "Cells are `rate [95% CI]`, a cluster bootstrap over transcripts (synth: over",
+        "bank topics, since it is one persona). `[—]` = fewer than 2 clusters, no",
+        "interval. Denominators `n` and cluster counts `k` sit under each table.",
+        "",
+    ]
+    cols = [("accuracy_strict", "acc"), ("premature_advance_rate", "premature ↓"),
+            ("stall_rate", "stall ↓"), ("minimal_pair_accuracy", "minimal pairs")]
     for split, res in r["gate"].items():
         if "error" in res:
             lines.append(f"**{split}** — {res['error']}\n")
             continue
         first = next(iter(res.values()))
+        unit = first.get("cluster_unit", "transcripts")
+        e2e = any(name.startswith("gate (e2e") for name in res)
         lines += [
-            f"**{split}** (n={first['n']}, premature denom {first['premature_advance_n']}, "
-            f"stall denom {first['stall_n']})",
+            f"**{split}**",
             "",
-            "| policy | acc | premature ↓ | stall ↓ | minimal pairs |",
-            "|---|---|---|---|---|",
+            "| policy | " + " | ".join(h for _, h in cols) + " |",
+            "|---|" + "---|" * len(cols),
         ]
         for name, m in res.items():
-            pct = lambda v: "n/a" if v is None else f"{v:.0%}"
-            lines.append(
-                f"| {name} | {m['accuracy_strict']:.0%} | {pct(m['premature_advance_rate'])} "
-                f"| {pct(m['stall_rate'])} | {pct(m['minimal_pair_accuracy'])} |"
-            )
-        lines.append("")
+            shown = f"{name} (oracle inputs)" if e2e and name == "gate" else name
+            lines.append(f"| {shown} | " + " | ".join(
+                format_ci(m[c], m.get(f"{c}_ci")) for c, _ in cols) + " |")
+        lines += ["", "denominators: " + " · ".join(
+            f"{h} n={first.get(f'{c}_n', first['n'])} (k={first.get(f'{c}_k', '?')} {unit})"
+            for c, h in cols), ""]
+        for name, m in res.items():
+            if "assessor_specificity_agreement" in m:
+                lines += [f"{name}: assessor matches authored specificity on "
+                          f"{m['assessor_specificity_agreement']:.0%} of items, ownership on "
+                          f"{m['assessor_ownership_agreement']:.0%}.", ""]
 
-    lines += ["## Assessors", "", "| assessor | n | specificity | within 1 | ownership | both |",
+    lines += ["## Assessors", "",
+              "Cells are `rate [95% CI]`, a cluster bootstrap over the seed set's transcripts.", "",
+              "| assessor | n (k) | specificity | within 1 | ownership | both |",
               "|---|---|---|---|---|---|"]
     for name, m in r["assessors"].items():
         if "error" in m:
             lines.append(f"| {name} | — | {m['error']} | | | |")
             continue
+        cell = lambda k: format_ci(m[k], m.get(f"{k}_ci"))
         lines.append(
-            f"| {name} | {m['n']} | {m['specificity_exact']:.0%} | "
-            f"{m['specificity_within_1']:.0%} | {m['ownership_exact']:.0%} | {m['both_exact']:.0%} |"
+            f"| {name} | {m['n']} (k={m.get('clusters', '?')}) | {cell('specificity_exact')} | "
+            f"{cell('specificity_within_1')} | {cell('ownership_exact')} | {cell('both_exact')} |"
         )
 
     inv = r.get("invariants")
@@ -380,7 +392,7 @@ def render(r: dict) -> str:
               "", f"- actions: `{cr['actions']}`", f"- rules fired: `{cr['rules']}`", ""]
 
     lines += ["## Provenance", "", "```json",
-              json.dumps({"packages": r["packages"], "dataset_hashes": r["dataset_hashes"]},
+              json.dumps({"packages": prov["packages"], "dataset_hashes": prov["dataset_hashes"]},
                          indent=2), "```", ""]
     return "\n".join(lines)
 

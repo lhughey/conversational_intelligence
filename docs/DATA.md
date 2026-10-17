@@ -118,11 +118,43 @@ of 92**. That is a twenty-minute task, not an afternoon.
 Adjudications append to their own file and never overwrite generated labels, so
 the set can be rebuilt without losing human work.
 
+## Held-out sufficiency set: scored, never tuned against
+
+`data/heldout/` holds 65 unlabelled candidate answers from three new synthetic
+personas:
+
+- a thin responder (Wren)
+- a tries-to-rush persona (Hollis)
+- a verbose-but-abstract persona (Lucian)
+
+The candidates are spread across S0–S3 and O0–O2 on purpose. They include
+boundary cases and 10 minimal pairs. **The user labels them**
+(`make label-heldout`, or the `-export`/`-import` sheet). The author's
+intended rung is kept apart in `intended.jsonl`, and the labelling flow never
+reads it. It is used only afterwards, to measure author/labeller agreement.
+`make bench-heldout` scores assessors on the labelled items only. It
+clusters by persona and refuses below 20 labels.
+
+| Path | Kind | Edited by | Format |
+|---|---|---|---|
+| `data/heldout/items.jsonl` | **authored** candidates | author, append-only | JSONL |
+| `data/heldout/labels.jsonl` | **human** labels | the user, via `make label-heldout*` | JSONL, append-only |
+| `data/heldout/intended.jsonl` | author's intended rung | author; agreement analysis only | JSONL |
+
+**The rule: never used for tuning.** That covers prompt edits, few-shot
+examples, optimizer (DSPy) train/dev data, and changing anything after
+reading its misses. It is the test split and nothing else.
+`tests/test_heldout_leak.py` enforces both directions. No held-out text may
+appear in the seed labels, the goldens, `data/turn_decisions/`, the synth
+banks or `src/`, and only the evaluation code on its `READERS` list may read
+the set. The details are in `data/heldout/README.md`.
+
 ## Still open
 
 - **The seed sufficiency set was tuned against.** Two fixes were made after
-  seeing results, so 74%/96% is a floor, not an unbiased estimate. A held-out
-  set authored from banks and never inspected would fix this.
+  seeing results, so 74%/96% is a floor, not an unbiased estimate. The
+  held-out set above is the fix. Until the user has labelled at least 20
+  items, there is no held-out number.
 - **One persona.** Maya only. `thin-responder` and `tries-to-rush` banks would
   extend coverage to the low-signal and impatient ends.
 - **Effective n ≈ 11**, not 92 — the transcripts are correlated and

@@ -12,8 +12,10 @@ against the API on 2026-09-03:
 
 `output_config.effort` is a SECOND per-model capability, split the other way:
 supported on the Opus/Sonnet 5 family, rejected with 400 on haiku-4-5
-("This model does not support the effort parameter"). So the cheapest model is
-the only one with a sampling knob and the only one without a depth knob.
+("This model does not support the effort parameter"). So haiku-4-5 is the
+only model here with a sampling knob and the only one without a depth knob.
+(Haiku 5.5, below, drops sampling and gains effort like the rest of the 5.x
+family, so "the cheap model" no longer implies "sampling, no effort".)
 
 So on the current Opus/Sonnet models the temperature field is accepted only at its default,
 where it is a no-op: there is no sampling control. Setting it uniformly across a
@@ -23,6 +25,20 @@ validated at CONFIG LOAD rather than discovered at request time.
 Those models run at temperature 1.0 - the high-variation end. What is lost is
 the ability to make output MORE deterministic, not more natural. Variety comes
 from move selection and prompt design instead.
+
+Added 2026-10 FROM ANTHROPIC DOCS, NOT YET LIVE-VERIFIED (the table above was
+measured; these rows are documented claims until a live probe confirms them):
+
+    opus-5-5    sampling 400, effort low..max, DEFAULT effort `medium`
+                (opus-5 defaults to `high`), thinking cannot be disabled
+    sonnet-5-5  non-default sampling 400, effort supported, default `high`
+    fable-5-1   sampling 400, effort supported
+    haiku-5-5   sampling 400 ("omit temperature, top_p, and top_k"), effort
+                supported (adaptive thinking), DEFAULT effort `medium`;
+                released 2026-10-07; Claude 4.7+ tokenizer (~30% more tokens
+                than haiku-4-5 for the same text)
+
+Also from the same docs: sonnet-5 is $2/$10 per MTok (was recorded as $3/$15).
 """
 
 from __future__ import annotations
@@ -44,6 +60,14 @@ class ModelSpec(BaseModel):
     price_in: float = 0.0
     price_out: float = 0.0
     max_tokens: int = 1024
+    #: Thinks by default when the request omits `thinking` (adaptive thinking on
+    #: the 5.x family). Thinking tokens count against `max_tokens` and are not
+    #: returned, so a visible-answer budget alone can be spent entirely on
+    #: thinking and come back EMPTY. The Anthropic adapter adds headroom for
+    #: these models (see llm_anthropic.thinking_headroom). False for haiku-4-5
+    #: (thinking only via an explicit budget), opus-4-8 (omitting `thinking`
+    #: runs without it) and every OpenAI model.
+    thinks: bool = False
     effort: str | None = None
     temperature: float | None = None
 
@@ -67,11 +91,41 @@ REGISTRY: dict[str, ModelSpec] = {
     m.key: m
     for m in [
         ModelSpec(key="opus-5", provider=ANTHROPIC, model_id="claude-opus-5",
-                  supports_sampling=False, price_in=5.0, price_out=25.0),
+                  supports_sampling=False, thinks=True,
+                  price_in=5.0, price_out=25.0),
         ModelSpec(key="opus-4-8", provider=ANTHROPIC, model_id="claude-opus-4-8",
                   supports_sampling=False, price_in=5.0, price_out=25.0),
         ModelSpec(key="sonnet-5", provider=ANTHROPIC, model_id="claude-sonnet-5",
-                  supports_sampling=False, price_in=3.0, price_out=15.0),
+                  supports_sampling=False, thinks=True,
+                  price_in=2.0, price_out=10.0),
+        # Pinned to `high` because opus-5-5's API default is `medium`, while
+        # opus-5 (whose spec leaves effort unset) runs at its default `high`.
+        # Leaving this unset would benchmark the newer model at lower depth and
+        # report the difference as a model difference. It only applies where a
+        # caller does not set LLMRequest.effort itself (the generator and the
+        # artifact builder); LLMAssessor always sends its own effort ("low").
+        ModelSpec(key="opus-5-5", provider=ANTHROPIC, model_id="claude-opus-5-5",
+                  supports_sampling=False, thinks=True,
+                  price_in=4.0, price_out=20.0,
+                  effort="high"),
+        ModelSpec(key="sonnet-5-5", provider=ANTHROPIC, model_id="claude-sonnet-5-5",
+                  supports_sampling=False, thinks=True,
+                  price_in=2.0, price_out=10.0),
+        # Registry only: deliberately absent from the default benchmark lists
+        # in scripts/ because of cost.
+        ModelSpec(key="fable-5-1", provider=ANTHROPIC, model_id="claude-fable-5-1",
+                  supports_sampling=False, thinks=True,
+                  price_in=10.0, price_out=50.0),
+        # Price is the <=100k-token prompt tier ($0.10/$0.50). Above 100k it is
+        # $0.50/$2.50; cost_usd does not model that tier (this repo's prompts
+        # are far below it). The 4.7+ tokenizer counts the same text as ~30%
+        # more tokens than haiku-4-5, so per-MTok prices understate the gap in
+        # a cost comparison against it.
+        # Effort deliberately NOT pinned: the generator path runs at the API
+        # default (`medium`) for now; LLMAssessor always sends its own ("low").
+        ModelSpec(key="haiku-5-5", provider=ANTHROPIC, model_id="claude-haiku-5-5",
+                  supports_sampling=False, thinks=True,
+                  price_in=0.10, price_out=0.50),
         ModelSpec(key="haiku-4-5", provider=ANTHROPIC, model_id="claude-haiku-4-5",
                   supports_sampling=True, supports_effort=False,
                   price_in=1.0, price_out=5.0),

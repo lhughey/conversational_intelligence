@@ -82,7 +82,8 @@ def test_haiku_still_accepts_sampling_through_extra_body():
 
     resp = llm.complete(LLMRequest(
         system="Reply with one word.",
-        messages=[LLMMessage(role="user", content="hi")], max_tokens=8,
+        # Room to finish: the adapter now raises on a cut-off answer.
+        messages=[LLMMessage(role="user", content="hi")], max_tokens=32,
     ))
     assert resp.text.strip()
 

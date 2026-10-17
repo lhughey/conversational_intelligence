@@ -32,6 +32,14 @@ def _no_network(request, monkeypatch):
     monkeypatch.setattr(socket.socket, "connect_ex", _blocked)
 
 
+@pytest.fixture(autouse=True)
+def _isolated_bench_results(tmp_path, monkeypatch):
+    """Recorded runs (convint.bench.record) go to a temp dir, never to the
+    real bench-results/HISTORY.md; and a stray $NOTE cannot leak in."""
+    monkeypatch.setenv("CONVINT_BENCH_RESULTS", str(tmp_path / "bench-results"))
+    monkeypatch.delenv("NOTE", raising=False)
+
+
 def _load(path: pathlib.Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 

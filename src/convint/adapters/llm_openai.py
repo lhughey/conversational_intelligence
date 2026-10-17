@@ -6,6 +6,14 @@ import time
 
 from ..ports.llm import LLMRequest, LLMResponse
 
+#: OpenAI finish_reason -> the Anthropic stop_reason vocabulary LLMResponse uses.
+_FINISH_TO_STOP = {
+    "stop": "end_turn",
+    "length": "max_tokens",
+    "content_filter": "refusal",
+    "tool_calls": "tool_use",
+}
+
 
 class OpenAILLM:
     name = "openai"
@@ -54,7 +62,9 @@ class OpenAILLM:
         elapsed = int((time.monotonic() - started) * 1000)
 
         usage = getattr(resp, "usage", None)
+        finish = getattr(resp.choices[0], "finish_reason", None)
         return LLMResponse(
+            stop_reason=_FINISH_TO_STOP.get(finish, finish),
             text=resp.choices[0].message.content or "",
             model=getattr(resp, "model", self.model_id),
             usage={

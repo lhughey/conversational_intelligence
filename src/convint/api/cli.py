@@ -32,16 +32,34 @@ def main(argv: list[str] | None = None) -> int:
     p_bench.add_argument("--json", action="store_true", help="machine-readable output")
     p_bench.add_argument("--gate", action="store_true",
                          help="evaluate the gate against the turn-decision labels")
-    p_bench.add_argument("--split", default="synth", choices=["synth", "corpus", "human"],
+    p_bench.add_argument("--split", default="synth",
+                         choices=["synth", "corpus", "human", "heldout"],
                          help="synth = balanced with minimal pairs; corpus = realistic but skewed; "
-                              "human = adjudicated items only (the only validity evidence)")
+                              "human = adjudicated items only (the only validity evidence); "
+                              "heldout = with --assessors, the never-tuned sufficiency set "
+                              "scored against YOUR labels")
+    p_bench.add_argument("--assessors", action="store_true",
+                         help="with --split heldout: score assessors on the held-out "
+                              "sufficiency set (refuses below 20 labelled items)")
+    p_bench.add_argument("--e2e", action="store_true",
+                         help="with --gate --split synth: add a row where the gate is fed by an "
+                              "assessor instead of the authored specificity/ownership")
+    p_bench.add_argument("--assessor", default="deterministic",
+                         help="assessor for --e2e: deterministic (offline), llm:<key> or "
+                              "hybrid:<key> (model registry key; calls the API on a cache miss). "
+                              "With --assessors: a comma-separated list of those, or 'all'")
+    p_bench.add_argument("--note", default=None,
+                         help="with --gate or --assessors: what this run is testing, recorded in "
+                              "bench-results/HISTORY.md (else $NOTE, else '(no note)')")
 
     p_ds = sub.add_parser("dataset", help="turn-decision dataset")
     p_ds.add_argument("dataset_command", choices=["build", "stats"])
 
     p_lab = sub.add_parser("label", help="adjudicate labels (the only path to validity)")
-    p_lab.add_argument("--split", default="synth", choices=["synth", "corpus"])
-    p_lab.add_argument("--limit", type=int, default=10)
+    p_lab.add_argument("--split", default="synth", choices=["synth", "corpus", "heldout"],
+                       help="heldout = label the held-out sufficiency set (S and O per answer)")
+    p_lab.add_argument("--limit", type=int, default=10,
+                       help="items per session (with --split heldout, 0 = all remaining)")
     p_lab.add_argument("--disagreements-only", action="store_true",
                        help="only show items where the spec label and the gate disagree")
     p_lab.add_argument("--export", action="store_true",
@@ -71,6 +89,20 @@ def main(argv: list[str] | None = None) -> int:
             "response": TurnResponse.model_json_schema(),
         }, indent=2))
         return 0
+
+    if args.command == "label" and args.split == "heldout":
+        from ..dataset import label_heldout
+
+        if args.disagreements_only:
+            parser.error("--disagreements-only does not apply to --split heldout")
+        if args.do_import:
+            print(json.dumps(label_heldout.import_sheet(), indent=2))
+            return 0
+        if args.export:
+            path, count = label_heldout.export()
+            print(f"wrote {count} unlabelled held-out items -> {path}")
+            return 0
+        return label_heldout.run_session(args.limit)
 
     if args.command == "label":
         from ..dataset.review import export, import_decisions
@@ -111,13 +143,43 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "bench":
+        if args.assessors or args.split == "heldout":
+            if args.split != "heldout" or not args.assessors or args.gate or args.e2e:
+                parser.error("the held-out set is scored with `--assessors --split heldout` "
+                             "(no --gate/--e2e); the seed set is `make bench-assessors`")
+            return _bench_heldout(args, parser)
         if args.gate:
             from ..bench.gate_eval import format_report as gate_report
+            from ..bench.gate_eval import make_assessor
             from ..bench.gate_eval import run as gate_run
 
-            result = gate_run(args.split)
-            print(json.dumps(result, indent=2) if args.json
-                  else gate_report(result, args.split))
+            assessor = None
+            if args.e2e:
+                if args.split != "synth":
+                    parser.error("--e2e applies to --split synth only; corpus/human items "
+                                 "already carry assessor-derived state")
+                try:
+                    assessor = make_assessor(args.assessor)
+                except (ValueError, KeyError) as exc:
+                    parser.error(str(exc))
+            from ..bench import record as recorder
+
+            prov = recorder.provenance()
+            result = gate_run(args.split, e2e_assessor=assessor)
+            report = gate_report(result, args.split)
+            print(json.dumps(result, indent=2) if args.json else report)
+            models = ["deterministic assessor (offline)"] if args.e2e else []
+            if assessor is not None and args.assessor != "deterministic":
+                models = [recorder.assessor_model_label(args.assessor.partition(":")[2])
+                          + f" via {args.assessor.partition(':')[0]}"]
+            paths = recorder.record_run(
+                f"gate-{args.split}" + ("-e2e" if args.e2e else ""), args.note,
+                {"split": args.split, "e2e_assessor": args.assessor if args.e2e else None,
+                 "policies": result},
+                "```\n" + report + "\n```\n", models=models,
+                headline=recorder.gate_headline(result, args.split), prov=prov,
+            )
+            print(f"recorded -> {paths['md'].name} (and HISTORY.md)", file=sys.stderr)
             return 0
 
         from ..adapters.assessor_deterministic import DeterministicAssessor
@@ -155,6 +217,39 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     return 1
+
+
+def _bench_heldout(args, parser) -> int:
+    """Score assessors on the held-out set. Refuses - exit 2, no model call,
+    nothing recorded - until enough items carry the user's label."""
+    from ..bench import heldout
+    from ..bench import record as recorder
+
+    try:
+        specs = heldout.expand_assessor_specs(args.assessor)
+    except ValueError as exc:
+        parser.error(str(exc))
+    st = heldout.status()
+    print(heldout.format_status(st), file=sys.stderr)
+    if st["n_labelled"] < heldout.MIN_LABELLED:
+        print(f"no headline: {st['n_labelled']} labelled of {st['n_items']}; need >= "
+              f"{heldout.MIN_LABELLED}. Label more with `make label-heldout`.",
+              file=sys.stderr)
+        return 2
+
+    prov = recorder.provenance()
+    rows = heldout.run(specs)
+    agreement = heldout.author_agreement()
+    report = heldout.render(rows, st, agreement)
+    payload = {"split": "heldout", "status": st, "assessors": rows,
+               "author_agreement": agreement}
+    print(json.dumps(payload, indent=2) if args.json else report)
+    keys = heldout.model_keys(specs)
+    models = [recorder.assessor_model_label(k) for k in keys] or ["deterministic (offline)"]
+    paths = recorder.record_run("assessors-heldout", args.note, payload, report,
+                                models=models, headline=heldout.headline(rows, st), prov=prov)
+    print(f"recorded -> {paths['md'].name} (and HISTORY.md)", file=sys.stderr)
+    return 0
 
 
 if __name__ == "__main__":  # pragma: no cover

@@ -1,0 +1,90 @@
+{
+  "persona_id": "hollis",
+  "display_name": "Hollis",
+  "one_line": "Tries to rush: commercial-construction project manager; impatient and compressing, but sometimes drops a genuinely specific episode in one line.",
+  "synthetic": true,
+  "topics": [
+    {
+      "topic_id": "opening.why_here",
+      "stage": "opening",
+      "intents": [
+        "ask_opening"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "career.tested_you",
+      "stage": "career",
+      "intents": [
+        "ask_hardest_problem"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "career.how_you_work",
+      "stage": "career",
+      "intents": [
+        "ask_career"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "pacing.back_to_childhood",
+      "stage": "early_life",
+      "intents": [
+        "ask_childhood"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "early_life.growing_up",
+      "stage": "early_life",
+      "intents": [
+        "ask_childhood"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "outside.free_time",
+      "stage": "outside_work",
+      "intents": [
+        "ask_outside_work"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "thrives.conditions",
+      "stage": "thrives",
+      "intents": [
+        "ask_where_you_thrive",
+        "ask_what_drains"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "reflection.frame",
+      "stage": "reflection",
+      "intents": [
+        "offer_framing"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    },
+    {
+      "topic_id": "closing.anything_else",
+      "stage": "closing",
+      "intents": [
+        "ask_anything_else"
+      ],
+      "rungs": [],
+      "exhausted_response": "I think that's the whole of it."
+    }
+  ]
+}
