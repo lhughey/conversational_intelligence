@@ -11,6 +11,7 @@ Read first: `README.md`, `docs/ARCHITECTURE.md`, `docs/DATA.md`, `bench-results/
 
 - `make setup` — create `.venv`, `pip install -e ".[dev]"`
 - `make test` / `make test-cov` — offline pytest (no network, no key); with coverage
+- `make ci` — what `.github/workflows/ci.yml` runs: offline suite + coverage floor, e2e, contract drift
 - `make test-live` — `-m live`, calls real model APIs; `make test-e2e` — `-m e2e`, Node client vs live HTTP server
 - `make testbed` / `make testbed-live` — `scripts/testbed.py`, runs everything and records the result
 - `make bench` — assessor agreement + corpus replay (offline); `make bench-assessors` — live, cached

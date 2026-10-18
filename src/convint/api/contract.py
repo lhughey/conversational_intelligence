@@ -18,7 +18,7 @@ from ..domain.state import ConversationState, TopicRecord
 from ..domain.sufficiency import Assessment
 
 #: Bump the minor for additive changes, the major for removals or renames.
-CONTRACT_VERSION = "1.1"
+CONTRACT_VERSION = "1.2"
 
 
 class Options(BaseModel):

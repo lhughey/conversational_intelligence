@@ -330,6 +330,14 @@ def test_truth_floor_violation_withholds_the_read():
     assert resp.diagnostics.degraded is True
 
 
+def test_invented_number_withholds_the_read():
+    """Unquoted invented specifics are held to the same hard floor as quotes."""
+    engine = TurnEngine(llm=FakeLLM(default=_read_json(brings="You grew revenue by 300%")))
+    resp = engine.run(read_request())
+    assert resp.artifact is None and resp.readiness.ready is True
+    assert "numbers not found in the user's own words: ['300%']" in resp.diagnostics.warnings[0]
+
+
 def test_artifact_provider_error_withholds_the_read():
     resp = TurnEngine(llm=Failing(RuntimeError("500"))).run(read_request())
     assert resp.artifact is None and resp.readiness.ready is True

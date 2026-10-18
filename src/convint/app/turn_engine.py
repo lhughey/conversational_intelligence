@@ -21,6 +21,7 @@ from ..domain.artifact import artifact_readiness
 from ..domain.enums import Action, Ownership, Specificity, UserSignal
 from ..domain.gate import decide
 from ..domain.signals import detect_signal
+from ..domain.state import TopicRecord
 from ..domain.sufficiency import Assessment, SufficiencyComponents
 from ..ports.assessor import SufficiencyAssessor
 from ..ports.llm import LLMPort
@@ -37,6 +38,34 @@ def _describe(exc: Exception, limit: int = 200) -> str:
 
 def _name(assessor: SufficiencyAssessor) -> str:
     return getattr(assessor, "name", "unknown")
+
+
+_COMPONENT_FLAGS = ("scene", "stakes", "action", "outcome", "reflection")
+
+
+def _record_best_quote(
+    topic: TopicRecord, user_text: str, assessment: Assessment,
+    prior_specificity: Specificity, prior_components: SufficiencyComponents,
+) -> None:
+    """Keep the user turn this topic's evidence rests on.
+
+    `user_text` is always the last USER turn, never assistant text. The quote
+    moves only when this turn strictly raised the topic's specificity; a tie
+    keeps the earlier quote. A topic with no quote yet (one the caller built,
+    or state from before 1.2) takes this turn only if the turn itself added
+    material - specificity is cumulative, so a bare "Yes." on an S2 topic still
+    assesses S2 and must not become the quote.
+    """
+    spec = assessment.specificity
+    if spec.rank <= Specificity.S0.rank:
+        return
+    raised = spec.rank > prior_specificity.rank
+    added = any(
+        getattr(assessment.components, f) and not getattr(prior_components, f)
+        for f in _COMPONENT_FLAGS
+    )
+    if raised or (topic.best_quote is None and added):
+        topic.best_quote = user_text
 
 
 class TurnEngine:
@@ -106,10 +135,13 @@ class TurnEngine:
 
         used = self._choose_assessor(request.options.assess, warnings)
         if topic is not None and last_user is not None:
+            prior_specificity, prior_components = topic.specificity, topic.components
             assessment, used = self._assess(used, last_user.content, topic.components, warnings)
             topic.components = assessment.components
             topic.specificity = assessment.specificity
             topic.ownership = assessment.ownership
+            _record_best_quote(topic, last_user.content, assessment,
+                               prior_specificity, prior_components)
         elif topic is not None:
             assessment = Assessment(
                 specificity=topic.specificity, ownership=topic.ownership,

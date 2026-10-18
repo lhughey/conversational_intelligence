@@ -4,19 +4,23 @@ Two rules the emitter cannot talk its way out of:
 
   1. Nothing is emitted unless `artifact_readiness` says the material supports
      it. An honest shortfall beats a fabricated Read.
-  2. Every quoted span in the output must appear verbatim in a user turn. This
-     is checked in code after generation, not requested in the prompt - a
-     model asked nicely not to fabricate will still occasionally fabricate.
+  2. Every quoted span and every stated number in the output must appear in a
+     user turn (`domain/truth_floor.py` says exactly what is and is not
+     checked). This is checked in code after generation, not requested in the
+     prompt - a model asked nicely not to fabricate will still occasionally
+     fabricate. Any violation withholds the Read.
 """
 
 from __future__ import annotations
 
 import json
-import re
 
 from ..domain.artifact import artifact_readiness, collect_evidence
 from ..domain.plan import InterviewPlan
 from ..domain.state import ConversationState
+from ..domain.truth_floor import (
+    TruthFloorIssue, check_truth_floor, unsupported_numbers, unsupported_quotes,
+)
 from ..ports.llm import LLMMessage, LLMPort, LLMRequest
 
 DEFAULT_SCHEMA = {
@@ -45,7 +49,19 @@ rather than padding it.\
 
 
 class TruthFloorViolation(ValueError):
-    pass
+    """An emitted Read states something the user did not say. `issues` carries
+    each unsupported span, its kind and the field it was in."""
+
+    def __init__(self, issues: list[TruthFloorIssue]):
+        self.issues = list(issues)
+        parts = []
+        quotes = [i.span for i in self.issues if i.kind == "quote"]
+        numbers = [i.span for i in self.issues if i.kind == "number"]
+        if quotes:
+            parts.append(f"emitted quotes not found in the user's own words: {quotes}")
+        if numbers:
+            parts.append(f"emitted numbers not found in the user's own words: {numbers}")
+        super().__init__("; ".join(parts) or "truth floor violated")
 
 
 def _user_text(state: ConversationState) -> str:
@@ -54,17 +70,17 @@ def _user_text(state: ConversationState) -> str:
 
 def verify_quotes(artifact: dict, state: ConversationState) -> list[str]:
     """Return every quoted span that does not appear verbatim in a user turn."""
-    source = _user_text(state).lower()
-    source = re.sub(r"\s+", " ", source)
-    violations = []
-    for value in artifact.values():
-        if not isinstance(value, str):
-            continue
-        for quote in re.findall(r'"([^"]{6,})"', value):
-            needle = re.sub(r"\s+", " ", quote.lower()).strip(" .,!?")
-            if needle and needle not in source:
-                violations.append(quote)
-    return violations
+    return [i.span for i in unsupported_quotes(artifact, _user_text(state))]
+
+
+def verify_numbers(artifact: dict, state: ConversationState) -> list[str]:
+    """Return every stated number that the user never stated, in any form."""
+    return [i.span for i in unsupported_numbers(artifact, _user_text(state))]
+
+
+def verify_truth_floor(artifact: dict, state: ConversationState) -> list[TruthFloorIssue]:
+    """Every mechanically-checkable truth-floor issue, structured."""
+    return check_truth_floor(artifact, _user_text(state))
 
 
 def build_artifact(
@@ -91,11 +107,9 @@ def build_artifact(
     ))
 
     artifact = json.loads(response.text)
-    violations = verify_quotes(artifact, state)
-    if violations:
-        raise TruthFloorViolation(
-            f"emitted quotes not found in the user's own words: {violations}"
-        )
+    issues = verify_truth_floor(artifact, state)
+    if issues:
+        raise TruthFloorViolation(issues)
 
     artifact["evidence"] = [e.model_dump(mode="json") for e in evidence]
     artifact["readiness"] = readiness.model_dump(mode="json")

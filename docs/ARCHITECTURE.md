@@ -59,7 +59,7 @@ The transports are each ~100 lines. Adding a fourth seam later is cheap, which i
 
 ```jsonc
 {
-  "contract_version": "1.1",
+  "contract_version": "1.2",
   "plan":  { /* InterviewPlan */ },
   "state": {
     "turns":  [ { "role": "user" | "assistant", "content": "..." } ],
@@ -68,6 +68,7 @@ The transports are each ~100 lines. Adding a fourth seam later is cheap, which i
       "stage": "early_life",
       "followups_used": 1,
       "asked_questions": [ "..." ],          // enables redundant-question detection
+      "best_quote": "..." | null,             // engine-maintained; persist it from state_delta
       "sufficiency": { "specificity": "S2", "ownership": "O0" }
     } ],
     "coverage": { "early_life": true, "career": false },
@@ -81,7 +82,7 @@ The transports are each ~100 lines. Adding a fourth seam later is cheap, which i
 
 ```jsonc
 {
-  "contract_version": "1.1",
+  "contract_version": "1.2",
   "decision": {
     "action": "follow_up" | "advance" | "synthesize" | "refuse_and_continue",
     "sub_action": "deepen" | "redirect" | "reflect_pattern" | "handoff" | "hold",
@@ -103,7 +104,7 @@ The transports are each ~100 lines. Adding a fourth seam later is cheap, which i
 }
 ```
 
-`assess` defaults to `"server"` (whatever the operator configured). `"deterministic"` forces the regex assessor for one call (free, offline); `"llm"` asks for the server's model-backed assessor and falls back to deterministic, with a warning, when the server has none. The caller never names a model. 1.1 is an additive minor over 1.0: `assessor_model`, `cost_usd`, `warnings` and `degraded` are new, and `latency_ms` is now the whole turn's wall time.
+`assess` defaults to `"server"` (whatever the operator configured). `"deterministic"` forces the regex assessor for one call (free, offline); `"llm"` asks for the server's model-backed assessor and falls back to deterministic, with a warning, when the server has none. The caller never names a model. 1.1 is an additive minor over 1.0: `assessor_model`, `cost_usd`, `warnings` and `degraded` are new, and `latency_ms` is now the whole turn's wall time. 1.2 is additive over 1.1: `TopicRecord.best_quote` is the verbatim user turn that last raised the topic's specificity. The engine sets it, the caller persists it from `state_delta`, and a Read's evidence quotes only it (no quote, no evidence item for that topic).
 
 `rule_fired` is the generalization of the app's `positionInjection` idea: it makes every decision attributable to a named rule, so a bad turn is debuggable as "wrong rule fired" versus "right rule, bad generation." Do not let it be nullable — an unattributable decision is a bug.
 

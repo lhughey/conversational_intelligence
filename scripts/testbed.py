@@ -63,8 +63,22 @@ def run_pytest(marker: str | None, label: str) -> dict:
     summary = (f"{passed} passed, {counts['failures']} failed, "
                f"{counts['errors']} errored, {counts['skipped']} skipped "
                f"in {counts['time']:.2f}s")
-    return {"suite": label, "exit_code": code, "ok": code == 0,
+    status = suite_status(code, passed)
+    return {"suite": label, "exit_code": code, "status": status, "ok": status == "PASS",
             "summary": summary, **counts, "passed": passed}
+
+
+# pytest exits 5 when it collected nothing (e.g. every test deselected).
+NO_TESTS_COLLECTED = 5
+
+
+def suite_status(exit_code: int, passed: int) -> str:
+    """PASS only if something actually ran and passed. A suite whose every test
+    was skipped (e2e without node) or that collected nothing is SKIPPED: it
+    proved nothing, so it must not read as green."""
+    if exit_code == NO_TESTS_COLLECTED or (exit_code == 0 and passed == 0):
+        return "SKIPPED"
+    return "PASS" if exit_code == 0 else "FAIL"
 
 
 def run_coverage() -> dict:
@@ -237,7 +251,7 @@ def main() -> int:
     ):
         result = run_pytest(marker, label)
         record["suites"].append(result)
-        print(f"  {label:<10} {'PASS' if result['ok'] else 'FAIL'}  {result['summary']}")
+        print(f"  {label:<10} {result['status']}  {result['summary']}")
 
     record["coverage"] = run_coverage()
     print(f"  {'coverage':<10} {record['coverage']['total']}")
@@ -267,7 +281,7 @@ def main() -> int:
 
     print(f"\nrecorded -> {paths['json'].name} / {paths['md'].name} "
           f"(and LATEST.md, HISTORY.md)")
-    failed = [s for s in record["suites"] if not s["ok"]]
+    failed = [s for s in record["suites"] if s["status"] == "FAIL"]
     return 1 if failed else 0
 
 
@@ -281,7 +295,7 @@ def testbed_models(live: bool) -> list[str]:
 
 
 def headline(r: dict) -> dict:
-    out = {"suites": ", ".join(f"{s['suite']} {'PASS' if s['ok'] else 'FAIL'} "
+    out = {"suites": ", ".join(f"{s['suite']} {_status(s)} "
                                f"({s.get('passed', 0)} passed)" for s in r["suites"])}
     for split, res in r["gate"].items():
         if "error" in res:
@@ -298,6 +312,11 @@ def headline(r: dict) -> dict:
     return out
 
 
+def _status(suite: dict) -> str:
+    # Records written before `status` existed carry only `ok`.
+    return suite.get("status") or ("PASS" if suite["ok"] else "FAIL")
+
+
 def render(r: dict, prov: dict) -> str:
     """The body; the recorder prepends the note/commit/models header."""
     from convint.bench.stats import format_ci
@@ -312,7 +331,8 @@ def render(r: dict, prov: dict) -> str:
         "|---|---|---|",
     ]
     for s in r["suites"]:
-        lines.append(f"| {s['suite']} | {'PASS' if s['ok'] else '**FAIL**'} | {s['summary']} |")
+        shown = {"FAIL": "**FAIL**"}.get(_status(s), _status(s))
+        lines.append(f"| {s['suite']} | {shown} | {s['summary']} |")
     total_passed = sum(s.get("passed", 0) for s in r["suites"])
     lines.append(f"| **total** | | **{total_passed} tests passed** |")
     lines += [f"| coverage | {r['coverage']['total']} | statements |", ""]

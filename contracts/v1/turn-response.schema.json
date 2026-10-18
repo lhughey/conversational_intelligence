@@ -357,6 +357,18 @@
           "title": "Asked Questions",
           "type": "array"
         },
+        "best_quote": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Best Quote"
+        },
         "closed": {
           "default": false,
           "title": "Closed",
@@ -413,7 +425,7 @@
       "$ref": "#/$defs/Assessment"
     },
     "contract_version": {
-      "default": "1.1",
+      "default": "1.2",
       "title": "Contract Version",
       "type": "string"
     },

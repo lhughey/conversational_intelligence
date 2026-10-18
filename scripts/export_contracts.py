@@ -6,6 +6,7 @@ models, so schema drift fails CI instead of surfacing in a consumer.
 
 from __future__ import annotations
 
+import argparse
 import json
 import pathlib
 import sys
@@ -26,11 +27,15 @@ def render(model) -> str:
     return json.dumps(model.model_json_schema(), indent=2, sort_keys=True) + "\n"
 
 
-def main() -> int:
-    OUT.mkdir(parents=True, exist_ok=True)
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--out", type=pathlib.Path, default=OUT,
+                        help=f"directory to write the schemas into (default: {OUT})")
+    out = parser.parse_args(argv).out
+    out.mkdir(parents=True, exist_ok=True)
     for filename, model in SCHEMAS.items():
-        (OUT / filename).write_text(render(model), encoding="utf-8")
-        print(f"wrote {OUT / filename}")
+        (out / filename).write_text(render(model), encoding="utf-8")
+        print(f"wrote {out / filename}")
     return 0
 
 

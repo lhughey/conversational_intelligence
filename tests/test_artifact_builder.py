@@ -5,7 +5,7 @@ import json
 import pytest
 
 from convint.app.artifact_builder import (
-    DEFAULT_SCHEMA, TruthFloorViolation, build_artifact, verify_quotes,
+    DEFAULT_SCHEMA, TruthFloorViolation, build_artifact, verify_numbers, verify_quotes,
 )
 from convint.adapters.llm_fake import FakeLLM
 from convint.domain import (
@@ -22,16 +22,19 @@ PLAN = InterviewPlan(
 )
 
 USER_TEXT = "I told my mom that. She comped the cleaning and the woman cried."
+CAREER_TEXT = "Every week I sit billing and clinical down and find the word they disagree on."
 
 
 def _state(**kw):
     base = dict(
-        turns=[Turn(role="user", content=USER_TEXT)],
+        turns=[Turn(role="user", content=USER_TEXT), Turn(role="user", content=CAREER_TEXT)],
         topics=[
             TopicRecord(topic_id="childhood", stage="early_life",
-                        specificity=Specificity.S3, ownership=Ownership.O1),
+                        specificity=Specificity.S3, ownership=Ownership.O1,
+                        best_quote=USER_TEXT),
             TopicRecord(topic_id="role", stage="career",
-                        specificity=Specificity.S2, ownership=Ownership.O1),
+                        specificity=Specificity.S2, ownership=Ownership.O1,
+                        best_quote=CAREER_TEXT),
         ],
         coverage={"early_life": True, "career": True},
         pattern_confirmed=True,
@@ -118,3 +121,35 @@ def test_caller_can_supply_its_own_artifact_schema():
     art = build_artifact(llm, _state(), PLAN, schema=schema)
     assert art["summary"] == "ok"
     assert llm.calls[0].response_schema == schema
+
+
+def test_verify_quotes_catches_curly_and_single_quoted_fabrication():
+    art = {"a": "You said “I ran the entire division”.",
+           "b": "and ‘I hired the whole team’."}
+    assert verify_quotes(art, _state()) == ["I ran the entire division", "I hired the whole team"]
+
+
+def test_verify_quotes_accepts_curly_quoted_own_words():
+    assert verify_quotes({"a": "You said “I told my mom that”."}, _state()) == []
+
+
+def test_build_artifact_withholds_an_invented_number():
+    """The truth floor is hard: a number the user never said withholds the Read."""
+    llm = FakeLLM(default=_artifact_json(brings="You increased revenue by 300%"))
+    with pytest.raises(TruthFloorViolation, match="numbers not found in the user") as err:
+        build_artifact(llm, _state(), PLAN)
+    assert [(i.kind, i.field, i.span) for i in err.value.issues] == [
+        ("number", "brings", "300%"),
+    ]
+
+
+def test_build_artifact_keeps_a_number_the_user_said():
+    state = _state(turns=[Turn(role="user", content=USER_TEXT + " That was 300 percent busier.")])
+    art = build_artifact(
+        FakeLLM(default=_artifact_json(brings="A 300% busier front desk")), state, PLAN,
+    )
+    assert art["brings"] == "A 300% busier front desk"
+
+
+def test_verify_numbers_reports_spans():
+    assert verify_numbers({"a": "You led 40 people for six years"}, _state()) == ["40", "six"]
