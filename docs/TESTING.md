@@ -85,6 +85,17 @@ with fakes in `tests/test_full_turn.py` and `tests/test_engine_factory.py`
 (385 tests pass). Still untested: the full turn against a real model over a
 transport; that needs an authorized live run.
 
+MCP specifically (fixed 2026-10-17, `tests/test_mcp_server.py`): `serve()` used
+the MCP SDK 1.x decorator API and crashed on startup with the installed 2.1.1
+(`'Server' object has no attribute 'list_tools'`); `mcp` was not a declared
+dependency and `serve()` was excluded from coverage, so nothing caught it. It
+also ran the synchronous engine on the event loop, serialising overlapping
+calls. Now `build_server` (2.x handlers) runs each call on a worker thread.
+Measured in-process, fake engine at 0.5 s/turn: 8 overlapping calls 4.05 s →
+0.51 s; 64 overlapping 32.4 s → 1.05 s (anyio's default 40-thread pool caps
+concurrency per process). Sequential throughput is unchanged (2/s), as
+expected.
+
 **W2. Truth floor is narrow.** `verify_quotes` only checks straight `"…"`
 quotes of 6+ chars (`app/artifact_builder.py:63`); curly or single quotes and
 unquoted invented claims ("revenue up 300%") pass. `_best_quote`

@@ -12,7 +12,7 @@ dependencies = ["pydantic>=2,<3", "python-dotenv>=1.0"]
 [project.optional-dependencies]
 dev = ["pytest>=8", "pytest-cov>=5"]
 providers = ["anthropic>=0.40", "openai>=1.50"]
-serve = ["fastapi>=0.115", "uvicorn>=0.30"]
+serve = ["fastapi>=0.115", "uvicorn>=0.30", "mcp>=2.1"]
 
 [project.scripts]
 convint = "convint.api.cli:main"
