@@ -20,6 +20,7 @@ from ..api.contract import Diagnostics, Message, StateDelta, TurnRequest, TurnRe
 from ..domain.artifact import artifact_readiness
 from ..domain.enums import Action, Ownership, Specificity, UserSignal
 from ..domain.gate import decide
+from ..domain.crisis import screen_text
 from ..domain.signals import detect_signal
 from ..domain.state import TopicRecord
 from ..domain.sufficiency import Assessment, SufficiencyComponents
@@ -129,9 +130,13 @@ class TurnEngine:
         topic = state.current_topic()
         last_user = state.last_user_turn()
 
+        # Screened on every turn and always reported, so the caller sees it
+        # even when it sent its own signal.
+        safety = screen_text(last_user.content) if last_user else None
+
         # Only fills a gap the caller left; never overrides an explicit signal.
         if request.options.detect_signal and state.signal is UserSignal.NONE and last_user:
-            state.signal = detect_signal(last_user.content)
+            state.signal = detect_signal(last_user.content, safety)
 
         used = self._choose_assessor(request.options.assess, warnings)
         if topic is not None and last_user is not None:
@@ -207,6 +212,7 @@ class TurnEngine:
             cost_usd=meter.cost_usd,
             warnings=warnings,
             degraded=bool(warnings),
+            safety=safety,
         )
 
         return TurnResponse(

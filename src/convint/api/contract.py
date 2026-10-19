@@ -11,6 +11,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from ..domain.artifact import ArtifactReadiness
+from ..domain.crisis import ScreenResult
 from ..domain.enums import MoveType
 from ..domain.gate import Decision
 from ..domain.plan import InterviewPlan
@@ -18,7 +19,7 @@ from ..domain.state import ConversationState, TopicRecord
 from ..domain.sufficiency import Assessment
 
 #: Bump the minor for additive changes, the major for removals or renames.
-CONTRACT_VERSION = "1.2"
+CONTRACT_VERSION = "1.3"
 
 
 class Options(BaseModel):
@@ -80,6 +81,12 @@ class Diagnostics(BaseModel):
     warnings: list[str] = Field(default_factory=list)
     #: true when any fallback/withholding happened or the server started degraded
     degraded: bool = False
+    #: crisis screen of the last user turn (`@meddevkit/crisis-signals`, offline,
+    #: unreviewed; it misses oblique language, so `none` does not mean safe).
+    #: Null when there is no user turn. Reported whatever `signal` the caller
+    #: sent; a `concern` or `crisis` level holds the turn only when convint
+    #: detected the signal itself. Offsets are code-point indices.
+    safety: ScreenResult | None = None
 
 
 class TurnResponse(BaseModel):

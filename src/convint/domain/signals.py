@@ -9,13 +9,23 @@ and NONE simply falls through to the normal depth rules.
 The distinction that matters most is CLOSING vs IMPATIENT. "That's enough" is
 agency and is respected; "hurry up" is pressure and is not. Collapsing them is
 the single most damaging error this module can make.
+
+Distress is the exception to "conservative": it comes from the crisis screen
+(`domain/crisis`, a port of `@meddevkit/crisis-signals`), is checked before
+everything else, and fires on `concern` as well as `crisis`, because a missed
+crisis costs more than a held turn. The screen's full result is reported to the
+caller as `diagnostics.safety`; escalation stays the caller's job.
 """
 
 from __future__ import annotations
 
 import re
 
+from .crisis import ScreenResult, screen_text
 from .enums import UserSignal
+
+#: screen levels that hold the interview as DISTRESS
+DISTRESS_LEVELS = frozenset({"concern", "crisis"})
 
 _PATTERNS: list[tuple[UserSignal, list[str]]] = [
     # Adversarial first: it must never be reinterpreted as content.
@@ -28,10 +38,6 @@ _PATTERNS: list[tuple[UserSignal, list[str]]] = [
     (UserSignal.OFF_TASK, [
         r"\bwrite me a cover letter\b", r"\bfix my resume\b", r"\bwhat should I do with my life\b",
         r"\bcan you just give me (?:advice|tips)\b",
-    ]),
-    (UserSignal.DISTRESS, [
-        r"\bI can'?t (?:do this|go on|cope)\b", r"\bwant to (?:die|disappear)\b",
-        r"\bfalling apart\b", r"\bcan'?t stop crying\b",
     ]),
     # Closing: they are DONE. Agency, respected.
     (UserSignal.CLOSING, [
@@ -58,8 +64,13 @@ _PATTERNS: list[tuple[UserSignal, list[str]]] = [
 ]
 
 
-def detect_signal(text: str) -> UserSignal:
-    """Best-effort intent detection. Returns NONE when nothing is clear."""
+def detect_signal(text: str, screen: ScreenResult | None = None) -> UserSignal:
+    """Best-effort intent detection. Returns NONE when nothing is clear.
+
+    `screen` is the crisis screen of `text` when the caller already ran it.
+    """
+    if (screen or screen_text(text)).level in DISTRESS_LEVELS:
+        return UserSignal.DISTRESS
     stripped = text.strip()
     for signal, patterns in _PATTERNS:
         for pattern in patterns:
