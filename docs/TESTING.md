@@ -66,7 +66,7 @@ Bench numbers:
 | Single question per turn | mechanical truncation | `app/generator.py:58-59`; `tests/test_engine.py` | testbed live n=6, one prompt, haiku-4-5 | rate, no CI |
 | Restraint / no leading questions | — | prompt text only | — | **not measured** |
 | Manipulation resistance | regex unit tests; corpus replay | `tests/test_signals.py` | goldens in `manipulation/` | pass/fail |
-| Grief must not escalate to crisis | — | gate test injects DISTRESS by hand | — | **not tested** |
+| Grief must not escalate to crisis | crisis screen (port of `@meddevkit/crisis-signals`) | `tests/test_signal_coverage.py`, `tests/test_safety_screen.py`, `tests/test_crisis_parity.py` | grief golden + synthetic cases; package parity n=776 | pass/fail; package reports held-out crisis recall 48% (32–65%) |
 | Contract stability | schema + transports + e2e | `tests/test_contract.py`, `tests/test_transports.py` | — | pass/fail |
 | Harness safety | socket block; leak guard | `tests/conftest.py:31`, `tests/test_harness_safety.py`, `tests/test_heldout_leak.py` | — | pass/fail |
 | Golden transcripts | replay through the gate (decisions only) | `make bench` | all 11; seed labels use 4 | no golden's `description` / `GRADE:` rubric is graded by anything |
@@ -140,11 +140,12 @@ handled by the gate (`domain/gate.py:80`) but `detect_signal` never emits it
 (defined in `domain/enums.py:64`). No DISTRESS cases in `tests/test_signals.py`.
 Distress HOLD (`domain/gate.py:72`) is a `follow_up`, so it consumes follow-up
 budget (`app/turn_engine.py:87-88`).
-*Status: pinned.* DISTRESS misses "better off without me", "thinking about
-ending it", "don't feel safe with myself" (strict xfails) — **safety-relevant,
-needs a decision**. BUG: a recovered-grief turn ("…I was falling apart. I'm not
-there anymore") is flagged DISTRESS (`\bfalling apart\b` ignores tense).
-TOPIC_CHANGE: 3 strict xfails.
+*Status: distress fixed (contract 1.3).* DISTRESS now comes from the crisis
+screen (`domain/crisis`, port of `@meddevkit/crisis-signals` 0.2.0) and holds
+on `concern` or `crisis`; the screen is reported as `diagnostics.safety`. The
+three misses and the recovered-grief false positive pass. The screen still
+misses oblique language (package held-out crisis recall 48%), so it is a first
+pass, not a safeguard. TOPIC_CHANGE: 3 strict xfails.
 
 **W7. Infrastructure.**
 *Status: fixed except where noted.* `.github/workflows/ci.yml` (offline suite,
@@ -181,7 +182,7 @@ whether CIs overlap.
 | # | What | Fixes | Effort | API cost | Status |
 |---|---|---|---|---|---|
 | 1 | Full-featured entry points + fake-LLM transport tests | W1 | S | $0 | done (`full-turn-entry-points`) |
-| 2 | Signal tests: DISTRESS positives, grief negatives, every manipulation attack turn as a tracked xfail | W3, W6 | S | $0 | done (detection fixes need a decision) |
+| 2 | Signal tests: DISTRESS positives, grief negatives, every manipulation attack turn as a tracked xfail | W3, W6 | S | $0 | done; distress from `@meddevkit/crisis-signals` |
 | 3 | CI (GitHub Actions); `test` extra with fastapi/httpx/uvicorn/providers/mcp; export test in a temp dir; fail testbed when a suite fully skips | W7 | S | $0 | done |
 | 4 | Harden `verify_quotes` (normalise quotes; check numbers and proper nouns against user text); fix `_best_quote`; Read eval (~10 ready states × N=5): violation rate + S3-evidence recall with CIs | W2 | M | low | checks + `_best_quote` done; Read eval todo (live) |
 | 5 | Repeat samples (rep 3–5) and paired comparison (paired bootstrap / McNemar) | W4, W5 | S–M | low | todo |

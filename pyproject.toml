@@ -22,6 +22,10 @@ convint = "convint.api.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+# vendored @meddevkit/crisis-signals pattern file, NOTICE and LICENSE
+"convint.domain.crisis" = ["data/*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q --strict-markers -m 'not live and not e2e'"

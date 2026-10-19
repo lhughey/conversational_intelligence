@@ -59,7 +59,7 @@ The transports are each ~100 lines. Adding a fourth seam later is cheap, which i
 
 ```jsonc
 {
-  "contract_version": "1.2",
+  "contract_version": "1.3",
   "plan":  { /* InterviewPlan */ },
   "state": {
     "turns":  [ { "role": "user" | "assistant", "content": "..." } ],
@@ -82,7 +82,7 @@ The transports are each ~100 lines. Adding a fourth seam later is cheap, which i
 
 ```jsonc
 {
-  "contract_version": "1.2",
+  "contract_version": "1.3",
   "decision": {
     "action": "follow_up" | "advance" | "synthesize" | "refuse_and_continue",
     "sub_action": "deepen" | "redirect" | "reflect_pattern" | "handoff" | "hold",
@@ -100,11 +100,22 @@ The transports are each ~100 lines. Adding a fourth seam later is cheap, which i
   "diagnostics": { "assessor": "hybrid/haiku-4-5", "assessor_model": "claude-haiku-4-5",
                    "model": "claude-haiku-4-5", "latency_ms": 0,
                    "usage": { "input": 0, "output": 0 }, "cost_usd": 0.0,
-                   "warnings": [], "degraded": false }
+                   "warnings": [], "degraded": false,
+                   "safety": { "level": "none" | "concern" | "crisis", "immediacy": false,
+                               "findings": [ { "rule_id": "si_active.ending_it",
+                                               "category": "suicidal_ideation_active",
+                                               "base_level": "crisis", "level": "crisis",
+                                               "start_offset": 7, "end_offset": 31, "text": "...",
+                                               "modifiers": { "negated": false, "...": false },
+                                               "subject": "self" | "other" | "unknown" } ],
+                               "patterns_version": "0.2.0",
+                               "screener": "@meddevkit/crisis-signals" } | null }
 }
 ```
 
-`assess` defaults to `"server"` (whatever the operator configured). `"deterministic"` forces the regex assessor for one call (free, offline); `"llm"` asks for the server's model-backed assessor and falls back to deterministic, with a warning, when the server has none. The caller never names a model. 1.1 is an additive minor over 1.0: `assessor_model`, `cost_usd`, `warnings` and `degraded` are new, and `latency_ms` is now the whole turn's wall time. 1.2 is additive over 1.1: `TopicRecord.best_quote` is the verbatim user turn that last raised the topic's specificity. The engine sets it, the caller persists it from `state_delta`, and a Read's evidence quotes only it (no quote, no evidence item for that topic).
+`assess` defaults to `"server"` (whatever the operator configured). `"deterministic"` forces the regex assessor for one call (free, offline); `"llm"` asks for the server's model-backed assessor and falls back to deterministic, with a warning, when the server has none. The caller never names a model. 1.1 is an additive minor over 1.0: `assessor_model`, `cost_usd`, `warnings` and `degraded` are new, and `latency_ms` is now the whole turn's wall time. 1.2 is additive over 1.1: `TopicRecord.best_quote` is the verbatim user turn that last raised the topic's specificity. The engine sets it, the caller persists it from `state_delta`, and a Read's evidence quotes only it (no quote, no evidence item for that topic). 1.3 is additive over 1.2: `diagnostics.safety` is the crisis screen of the last user turn.
+
+**Crisis screen.** `domain/crisis/` is a Python port of `@meddevkit/crisis-signals` (MIT), with its pattern file, NOTICE and LICENSE vendored unchanged in `domain/crisis/data/`. It is offline, deterministic and unreviewed by a clinician; on text it was not written against it catches about half of crisis statements, so `none` never means safe. Every turn with a user message is screened and reported as `diagnostics.safety`, whatever signal the caller sent. When convint detects the signal itself, `concern` or `crisis` becomes `DISTRESS` ahead of every other signal, and the gate holds (`distress_defer_to_caller`). convint never escalates; the caller owns that. `tests/test_crisis_parity.py` requires the port to reproduce the JavaScript package on 776 synthetic inputs. To update: `npm pack` the new version, replace the vendored files, regenerate the fixture with `scripts/crisis_parity_fixture.mjs`, and port any engine change until parity passes.
 
 `rule_fired` is the generalization of the app's `positionInjection` idea: it makes every decision attributable to a named rule, so a bad turn is debuggable as "wrong rule fired" versus "right rule, bad generation." Do not let it be nullable — an unattributable decision is a bug.
 
