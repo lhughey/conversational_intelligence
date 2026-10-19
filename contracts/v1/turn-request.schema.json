@@ -110,7 +110,12 @@
     "Options": {
       "properties": {
         "assess": {
-          "default": "deterministic",
+          "default": "server",
+          "enum": [
+            "server",
+            "deterministic",
+            "llm"
+          ],
           "title": "Assess",
           "type": "string"
         },
@@ -228,6 +233,18 @@
           "title": "Asked Questions",
           "type": "array"
         },
+        "best_quote": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Best Quote"
+        },
         "closed": {
           "default": false,
           "title": "Closed",
@@ -331,7 +348,7 @@
   },
   "properties": {
     "contract_version": {
-      "default": "1.0",
+      "default": "1.2",
       "title": "Contract Version",
       "type": "string"
     },

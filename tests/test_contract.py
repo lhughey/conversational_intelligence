@@ -34,14 +34,16 @@ def test_committed_schema_matches_the_models():
         )
 
 
-def test_export_script_is_idempotent():
-    before = {p.name: p.read_text() for p in CONTRACTS.glob("*.json")}
+def test_export_script_reproduces_the_committed_files_byte_for_byte(tmp_path):
+    """Exports into a temp dir, never over contracts/v1, so drift fails on every
+    run instead of failing once and then passing on the rerun."""
     subprocess.run(
-        [sys.executable, str(REPO / "scripts" / "export_contracts.py")],
+        [sys.executable, str(REPO / "scripts" / "export_contracts.py"), "--out", str(tmp_path)],
         check=True, capture_output=True,
     )
-    after = {p.name: p.read_text() for p in CONTRACTS.glob("*.json")}
-    assert before == after
+    committed = {p.name: p.read_text() for p in CONTRACTS.glob("*.json")}
+    exported = {p.name: p.read_text() for p in tmp_path.glob("*.json")}
+    assert exported == committed, "contracts/v1 is stale — run: make contracts"
 
 
 def test_request_round_trips_through_json():

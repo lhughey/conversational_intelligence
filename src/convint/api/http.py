@@ -7,11 +7,13 @@ from .contract import CONTRACT_VERSION, TurnRequest, TurnResponse
 
 
 def build_app(engine=None):
+    """`engine=None` builds the server-configured engine (CONVINT_ASSESSOR /
+    CONVINT_MODEL, see app/engine_factory.py)."""
     from fastapi import FastAPI, HTTPException
 
-    from ..app.turn_engine import TurnEngine
+    from ..app.engine_factory import build_engine
 
-    engine = engine or TurnEngine()
+    engine = engine or build_engine()
     app = FastAPI(title="convint", version=CONTRACT_VERSION)
 
     @app.get("/health")
@@ -43,7 +45,11 @@ def build_app(engine=None):
     return app
 
 
-def serve(host: str = "127.0.0.1", port: int = 8000) -> None:  # pragma: no cover
+def serve(host: str = "127.0.0.1", port: int = 8000, engine=None, *,
+          assessor: str | None = None, model: str | None = None) -> None:  # pragma: no cover
     import uvicorn
 
-    uvicorn.run(build_app(), host=host, port=port)
+    from ..app.engine_factory import build_engine
+
+    engine = engine or build_engine(assessor=assessor, model=model)
+    uvicorn.run(build_app(engine), host=host, port=port)

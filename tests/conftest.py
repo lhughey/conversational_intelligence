@@ -33,6 +33,19 @@ def _no_network(request, monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _model_free_server_config(request, monkeypatch):
+    """Any engine a non-live test builds from configuration (build_app(),
+    handle_tool_call(), `convint turn`) is model-free, whatever this repo's
+    .env holds. Without this a real key would make it construct real adapters,
+    and since a model failure no longer fails a turn, the socket block above
+    would surface only as a fallback warning instead of a test failure."""
+    if request.node.get_closest_marker("live"):
+        return
+    monkeypatch.setenv("CONVINT_ASSESSOR", "deterministic")
+    monkeypatch.setenv("CONVINT_MODEL", "none")
+
+
+@pytest.fixture(autouse=True)
 def _isolated_bench_results(tmp_path, monkeypatch):
     """Recorded runs (convint.bench.record) go to a temp dir, never to the
     real bench-results/HISTORY.md; and a stray $NOTE cannot leak in."""

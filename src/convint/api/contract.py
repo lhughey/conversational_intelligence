@@ -6,6 +6,8 @@ MCP, HTTP, subprocess, and in-process callers all speak exactly these models.
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 from ..domain.artifact import ArtifactReadiness
@@ -16,14 +18,18 @@ from ..domain.state import ConversationState, TopicRecord
 from ..domain.sufficiency import Assessment
 
 #: Bump the minor for additive changes, the major for removals or renames.
-CONTRACT_VERSION = "1.0"
+CONTRACT_VERSION = "1.2"
 
 
 class Options(BaseModel):
     #: false -> `message` comes back null and the caller writes its own words
     generate_text: bool = True
-    #: "deterministic" needs no network; "llm" requires a configured adapter
-    assess: str = "deterministic"
+    #: "server" = whatever the operator configured (CONVINT_ASSESSOR);
+    #: "deterministic" forces the regex assessor for this call (free, offline);
+    #: "llm" asks for the server's model-backed assessor, falling back to
+    #: deterministic with a warning when the server has none. The caller never
+    #: names a model - the operator controls cost.
+    assess: Literal["server", "deterministic", "llm"] = "server"
     #: derive the user signal from the latest turn when the caller left it NONE.
     #: Set false if the consumer classifies intent itself.
     detect_signal: bool = True
@@ -57,10 +63,23 @@ class StateDelta(BaseModel):
 
 
 class Diagnostics(BaseModel):
+    #: the assessor actually used this turn, e.g. "hybrid/haiku-4-5", or
+    #: "deterministic" after a fallback
     assessor: str = "deterministic"
+    #: generator / Read model id, when one was called
     model: str | None = None
+    #: model id behind the assessor, when it is model-backed
+    assessor_model: str | None = None
     latency_ms: int = 0
+    #: tokens summed over every metered model call this turn (generation, Read,
+    #: and the assessor when the server built it)
     usage: dict[str, int] = Field(default_factory=dict)
+    #: USD for those calls; null when a called model's price is unknown
+    cost_usd: float | None = None
+    #: why anything fell back or was withheld; also startup degradations
+    warnings: list[str] = Field(default_factory=list)
+    #: true when any fallback/withholding happened or the server started degraded
+    degraded: bool = False
 
 
 class TurnResponse(BaseModel):

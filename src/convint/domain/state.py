@@ -36,6 +36,13 @@ class TopicRecord(BaseModel):
 
     closed: bool = False
 
+    #: the user's own words this topic's evidence rests on: the verbatim user
+    #: turn that last RAISED its specificity (a tie keeps the earlier turn).
+    #: Maintained by the engine and returned in `state_delta`; the caller only
+    #: persists it. None means no turn on this topic has been recorded as
+    #: material, and the topic then contributes no quote to the Read.
+    best_quote: str | None = None
+
     def has_asked(self, question: str) -> bool:
         """Normalized containment check - catches the re-ask failure mode."""
         norm = " ".join(question.lower().split())

@@ -1,8 +1,10 @@
-# Where we left off — 2026-10-16
+# Where we left off — updated 2026-10-17
 
-Branch `model-refresh-2026-10` (commit `08ec30e`). Full write-up of the day:
-`bench-results/2026-10-16-model-refresh.md`; every run is indexed in
-`bench-results/HISTORY.md`.
+The 2026-10-16 model-refresh work is merged to `main` (PR #1, commit `a354917`).
+Full write-up of that day: `bench-results/2026-10-16-model-refresh.md`; every
+run is indexed in `bench-results/HISTORY.md`.
+
+Testing review and improvement roadmap: `docs/TESTING.md`.
 
 ## State
 
@@ -33,7 +35,8 @@ Branch `model-refresh-2026-10` (commit `08ec30e`). Full write-up of the day:
 
 ## Known gaps
 
-- Read artifact groundedness/recall is not measured as a rate.
+- Testing gaps (Read truth floor/recall, manipulation, sampling variance, CI,
+  entry points) are ranked W1–W7 in `docs/TESTING.md`; not repeated here.
 - Gate stall of ~21% persists even with a perfect cascade (ownership rules or
   strong-model errors) — separate problem.
 - `cost_usd` ignores Haiku 5.5's >100k-token price tier (irrelevant at current prompt sizes).

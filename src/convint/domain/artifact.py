@@ -112,10 +112,16 @@ def collect_evidence(state: ConversationState, min_tier: str = "recurring_practi
 
 
 def _best_quote(state: ConversationState, topic: TopicRecord) -> str:
-    """The longest user turn, as a stand-in for the moment this topic rests on.
+    """The user turn this topic's evidence rests on (`TopicRecord.best_quote`,
+    recorded by the engine when that turn raised the topic's specificity).
 
     Deliberately a verbatim quote: the truth floor requires evidence the user
-    actually produced, never a paraphrase that could drift.
+    actually produced, never a paraphrase that could drift. There is no
+    fallback to another turn: borrowing the longest turn in the conversation is
+    how a childhood topic ended up quoting a career story. No recorded quote
+    returns "", and `collect_evidence` then omits the item rather than emitting
+    an empty or borrowed one. Readiness is unaffected - it rests on
+    specificity, not on quotes.
     """
-    user_turns = [t.content for t in state.turns if t.role == "user"]
-    return max(user_turns, key=len, default="")
+    quote = topic.best_quote or ""
+    return quote if quote.strip() else ""

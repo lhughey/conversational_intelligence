@@ -38,6 +38,25 @@ convint mcp                         # MCP seam (stdio)
 
 All four call the same engine and return the same answer; a test asserts that.
 
+Every entry point is full-featured: with a credential in this repo's `.env`, a
+turn returns the decision, the next question (`message`) and, on a supported
+close, the Read (`artifact`). The **operator** picks the models, never the caller:
+
+```bash
+CONVINT_ASSESSOR=hybrid:haiku-4-5   # deterministic | llm:<key> | hybrid:<key> (default shown)
+CONVINT_MODEL=haiku-4-5             # question + Read model; `none` = decision only
+convint serve --port 8000
+# or override per process (also on `convint mcp` / `convint turn`):
+convint serve --assessor deterministic --model none   # free, offline
+```
+
+Callers choose per turn with `options.assess` (`server` default, `deterministic`
+to force the free assessor, `llm` to ask for the model one) and
+`options.generate_text`. A missing credential or a failed model call never fails
+a turn: it falls back (deterministic assessor, `message`/`artifact` null) and says
+why in `diagnostics.warnings`, with `diagnostics.degraded: true`. Usage and
+`cost_usd` are reported per turn.
+
 ## The decision rule
 
 Sufficiency is scored on two independent axes — **Specificity** (S0–S3, how

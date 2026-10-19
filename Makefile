@@ -3,7 +3,7 @@ VENV := .venv
 NOTE ?=
 PY   := $(VENV)/bin/python
 
-.PHONY: setup test test-cov test-e2e test-live testbed testbed-live bench bench-gate bench-gate-e2e bench-assessors bench-heldout label-heldout label-heldout-export label-heldout-import dataset contracts clean
+.PHONY: setup ci test test-cov test-e2e test-live testbed testbed-live bench bench-gate bench-gate-e2e bench-assessors bench-heldout label-heldout label-heldout-export label-heldout-import dataset contracts clean
 
 setup:
 	python3 -m venv $(VENV)
@@ -12,6 +12,12 @@ setup:
 
 test:                      ## tier 1+2: pure domain + contract. no network, no key.
 	$(PY) -m pytest
+
+ci:                        ## what .github/workflows/ci.yml runs: offline + coverage floor, e2e, contract drift
+	$(PY) -m pytest --cov=convint --cov-report=term --cov-fail-under=88
+	$(PY) -m pytest -m e2e -v
+	$(PY) scripts/export_contracts.py
+	git diff --exit-code contracts/
 
 test-cov:
 	$(PY) -m pytest --cov=convint --cov-report=term-missing

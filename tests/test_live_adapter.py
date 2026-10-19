@@ -127,22 +127,23 @@ def test_artifact_emission_respects_the_truth_floor_live():
         topics=[TopicSpec(topic_id="childhood", stage="early_life"),
                 TopicSpec(topic_id="role", stage="career")],
     )
+    childhood = (
+        "I remember one woman, furious about a dress. It was her daughter's "
+        "graduation and she was terrified of looking poor. I told my mom that. "
+        "She comped the cleaning and the woman cried.")
+    career = (
+        "Billing and clinical blamed each other for months. I saw they were "
+        "using the same word to mean different things. I got them in a room "
+        "and the standoff dissolved in one session.")
     state = ConversationState(
-        turns=[
-            Turn(role="user", content=(
-                "I remember one woman, furious about a dress. It was her daughter's "
-                "graduation and she was terrified of looking poor. I told my mom that. "
-                "She comped the cleaning and the woman cried.")),
-            Turn(role="user", content=(
-                "Billing and clinical blamed each other for months. I saw they were "
-                "using the same word to mean different things. I got them in a room "
-                "and the standoff dissolved in one session.")),
-        ],
+        turns=[Turn(role="user", content=childhood), Turn(role="user", content=career)],
         topics=[
             TopicRecord(topic_id="childhood", stage="early_life",
-                        specificity=Specificity.S3, ownership=Ownership.O1),
+                        specificity=Specificity.S3, ownership=Ownership.O1,
+                        best_quote=childhood),
             TopicRecord(topic_id="role", stage="career",
-                        specificity=Specificity.S3, ownership=Ownership.O1),
+                        specificity=Specificity.S3, ownership=Ownership.O1,
+                        best_quote=career),
         ],
         coverage={"early_life": True, "career": True},
         pattern_confirmed=True,
